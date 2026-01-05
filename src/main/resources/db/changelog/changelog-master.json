@@ -1,0 +1,94 @@
+{
+  "databaseChangeLog": [
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V1_0_create_users_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V1_1_insert_users_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V2_0_create_seconde-residences_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V2_1_insert_seconde-residences_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V3_0_create_categories_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V3_1_insert_categories_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V4_0_create_materials_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V5_0_create_favour_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V5_1_insert_favour_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V6_0_create_user-materials_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V6_1_insert_user-materials_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V7_0_create_user-favour_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V8_0_create_bills_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V9_0_create_reviews_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V10_0_create_pictures_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V11_0_create_rentals_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V12_0_create_picture_user_materials_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V13_0_create_picture_user_favour_table.sql"
+      }
+    }
+  ]
+}
