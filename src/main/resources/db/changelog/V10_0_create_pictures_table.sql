@@ -1,8 +1,8 @@
 CREATE TABLE pictures
 (
-    id           bigint                 NOT NULL,
-    name_picture character varying(255) NOT NULL,
-    created_at   DATE                   NOT NULL,
+    id           BIGINT       NOT NULL,
+    name_picture VARCHAR(255) NOT NULL,
+    created_at   DATE         NOT NULL,
     updated_at   DATE
 --     user_favor_id    bigint                 NOT NULL,
 --     user_material_id bigint                 NOT NULL

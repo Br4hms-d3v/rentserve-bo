@@ -1,13 +1,13 @@
 CREATE TABLE user_favour
 (
-    id                bigint        NOT NULL,
-    description_favor text,
+    id                BIGINT        NOT NULL,
+    description_favor TEXT,
     price_hour_favor  numeric(7, 2) NOT NULL,
-    is_available      boolean,
+    is_available      BOOLEAN,
     created_at        DATE          NOT NULL,
     updated_at        DATE,
-    favor_id          bigint        NOT NULL,
-    user_id           bigint        NOT NULL
+    favor_id          BIGINT        NOT NULL,
+    user_id           BIGINT        NOT NULL
 );
 
 ALTER TABLE user_favour

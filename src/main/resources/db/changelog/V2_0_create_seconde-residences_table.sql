@@ -1,12 +1,12 @@
 CREATE TABLE second_residences
 (
-    id         bigint                 NOT NULL,
+    id         BIGINT                 NOT NULL,
     created_at DATE                   NOT NULL,
     updated_at DATE,
     street     character varying(255) NOT NULL,
     city       character varying(100) NOT NULL,
     zip_code   character varying(50)  NOT NULL,
-    user_id    bigint                 NOT NULL
+    user_id    BIGINT                 NOT NULL
 );
 
 ALTER TABLE second_residences

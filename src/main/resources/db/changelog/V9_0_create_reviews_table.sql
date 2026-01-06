@@ -1,13 +1,13 @@
 CREATE TABLE reviews
 (
-    id               bigint NOT NULL,
-    rating           double precision,
-    comment          text,
+    id               BIGINT NOT NULL,
+    rating           DOUBLE PRECISION,
+    comment          TEXT,
     created_at       DATE   NOT NULL,
     updated_at       DATE,
-    user_favor_id    bigint,
-    user_material_id bigint,
-    is_active        boolean
+    user_favor_id    BIGINT,
+    user_material_id BIGINT,
+    is_active        BOOLEAN
 );
 
 ALTER TABLE reviews ALTER COLUMN id

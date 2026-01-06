@@ -1,14 +1,14 @@
 CREATE TABLE user_materials
 (
-    id                   bigint        NOT NULL,
-    description_material text,
-    price_hour_material  numeric(7, 2) NOT NULL,
-    state_material       character varying(255),
-    is_available         boolean,
+    id                   BIGINT        NOT NULL,
+    description_material TEXT,
+    price_hour_material  NUMERIC(7, 2) NOT NULL,
+    state_material       VARCHAR(255),
+    is_available         BOOLEAN,
     created_at           DATE          NOT NULL,
     updated_at           DATE,
-    material_id          bigint        NOT NULL,
-    user_id              bigint        NOT NULL,
+    material_id          BIGINT        NOT NULL,
+    user_id              BIGINT        NOT NULL,
     CONSTRAINT materials_state_material_check CHECK (((state_material)::text = ANY ((ARRAY['GOOD_STATE':: character varying, 'BAD_STATE':: character varying, 'DAMAGED_STATE':: character varying])::text[])
 ) )
 );
@@ -28,16 +28,12 @@ COLUMN id
 ALTER TABLE user_materials
     ADD CONSTRAINT user_materials_pkey PRIMARY KEY (id);
 
--- ALTER TABLE user_materials
---     ADD CONSTRAINT fk_user_material_to_material
---         FOREIGN KEY (material_id) REFERENCES materials (id);
 
-
--- ALTER TABLE user_materials
---     ADD CONSTRAINT fkuser_material_to_material
---         FOREIGN KEY (material_id) REFERENCES materials (id)
---             ON UPDATE CASCADE
---             ON DELETE RESTRICT;
+ALTER TABLE user_materials
+    ADD CONSTRAINT fk_user_material_to_material
+        FOREIGN KEY (material_id) REFERENCES materials (id)
+            ON UPDATE CASCADE
+            ON DELETE RESTRICT;
 
 ALTER TABLE user_materials
     ADD CONSTRAINT fk_user_material_from_user

@@ -1,6 +1,6 @@
 INSERT INTO materials (id, name_material, category_id, is_available, created_at, updated_at)
 VALUES
-    (1, 'Tondeuse', 1, TRUE, '2025-01-05', NULL),
+    (1, 'Tondeuse', 1, TRUE, '2025-01-05', NOW()),
     (2, 'Râteau', 1, TRUE, '2025-01-06', NULL),
     (3, 'Pelle', 1, TRUE, '2025-01-07', NULL),
     (4, 'Sécateur', 1, TRUE, '2025-01-08', NULL),

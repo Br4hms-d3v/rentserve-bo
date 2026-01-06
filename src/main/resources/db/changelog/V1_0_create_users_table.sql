@@ -1,21 +1,21 @@
 CREATE TABLE users
 (
-    id         bigint                 NOT NULL,
-    first_name character varying(150) NOT NULL,
-    name       character varying(200) NOT NULL,
-    birthdate  DATE                   NOT NULL,
-    pseudo     character varying(255) NOT NULL,
-    email      character varying(255) NOT NULL,
-    password   character varying(255) NOT NULL,
-    role       character varying(255) NOT NULL,
-    street     character varying(255) NOT NULL,
-    city       character varying(100) NOT NULL,
-    zip_code   character varying(60)  NOT NULL,
-    is_active  boolean                NOT NULL,
-    created_at DATE                   NOT NULL,
+    id         BIGINT       NOT NULL,
+    first_name VARCHAR(150) NOT NULL,
+    name       VARCHAR(200) NOT NULL,
+    birthdate  DATE         NOT NULL,
+    pseudo     VARCHAR(255) NOT NULL,
+    email      VARCHAR(255) NOT NULL,
+    password   VARCHAR(255) NOT NULL,
+    role       VARCHAR(255) NOT NULL,
+    street     VARCHAR(255) NOT NULL,
+    city       VARCHAR(100) NOT NULL,
+    zip_code   VARCHAR(60)  NOT NULL,
+    is_active  BOOLEAN      NOT NULL,
+    created_at DATE         NOT NULL,
     updated_at DATE,
     CONSTRAINT users_role_check CHECK (
-        ((role)::text = ANY ((ARRAY['MEMBER':: character varying, 'MODERATOR':: character varying, 'ADMIN':: character varying])::text[])
+        ((role)::text = ANY ((ARRAY['MEMBER':: VARCHAR, 'MODERATOR':: VARCHAR, 'ADMIN':: VARCHAR])::text[])
 )
     )
 );

@@ -37,6 +37,11 @@
     },
     {
       "include": {
+        "file": "classpath:/db/changelog/V4_1_insert_materials_table.sql"
+      }
+    },
+    {
+      "include": {
         "file": "classpath:/db/changelog/V5_0_create_favour_table.sql"
       }
     },

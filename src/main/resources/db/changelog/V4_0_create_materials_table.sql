@@ -1,9 +1,9 @@
 CREATE TABLE materials
 (
-    id            bigint                 NOT NULL,
-    name_material character varying(255) NOT NULL,
-    category_id   bigint,
-    is_available  boolean,
+    id            BIGINT                 NOT NULL,
+    name_material VARCHAR(255) NOT NULL,
+    category_id   BIGINT,
+    is_available  BOOLEAN,
     created_at    DATE                   NOT NULL,
     updated_at    DATE
 );

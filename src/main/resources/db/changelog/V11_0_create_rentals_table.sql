@@ -1,17 +1,17 @@
 CREATE TABLE rentals
 (
-    id               bigint NOT NULL,
-    amount           numeric(7, 2),
-    start_date_at    date,
-    start_time       time(6) without time zone,
-    end_date_at      date,
-    end_time         time(6) without time zone,
+    id               BIGINT NOT NULL,
+    amount           NUMERIC(7, 2),
+    start_date_at    DATE,
+    start_time       TIME(6) without time zone,
+    end_date_at      DATE,
+    end_time         TIME(6) without time zone,
     created_at       DATE   NOT NULL,
     updated_at       DATE,
-    bill_id          bigint,
-    user_favor_id    bigint,
-    user_id          bigint,
-    user_material_id bigint
+    bill_id          BIGINT,
+    user_favor_id    BIGINT,
+    user_id          BIGINT,
+    user_material_id BIGINT
 );
 
 ALTER TABLE rentals

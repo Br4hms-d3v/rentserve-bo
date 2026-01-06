@@ -1,8 +1,8 @@
 CREATE TABLE categories
 (
-    id            bigint                 NOT NULL,
-    name_category character varying(150) NOT NULL,
-    created_at    DATE                   NOT NULL,
+    id            BIGINT       NOT NULL,
+    name_category VARCHAR(150) NOT NULL,
+    created_at    DATE         NOT NULL,
     updated_at    DATE
 );
 

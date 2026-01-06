@@ -1,11 +1,11 @@
 CREATE TABLE favour
 (
-    id           bigint                 NOT NULL,
+    id           BIGINT                 NOT NULL,
     name_favor   character varying(255) NOT NULL,
     created_at   DATE                   NOT NULL,
     updated_at   DATE,
-    category_id  bigint,
-    is_available boolean
+    category_id  BIGINT,
+    is_available BOOLEAN
 );
 
 ALTER TABLE favour
