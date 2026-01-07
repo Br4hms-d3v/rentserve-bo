@@ -207,12 +207,20 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private Set<Rental> rentals = new HashSet<>();
 
+    /**
+     * A set of reviews related to this user.
+     * Represents list review from user.
+     */
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    private Set<Review> reviews = new HashSet<>();
+
     // From UserDetails AND It's need it
 
-    /**
-     * This method gives the user roles.
-     * Now, it gives nothing (empty list).
-     */
+//    /**
+//     * This method gives the user roles.
+//     * Now, it gives nothing (empty list).
+//     */
+//
 //    @Override
 //    public Collection<? extends GrantedAuthority> getAuthorities() {
 //        return List.of();
