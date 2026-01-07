@@ -200,13 +200,3 @@ VALUES
     (198, 'Filet de chargement', 4, TRUE, '2025-07-21', NULL),
     (199, 'Barre d’arrimage', 4, TRUE, '2025-07-22', NULL),
     (200, 'Coffre de toit', 4, TRUE, '2025-07-23', NULL);
-
-
-
-
-
-
-
-
-
-
