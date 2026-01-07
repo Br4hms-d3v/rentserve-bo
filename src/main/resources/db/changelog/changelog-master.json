@@ -67,7 +67,17 @@
     },
     {
       "include": {
+        "file": "classpath:/db/changelog/V7_1_insert_user-favour_table.sql"
+      }
+    },
+    {
+      "include": {
         "file": "classpath:/db/changelog/V8_0_create_bills_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V8_1_insert_bills_table.sql"
       }
     },
     {
@@ -77,12 +87,27 @@
     },
     {
       "include": {
+        "file": "classpath:/db/changelog/V9_1_insert_reviews_table.sql"
+      }
+    },
+    {
+      "include": {
         "file": "classpath:/db/changelog/V10_0_create_pictures_table.sql"
       }
     },
     {
       "include": {
+        "file": "classpath:/db/changelog/V10_1_insert_pictures_table.sql"
+      }
+    },
+    {
+      "include": {
         "file": "classpath:/db/changelog/V11_0_create_rentals_table.sql"
+      }
+    },
+    {
+      "include": {
+        "file": "classpath:/db/changelog/V11_1_insert_rentals_table.sql"
       }
     },
     {
