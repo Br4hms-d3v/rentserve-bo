@@ -7,6 +7,7 @@ CREATE TABLE reviews
     updated_at       DATE,
     user_favor_id    BIGINT,
     user_material_id BIGINT,
+    user_id          BIGINT NOT NULL,
     is_active        BOOLEAN
 );
 
@@ -29,3 +30,9 @@ ALTER TABLE reviews
 
 ALTER TABLE reviews
     ADD CONSTRAINT fk_review_comment_favor FOREIGN KEY (user_favor_id) REFERENCES user_favour (id);
+
+ALTER TABLE reviews
+    ADD CONSTRAINT fk_review_from_user
+        FOREIGN KEY (user_id) REFERENCES users (id)
+            ON UPDATE CASCADE
+            ON DELETE RESTRICT;
