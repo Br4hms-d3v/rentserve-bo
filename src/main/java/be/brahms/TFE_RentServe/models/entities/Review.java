@@ -60,4 +60,12 @@ public class Review extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_Favor_id")
     private UserFavor userFavor;
+
+    /**
+     * The user relationship associated with this review.
+     * A review must write by a user.
+     */
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
