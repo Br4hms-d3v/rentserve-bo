@@ -214,24 +214,4 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Review> reviews = new HashSet<>();
 
-    // From UserDetails AND It's need it
-
-//    /**
-//     * This method gives the user roles.
-//     * Now, it gives nothing (empty list).
-//     */
-//
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return List.of();
-//    }
-
-//    /**
-//     * This method gives the user's name (username).
-//     * It returns the pseudo.
-//     */
-//    @Override
-//    public String getUsername() {
-//        return pseudo;
-//    }
 }
