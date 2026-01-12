@@ -1,0 +1,18 @@
+{
+  "databaseChangeLog": [
+    {
+      "changeSet": {
+        "id": "update-sequence-after-inserts-users",
+        "author": "Brahms",
+        "changes": [
+          {
+            "sql": {
+              "dbms": "postgresql",
+              "sql": "SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
