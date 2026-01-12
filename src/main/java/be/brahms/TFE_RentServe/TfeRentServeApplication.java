@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class TfeRentServeApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TfeRentServeApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TfeRentServeApplication.class, args);
+    }
 
 }
