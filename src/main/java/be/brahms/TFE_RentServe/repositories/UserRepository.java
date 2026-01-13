@@ -32,4 +32,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return true if pseudo exists
      */
     boolean existsByPseudo(String pseudo); // Check if there is already a pseudo already.
+
+    /**
+     * Finds a user by email.
+     *
+     * @param email The email.
+     * @return The user.
+     */
+    User findByEmail(String email);
 }

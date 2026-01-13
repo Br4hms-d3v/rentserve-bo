@@ -17,4 +17,11 @@ public interface UserService {
      * @return the saved user
      */
     User register(@Valid UserForm user);
+
+    /**
+     * To activate the user.
+     *
+     * @param email The user email.
+     */
+    void activateUser(String email);
 }
