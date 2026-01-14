@@ -2,12 +2,12 @@ package be.brahms.TFE_RentServe.services.impl;
 
 import be.brahms.TFE_RentServe.exceptions.email.EmailExistingException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailNotFoundException;
-import be.brahms.TFE_RentServe.exceptions.user.PseudoExistException;
-import be.brahms.TFE_RentServe.exceptions.user.UserException;
+import be.brahms.TFE_RentServe.exceptions.user.*;
 import be.brahms.TFE_RentServe.mappers.AuthMapper;
 import be.brahms.TFE_RentServe.models.dtos.email.EmailTokenDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserForm;
+import be.brahms.TFE_RentServe.models.forms.user.UserLoginForm;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.UserService;
 import be.brahms.TFE_RentServe.services.email.EmailService;
@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 /**
  * Service implementation for managing users.
@@ -107,5 +108,47 @@ public class UserServiceImpl implements UserService {
 
         userActivated.setIsActive(true);
         userRepository.save(userActivated);
+    }
+
+    @Override
+    public User login(UserLoginForm form) {
+        Optional<User> foundEmailOrPseudo = userRepository.findByEmailOrPseudo(form.email(), form.pseudo());
+
+        /**
+         * Check the email or pseudo
+         * If it doesn't exist in the DB
+         * Send Exception
+         */
+        if (foundEmailOrPseudo.isEmpty()) {
+
+            boolean userLoginWithEmail = userRepository.existsByEmail(form.email());
+            boolean userLoginWithPseudo = userRepository.existsByPseudo(form.pseudo());
+
+            // Check if the email or pseudo are available in the DB
+            if (!userLoginWithEmail && form.email() != null) {
+                throw new EmailNotFoundException();
+            }
+            if (!userLoginWithPseudo && form.pseudo() != null) {
+                throw new PseudoNotFoundException();
+            }
+        }
+
+        /**
+         * Check the account boolean
+         * If it's true the account is available
+         * If it's false the account isn't available
+         */
+        User user = foundEmailOrPseudo.get();
+
+        if (!user.getIsActive()) {
+            throw new AccountNotActivatedException();
+        }
+
+        // Check the password between DB and the user
+        if (!bCryptPasswordEncoder.matches(form.password(), user.getPassword())) {
+            throw new InvalidPasswordException();
+        }
+
+        return user;
     }
 }

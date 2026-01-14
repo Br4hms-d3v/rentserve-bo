@@ -4,9 +4,11 @@ import be.brahms.TFE_RentServe.mappers.AuthMapper;
 import be.brahms.TFE_RentServe.models.dtos.user.UserTokenDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserForm;
+import be.brahms.TFE_RentServe.models.forms.user.UserLoginForm;
 import be.brahms.TFE_RentServe.services.UserService;
 import be.brahms.TFE_RentServe.utilities.JwtUtil;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,11 +47,27 @@ public class AuthController {
      * @param form the form with user data
      * @return user info and token
      */
-    @PostMapping("/register")
+    @PostMapping("register")
     public UserTokenDTO register(@RequestBody @Valid UserForm form) {
         User user = userService.register(form);
         String token = jwtUtil.generateToken(user);
         return authMapper.toTokenDTO(user, token);
     }
+
+    /**
+     * This method connects a user.
+     * It makes a token and sends back user info with the token.
+     *
+     * @param form the form with user data
+     * @return user connected with his token
+     */
+    @PostMapping("login")
+    public ResponseEntity<UserTokenDTO> login(@RequestBody @Valid UserLoginForm form) {
+        User userLogin = userService.login(form);
+        String token = jwtUtil.generateToken(userLogin);
+        UserTokenDTO uTDTO = authMapper.toTokenDTO(userLogin, token);
+        return ResponseEntity.ok(uTDTO);
+    }
+
 }
 

@@ -3,8 +3,7 @@ package be.brahms.TFE_RentServe.exceptions.global;
 import be.brahms.TFE_RentServe.exceptions.dto.ApiError;
 import be.brahms.TFE_RentServe.exceptions.email.EmailExistingException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailNotFoundException;
-import be.brahms.TFE_RentServe.exceptions.user.PseudoExistException;
-import be.brahms.TFE_RentServe.exceptions.user.UserException;
+import be.brahms.TFE_RentServe.exceptions.user.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,6 +49,25 @@ public class GlobalExceptionHandler {
                 except.getMessage()
         );
         return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    /**
+     * Handles AccountNotActivatedException and sends a 403 Forbidden error.
+     * <p>
+     * This method is called automatically when the user doesn't activate the account
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (AccountNotActivatedException).
+     * @return A response with an apiError and HTTP status 403 (FORBIDDEN).
+     */
+    @ExceptionHandler(AccountNotActivatedException.class)
+    public ResponseEntity<ApiError> handleAccountNotActivatedException(AccountNotActivatedException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
     }
 
     // Email
@@ -108,6 +126,44 @@ public class GlobalExceptionHandler {
                 except.getMessage()
         );
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles the InvalidPasswordException and sends a 401 Unauthorized error.
+     * <p>
+     * This method is called automatically when the user gives a wrong password.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except the exception that was thrown (InvalidPasswordException)
+     * @return a ResponseEntity with an ApiError and HTTP status 401 (Unauthorized)
+     */
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ApiError> handleInvalidPasswordException(InvalidPasswordException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Handles PseudoNotFoundException and sends a 404 NOT_FOUND error.
+     * <p>
+     * This method is called automatically when the pseudo doesn't exist.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (PseudoNotFoundException).
+     * @return A response with an apiError and HTTP status 404 (NOT_FOUND).
+     */
+    @ExceptionHandler(PseudoNotFoundException.class)
+    public ResponseEntity<ApiError> handlePseudoNotFoundException(PseudoNotFoundException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
     }
 
 }

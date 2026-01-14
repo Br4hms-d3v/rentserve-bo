@@ -2,6 +2,7 @@ package be.brahms.TFE_RentServe.services;
 
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserForm;
+import be.brahms.TFE_RentServe.models.forms.user.UserLoginForm;
 import jakarta.validation.Valid;
 
 /**
@@ -24,4 +25,12 @@ public interface UserService {
      * @param email The user email.
      */
     void activateUser(String email);
+
+    /**
+     * This method connect the user
+     *
+     * @param user the user for log in
+     * @return the connected user
+     */
+    User login(UserLoginForm user);
 }
