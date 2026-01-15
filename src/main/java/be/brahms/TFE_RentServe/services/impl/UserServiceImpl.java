@@ -4,6 +4,7 @@ import be.brahms.TFE_RentServe.exceptions.email.EmailExistingException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.user.*;
 import be.brahms.TFE_RentServe.mappers.AuthMapper;
+import be.brahms.TFE_RentServe.mappers.UserMapper;
 import be.brahms.TFE_RentServe.models.dtos.email.EmailTokenDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserForm;
@@ -28,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AuthMapper authMapper;
+    private final UserMapper userMapper;
     private final EmailService emailService;
 
     /**
@@ -38,10 +40,11 @@ public class UserServiceImpl implements UserService {
      * @param authMapper            the mapper for user data
      */
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthMapper authMapper, EmailService emailService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthMapper authMapper, UserMapper userMapper, EmailService emailService) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.authMapper = authMapper;
+        this.userMapper = userMapper;
         this.emailService = emailService;
     }
 
@@ -150,5 +153,17 @@ public class UserServiceImpl implements UserService {
         }
 
         return user;
+    }
+
+    /**
+     * Get user by ID
+     * If not found send a message exception
+     *
+     * @param id from the user
+     * @return data about user
+     */
+    @Override
+    public User userFindById(long id) {
+        return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
     }
 }
