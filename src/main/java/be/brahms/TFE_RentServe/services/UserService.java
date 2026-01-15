@@ -5,6 +5,8 @@ import be.brahms.TFE_RentServe.models.forms.user.UserForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserLoginForm;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * Service interface for managing user.
  * Defines business operations related to Bill entities.
@@ -41,4 +43,11 @@ public interface UserService {
      * @return data's from user by id if exist
      */
     User userFindById(long id);
+
+    /**
+     * This method get a list of users
+     *
+     * @return list of all users
+     */
+    List<User> findAllUsers();
 }
