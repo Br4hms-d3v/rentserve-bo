@@ -17,6 +17,6 @@ public class UserNotFoundException extends UserException {
      * This exception is used when a user is not found
      */
     public UserNotFoundException() {
-        super("L'utilisateur n'existe pas.");
+        super("L'utilisateur n'a pas été retrouvé.");
     }
 }
