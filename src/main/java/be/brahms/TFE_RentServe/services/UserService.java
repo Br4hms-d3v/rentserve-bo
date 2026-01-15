@@ -33,4 +33,12 @@ public interface UserService {
      * @return the connected user
      */
     User login(UserLoginForm user);
+
+    /**
+     * This method get a user by ID
+     *
+     * @param id from the user
+     * @return data's from user by id if exist
+     */
+    User userFindById(long id);
 }
