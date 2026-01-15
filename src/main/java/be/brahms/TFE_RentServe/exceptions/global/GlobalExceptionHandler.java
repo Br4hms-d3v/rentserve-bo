@@ -166,4 +166,23 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Handles UserNotFoundException and sends a 404 NOT_FOUND error.
+     * <p>
+     * This method is called automatically when the user doesn't exist.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (UserNotFoundException).
+     * @return A response with an apiError and HTTP status 404 (NOT_FOUND).
+     */
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiError> handleUserNotFoundException(UserNotFoundException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+    }
+
 }
