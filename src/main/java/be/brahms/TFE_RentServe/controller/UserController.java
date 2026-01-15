@@ -5,12 +5,15 @@ import be.brahms.TFE_RentServe.mappers.UserMapper;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.services.UserService;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user/")
@@ -44,5 +47,21 @@ public class UserController {
         UserDTO userDto = userMapper.toDto(userById);
 
         return ResponseEntity.ok(userAssembler.toModel(userDto));
+    }
+
+    /**
+     * Get a list of all users
+     *
+     * @return a list of all users
+     */
+    @GetMapping("list")
+    public ResponseEntity<CollectionModel<UserDTO>> getAllUsers() {
+        List<User> users = userService.findAllUsers();
+        List<UserDTO> listUsersDto = users
+                .stream()
+                .map(userMapper::toDto)
+                .toList();
+
+        return ResponseEntity.ok(CollectionModel.of(listUsersDto));
     }
 }
