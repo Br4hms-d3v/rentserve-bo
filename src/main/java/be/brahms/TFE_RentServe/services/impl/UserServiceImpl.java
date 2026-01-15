@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -165,5 +166,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public User userFindById(long id) {
         return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    }
+
+    /**
+     * Get a list of all users
+     * If the list is empty, send a message
+     *
+     * @return a list of all users
+     */
+    @Override
+    public List<User> findAllUsers() {
+        List<User> listOfUsers = userRepository.findAll();
+
+        // If the list is empty, send a message exception
+        if (listOfUsers.isEmpty()) {
+            throw new UserException("La liste est vide !");
+        }
+
+        return listOfUsers;
     }
 }
