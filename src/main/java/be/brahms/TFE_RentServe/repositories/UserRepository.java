@@ -1,9 +1,13 @@
 package be.brahms.TFE_RentServe.repositories;
 
+import be.brahms.TFE_RentServe.enums.Role;
 import be.brahms.TFE_RentServe.models.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -49,4 +53,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return an optional user if found, or empty if not found
      */
     Optional<User> findByEmailOrPseudo(String email, String pseudo);
+
+    /**
+     * Find users by their role.
+     *
+     * @param role the role to search for
+     * @return list of users with the given role
+     */
+    @Query("SELECT u FROM User u WHERE u.role = :role")
+    List<User> listUsersByRole(@Param("role") Role role);
 }
