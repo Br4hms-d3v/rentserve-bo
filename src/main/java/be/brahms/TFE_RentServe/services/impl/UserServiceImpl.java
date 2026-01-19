@@ -1,5 +1,6 @@
 package be.brahms.TFE_RentServe.services.impl;
 
+import be.brahms.TFE_RentServe.enums.Role;
 import be.brahms.TFE_RentServe.exceptions.email.EmailExistingException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.user.*;
@@ -9,6 +10,7 @@ import be.brahms.TFE_RentServe.models.dtos.email.EmailTokenDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserLoginForm;
+import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.UserService;
 import be.brahms.TFE_RentServe.services.email.EmailService;
@@ -38,7 +40,9 @@ public class UserServiceImpl implements UserService {
      *
      * @param userRepository        the repository to access user data
      * @param bCryptPasswordEncoder encode password with BCrypt
-     * @param authMapper            the mapper for user data
+     * @param authMapper            map between form auth to entity
+     * @param userMapper            map between form user to entity
+     * @param emailService          email confirm or update password
      */
     @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthMapper authMapper, UserMapper userMapper, EmailService emailService) {
@@ -185,4 +189,58 @@ public class UserServiceImpl implements UserService {
 
         return listOfUsers;
     }
+
+    /**
+     * Get a list of all users by their role
+     *
+     * @param role The role of user (Member, Moderator or Admin)
+     * @return a list of users
+     */
+    public List<User> findUsersByRole(Role role) {
+        List<User> listUserByRole = userRepository.listUsersByRole(role);
+
+        if (listUserByRole.isEmpty()) {
+            throw new UserException("Aucun n'a le role: " + role);
+        }
+
+        return listUserByRole;
+    }
+
+    /**
+     * Update the profile user
+     * Check if the pseudo, email exist before save
+     *
+     * @param id   the user's ID
+     * @param user the data user
+     * @return a user with data updated
+     */
+    public User updateUser(long id, UserUpdateForm user) {
+        User userIdUpdate = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+
+        boolean userEmailExist = userRepository.existsByEmail(user.email());
+        boolean userPseudoExist = userRepository.existsByPseudo(user.pseudo());
+
+        if (userPseudoExist && !userIdUpdate.getPseudo().equals(user.pseudo())) {
+            throw new PseudoExistException();
+        }
+
+        if (userEmailExist && !userIdUpdate.getEmail().equals(user.email())) {
+            throw new EmailExistingException();
+        }
+
+        // Persist new data to old data
+        userIdUpdate.setPseudo(user.pseudo());
+        userIdUpdate.setEmail(user.email());
+
+        userIdUpdate.setIsActive(true);
+        userIdUpdate.setStreet(user.street());
+        userIdUpdate.setCity(user.city());
+        userIdUpdate.setZipCode(user.zipCode());
+
+        // map from Form to Entity
+        userMapper.fromUpdateUserForm(user, userIdUpdate);
+
+        return userRepository.save(userIdUpdate);
+    }
+
 }
