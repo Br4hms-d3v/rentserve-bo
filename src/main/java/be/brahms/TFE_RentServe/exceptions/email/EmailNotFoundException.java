@@ -1,6 +1,6 @@
 package be.brahms.TFE_RentServe.exceptions.email;
 
-public class EmailNotFoundException extends RuntimeException {
+public class EmailNotFoundException extends EmailException {
     public EmailNotFoundException(String message) {
         super(message);
     }
