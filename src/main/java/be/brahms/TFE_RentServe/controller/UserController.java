@@ -5,17 +5,16 @@ import be.brahms.TFE_RentServe.hateoas.user.UserAssembler;
 import be.brahms.TFE_RentServe.hateoas.user.UserRoleAssembler;
 import be.brahms.TFE_RentServe.mappers.UserMapper;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
+import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
 import be.brahms.TFE_RentServe.services.UserService;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -106,5 +105,14 @@ public class UserController {
         return ResponseEntity.ok(userAssembler.toModel(userUpdatedDTO));
         //    }
         //   return ResponseEntity.badRequest().build();
+    }
+
+    @PatchMapping("{id}/change-password")
+    public ResponseEntity<?> changePassword(@PathVariable long id, @RequestBody @Valid UserChangePasswordForm form) {
+        User user = userService.changePassword(id, form);
+        UserPasswordDTO userUpdatedDTO = userMapper.toUserPasswordDto(user);
+        userAssembler.toModel1(userUpdatedDTO);
+
+        return ResponseEntity.ok("Mot de passe changé avec succès");
     }
 }
