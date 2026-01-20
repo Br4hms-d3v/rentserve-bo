@@ -23,7 +23,6 @@ public interface UserMapper {
      * @param user the user data
      * @return a User dto
      */
-
     @Mapping(target = "id", source = "id")
     @Mapping(target = "name", source = "name")
     @Mapping(target = "firstName", source = "firstName")
@@ -38,8 +37,11 @@ public interface UserMapper {
      * @param user the user data
      * @return a User from role
      */
-
-
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "firstName", source = "firstName")
+    @Mapping(target = "pseudo", source = "pseudo")
+    @Mapping(target = "role", source = "role")
+    @Mapping(target = "createdAt", source = "createdAt")
     UserRoleDTO listRoleToDto(User user);
 
     // Form to Entity
