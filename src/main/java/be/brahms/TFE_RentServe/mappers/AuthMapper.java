@@ -19,7 +19,7 @@ public interface AuthMapper {
      * @param token the token value
      * @return a UserTokenDTO
      */
-    @Mapping(target = "token", source = "token")
+
     UserTokenDTO toTokenDTO(User user, String token);
 
     /**
@@ -31,13 +31,6 @@ public interface AuthMapper {
      * @param form the user form
      * @return a new User
      */
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "role", constant = "MEMBER")
-    @Mapping(target = "isActive", constant = "false")
-    @Mapping(target = "secondResidences", ignore = true)
-    @Mapping(target = "userMaterials", ignore = true)
-    @Mapping(target = "userFavours", ignore = true)
-    @Mapping(target = "rentals", ignore = true)
-    @Mapping(target = "reviews", ignore = true)
+
     User fromUserForm(UserForm form);
 }

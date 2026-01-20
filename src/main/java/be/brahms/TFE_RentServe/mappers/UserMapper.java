@@ -23,15 +23,12 @@ public interface UserMapper {
      * @param user the user data
      * @return a User dto
      */
+
     @Mapping(target = "id", source = "id")
     @Mapping(target = "name", source = "name")
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "birthdate", source = "birthdate")
-    @Mapping(target = "pseudo", source = "pseudo")
     @Mapping(target = "email", source = "email")
-    @Mapping(target = "street", source = "street")
-    @Mapping(target = "city", source = "city")
-    @Mapping(target = "zipCode", source = "zipCode")
     @Mapping(target = "isActive", source = "isActive")
     UserDTO toDto(User user);
 
@@ -41,10 +38,8 @@ public interface UserMapper {
      * @param user the user data
      * @return a User from role
      */
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "firstName", source = "firstName")
-    @Mapping(target = "pseudo", source = "pseudo")
-    @Mapping(target = "role", source = "role")
+
+
     UserRoleDTO listRoleToDto(User user);
 
     // Form to Entity
@@ -56,8 +51,6 @@ public interface UserMapper {
      * @param form the user form to update
      * @return a user with update data
      */
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "role", ignore = true)
     void fromUpdateUserForm(UserUpdateForm form, @MappingTarget User user);
 
 }
