@@ -1,6 +1,7 @@
 package be.brahms.TFE_RentServe.exceptions.global;
 
 import be.brahms.TFE_RentServe.exceptions.dto.ApiError;
+import be.brahms.TFE_RentServe.exceptions.email.EmailException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailExistingException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.user.*;
@@ -71,6 +72,22 @@ public class GlobalExceptionHandler {
     }
 
     // Email
+
+    /**
+     * Handles errors specific to email operations.
+     *
+     * @param except the EmailException containing the error message
+     * @return a response with the error message and HTTP 400 status
+     */
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<ApiError> handleEmailException(EmailException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
 
     /**
      * Handles EmailExistingException and sends a 302 FOUND error.
