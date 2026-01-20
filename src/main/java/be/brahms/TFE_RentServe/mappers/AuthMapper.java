@@ -4,7 +4,6 @@ import be.brahms.TFE_RentServe.models.dtos.user.UserTokenDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserForm;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 /**
  * Mapper for auth data.
