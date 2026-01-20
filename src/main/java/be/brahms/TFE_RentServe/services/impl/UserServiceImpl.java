@@ -1,6 +1,7 @@
 package be.brahms.TFE_RentServe.services.impl;
 
 import be.brahms.TFE_RentServe.enums.Role;
+import be.brahms.TFE_RentServe.exceptions.email.EmailException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailExistingException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.user.*;
@@ -8,6 +9,7 @@ import be.brahms.TFE_RentServe.mappers.AuthMapper;
 import be.brahms.TFE_RentServe.mappers.UserMapper;
 import be.brahms.TFE_RentServe.models.dtos.email.EmailTokenDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
+import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserLoginForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
@@ -241,6 +243,44 @@ public class UserServiceImpl implements UserService {
         userMapper.fromUpdateUserForm(user, userIdUpdate);
 
         return userRepository.save(userIdUpdate);
+    }
+
+    @Override
+    public User changePassword(long id, UserChangePasswordForm user) {
+
+        User userUpdatePassword = userRepository.findByEmail(user.email());
+
+        // Check the email exist or not => send a message with exception
+        if (userUpdatePassword.getEmail() == null) {
+            throw new EmailNotFoundException();
+        }
+        if (!user.email().equals(userUpdatePassword.getEmail())) {
+            throw new EmailException("Votre email n'est pas identique à votre compte");
+        }
+
+        if (!user.password().equals(user.comparePassword())) {
+            throw new InvalidPasswordException("Le mot de passe doit être identique");
+        }
+
+        if (user.email().isEmpty() || user.email().isBlank()) {
+            throw new EmailException("Veuillez entrez une adresse email");
+        }
+        userMapper.fromUserChangePasswordForm(user, userUpdatePassword);
+
+        // Hash the password
+        userUpdatePassword.setPassword(bCryptPasswordEncoder.encode(user.password()));
+
+
+        userRepository.save(userUpdatePassword);
+
+        // Generate a token for email
+        EmailTokenDTO emailTokenDTO = new EmailTokenDTO();
+
+        String warnUpdatePasswordConfirmationUrl = "http://localhost:8080/api/user/" + id + "/change-password?token=" + emailTokenDTO.confirmationToken() + "&email=" + user.email();
+
+        emailService.sendEmailUpdatePassword(user.email(), warnUpdatePasswordConfirmationUrl);
+
+        return userUpdatePassword;
     }
 
 }

@@ -2,6 +2,7 @@ package be.brahms.TFE_RentServe.services;
 
 import be.brahms.TFE_RentServe.enums.Role;
 import be.brahms.TFE_RentServe.models.entities.User;
+import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserLoginForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
@@ -69,4 +70,13 @@ public interface UserService {
      * @return the new user
      */
     User updateUser(long id, UserUpdateForm user);
+
+    /**
+     * Change only the password
+     *
+     * @param id   the identifier of user
+     * @param user the data's user
+     * @return a password updated
+     */
+    User changePassword(long id, UserChangePasswordForm user);
 }
