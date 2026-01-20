@@ -2,6 +2,7 @@ package be.brahms.TFE_RentServe.hateoas.user;
 
 import be.brahms.TFE_RentServe.controller.UserController;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,16 @@ public class UserAssembler implements RepresentationModelAssembler<UserDTO, Enti
         return EntityModel.of(user,
                 linkTo(methodOn(UserController.class).getUser(user.id())).withSelfRel(),
                 linkTo(methodOn(UserController.class).getAllUsers()).withRel("List of all users"),
-                linkTo(methodOn(UserController.class).putUserUpdate(user.id(), null)).withRel("Update the user: " + user.id()));
+                linkTo(methodOn(UserController.class).putUserUpdate(user.id(), null)).withRel("Update the user: " + user.id()),
+                linkTo(methodOn(UserController.class).changePassword(user.id(), null)).withRel("ChangePassowrd")
+        );
     }
+
+    public EntityModel<UserPasswordDTO> toModel1(UserPasswordDTO dto) {
+        return EntityModel.of(
+                dto,
+                linkTo(methodOn(UserController.class).changePassword(dto.id(), null)).withSelfRel()
+        );
+    }
+
 }
