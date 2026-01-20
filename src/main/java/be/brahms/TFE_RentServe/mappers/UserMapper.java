@@ -1,8 +1,10 @@
 package be.brahms.TFE_RentServe.mappers;
 
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
+import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -44,6 +46,9 @@ public interface UserMapper {
     @Mapping(target = "createdAt", source = "createdAt")
     UserRoleDTO listRoleToDto(User user);
 
+    @Mapping(target = "email", source = "email")
+    UserPasswordDTO toUserPasswordDto(User user);
+
     // Form to Entity
 
     /**
@@ -51,8 +56,9 @@ public interface UserMapper {
      * Some fields are ignored.
      *
      * @param form the user form to update
-     * @return a user with update data
      */
     void fromUpdateUserForm(UserUpdateForm form, @MappingTarget User user);
+
+    User fromUserChangePasswordForm(UserChangePasswordForm form, @MappingTarget User user);
 
 }
