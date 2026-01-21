@@ -9,15 +9,13 @@ import be.brahms.TFE_RentServe.mappers.AuthMapper;
 import be.brahms.TFE_RentServe.mappers.UserMapper;
 import be.brahms.TFE_RentServe.models.dtos.email.EmailTokenDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
-import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
-import be.brahms.TFE_RentServe.models.forms.user.UserForm;
-import be.brahms.TFE_RentServe.models.forms.user.UserLoginForm;
-import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
+import be.brahms.TFE_RentServe.models.forms.user.*;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.UserService;
 import be.brahms.TFE_RentServe.services.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -36,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final AuthMapper authMapper;
     private final UserMapper userMapper;
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Constructor to create UserServiceImpl with UserRepository.
@@ -47,12 +46,13 @@ public class UserServiceImpl implements UserService {
      * @param emailService          email confirm or update password
      */
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthMapper authMapper, UserMapper userMapper, EmailService emailService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthMapper authMapper, UserMapper userMapper, EmailService emailService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.authMapper = authMapper;
         this.userMapper = userMapper;
         this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -282,5 +282,38 @@ public class UserServiceImpl implements UserService {
 
         return userUpdatePassword;
     }
+
+    /**
+     * Soft delete of user
+     *
+     * @param id   the identifier of user
+     * @param form the form to delete the account
+     */
+    @Override
+    public void deleteAccount(long id, UserDeleteForm form) {
+        // Get user id from form delete
+        User userId = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+
+        // Check if it's already deactivated
+        if (!userId.getIsActive()) {
+            throw new UserException("Le compte est déjà supprimé");
+        }
+        // Check if it's email is identical
+        if (!userId.getEmail().equals(form.email())) {
+            throw new EmailException("L'email fourni est incorrect");
+        }
+        // Compare the password
+        if (!passwordEncoder.matches(form.password(), userId.getPassword())) {
+            throw new InvalidPasswordException();
+        }
+        // Map the form
+        userMapper.fromDeleteForm(form, userId);
+        // Persist to DB
+        userId.setIsActive(false);
+
+        userRepository.deleteAccount(id);
+
+    }
+
 
 }
