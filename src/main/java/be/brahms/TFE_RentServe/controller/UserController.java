@@ -5,7 +5,6 @@ import be.brahms.TFE_RentServe.hateoas.user.UserAssembler;
 import be.brahms.TFE_RentServe.hateoas.user.UserRoleAssembler;
 import be.brahms.TFE_RentServe.mappers.UserMapper;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
-import be.brahms.TFE_RentServe.models.dtos.user.UserDeleteDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
 import be.brahms.TFE_RentServe.models.entities.User;

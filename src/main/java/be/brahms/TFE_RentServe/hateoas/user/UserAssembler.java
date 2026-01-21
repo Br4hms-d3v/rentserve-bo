@@ -2,9 +2,7 @@ package be.brahms.TFE_RentServe.hateoas.user;
 
 import be.brahms.TFE_RentServe.controller.UserController;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
-import be.brahms.TFE_RentServe.models.dtos.user.UserDeleteDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
-import be.brahms.TFE_RentServe.models.entities.User;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
