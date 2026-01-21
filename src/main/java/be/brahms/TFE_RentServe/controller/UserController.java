@@ -5,10 +5,12 @@ import be.brahms.TFE_RentServe.hateoas.user.UserAssembler;
 import be.brahms.TFE_RentServe.hateoas.user.UserRoleAssembler;
 import be.brahms.TFE_RentServe.mappers.UserMapper;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserDeleteDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
+import be.brahms.TFE_RentServe.models.forms.user.UserDeleteForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
 import be.brahms.TFE_RentServe.services.UserService;
 import jakarta.validation.Valid;
@@ -29,10 +31,11 @@ public class UserController {
     private final UserRoleAssembler userRoleAssembler;
 
     /**
-     * UserController constructor
      *
-     * @param userService service for user management
-     * @param userMapper  mapper entity to Dto or form to entity
+     * @param userService       service for user management
+     * @param userMapper        mapper entity to Dto or form to entity
+     * @param userAssembler     hateoas create the link to redirect to endPoints
+     * @param userRoleAssembler hateoas create the link to redirect to user role
      */
     public UserController(UserService userService, UserMapper userMapper, UserAssembler userAssembler, UserRoleAssembler userRoleAssembler) {
         this.userService = userService;
@@ -114,5 +117,12 @@ public class UserController {
         userAssembler.toModel1(userUpdatedDTO);
 
         return ResponseEntity.ok("Mot de passe changé avec succès");
+    }
+
+    @PatchMapping("{id}/delete")
+    public ResponseEntity<?> deleteAccount(@PathVariable long id, @RequestBody @Valid UserDeleteForm form) {
+        userService.deleteAccount(id, form);
+        userAssembler.toModelDelete(id);
+        return ResponseEntity.ok("Le compte a bien été supprimé");
     }
 }
