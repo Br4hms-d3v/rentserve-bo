@@ -2,7 +2,9 @@ package be.brahms.TFE_RentServe.hateoas.user;
 
 import be.brahms.TFE_RentServe.controller.UserController;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserDeleteDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
+import be.brahms.TFE_RentServe.models.entities.User;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -34,7 +36,8 @@ public class UserAssembler implements RepresentationModelAssembler<UserDTO, Enti
                 linkTo(methodOn(UserController.class).getUser(user.id())).withSelfRel(),
                 linkTo(methodOn(UserController.class).getAllUsers()).withRel("List of all users"),
                 linkTo(methodOn(UserController.class).putUserUpdate(user.id(), null)).withRel("Update the user: " + user.id()),
-                linkTo(methodOn(UserController.class).changePassword(user.id(), null)).withRel("ChangePassowrd")
+                linkTo(methodOn(UserController.class).changePassword(user.id(), null)).withRel("Change the password"),
+                linkTo(methodOn(UserController.class).deleteAccount(user.id(), null)).withRel("Delete account")
         );
     }
 
@@ -44,5 +47,18 @@ public class UserAssembler implements RepresentationModelAssembler<UserDTO, Enti
                 linkTo(methodOn(UserController.class).changePassword(dto.id(), null)).withSelfRel()
         );
     }
+
+    /**
+     * Hateoas to delete an account
+     *
+     * @param id the identifier
+     * @return a message to confirm the account deleted
+     */
+    public EntityModel<?> toModelDelete(long id) {
+        return EntityModel.of(
+                linkTo(methodOn(UserController.class).deleteAccount(id, null)).withRel("Delete account")
+        );
+    }
+
 
 }
