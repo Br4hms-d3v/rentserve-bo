@@ -5,6 +5,7 @@ import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
+import be.brahms.TFE_RentServe.models.forms.user.UserDeleteForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -60,5 +61,13 @@ public interface UserMapper {
     void fromUpdateUserForm(UserUpdateForm form, @MappingTarget User user);
 
     User fromUserChangePasswordForm(UserChangePasswordForm form, @MappingTarget User user);
+
+    /**
+     * Map the form to entity User
+     *
+     * @param form the form to delete
+     * @param user the data user
+     */
+    void fromDeleteForm(UserDeleteForm form, @MappingTarget User user);
 
 }
