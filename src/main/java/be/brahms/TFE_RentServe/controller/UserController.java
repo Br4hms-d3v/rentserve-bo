@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,6 +51,7 @@ public class UserController {
      * @return data's about the user
      */
     @GetMapping("{id}")
+    @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
     public ResponseEntity<EntityModel<UserDTO>> getUser(@PathVariable long id) {
         User userById = userService.userFindById(id);
         UserDTO userDto = userMapper.toDto(userById);
@@ -63,6 +65,7 @@ public class UserController {
      * @return a list of all users
      */
     @GetMapping("list")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CollectionModel<UserDTO>> getAllUsers() {
         List<User> users = userService.findAllUsers();
         List<UserDTO> listUsersDto = users
@@ -80,6 +83,7 @@ public class UserController {
      * @return a list of user only with the role selected
      */
     @GetMapping("list/{role}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CollectionModel<EntityModel<UserRoleDTO>>> getUsersByRole(@PathVariable Role role) {
         List<UserRoleDTO> usersRoleDTO = userService.findUsersByRole(role)
                 .stream()
@@ -96,20 +100,16 @@ public class UserController {
 
     //TODO add path to Secure has many role
     @PutMapping("{id}/edit")
+    @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
     public ResponseEntity<EntityModel<UserDTO>> putUserUpdate(@PathVariable long id, @RequestBody @Valid UserUpdateForm form) {
-
-        //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // System.out.println(authentication);
-
-        //  if (authentication.getName().equals(form.pseudo())) {
         User user = userService.updateUser(id, form);
         UserDTO userUpdatedDTO = userMapper.toDto(user);
         return ResponseEntity.ok(userAssembler.toModel(userUpdatedDTO));
-        //    }
-        //   return ResponseEntity.badRequest().build();
+
     }
 
     @PatchMapping("{id}/change-password")
+    @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
     public ResponseEntity<?> changePassword(@PathVariable long id, @RequestBody @Valid UserChangePasswordForm form) {
         User user = userService.changePassword(id, form);
         UserPasswordDTO userUpdatedDTO = userMapper.toUserPasswordDto(user);
@@ -119,6 +119,7 @@ public class UserController {
     }
 
     @PatchMapping("{id}/delete")
+    @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
     public ResponseEntity<?> deleteAccount(@PathVariable long id, @RequestBody @Valid UserDeleteForm form) {
         userService.deleteAccount(id, form);
         userAssembler.toModelDelete(id);
