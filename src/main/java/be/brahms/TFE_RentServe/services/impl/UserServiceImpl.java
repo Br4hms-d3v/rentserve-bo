@@ -14,6 +14,8 @@ import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.UserService;
 import be.brahms.TFE_RentServe.services.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -171,7 +173,15 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User userFindById(long id) {
-        return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        String currentPseudo = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User currentUser = userRepository.findByPseudo(currentPseudo).orElseThrow(UserNotFoundException::new);
+
+        if (currentUser.getId() != id) {
+            throw new AccessNotAuthorizedException();
+        }
+        return currentUser;
+
     }
 
     /**
@@ -217,15 +227,18 @@ public class UserServiceImpl implements UserService {
      * @return a user with data updated
      */
     public User updateUser(long id, UserUpdateForm user) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User userIdUpdate = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
         boolean userEmailExist = userRepository.existsByEmail(user.email());
         boolean userPseudoExist = userRepository.existsByPseudo(user.pseudo());
 
+        if (!authentication.getName().equals(userIdUpdate.getPseudo())) {
+            throw new AccessNotAuthorizedException();
+        }
         if (userPseudoExist && !userIdUpdate.getPseudo().equals(user.pseudo())) {
             throw new PseudoExistException();
         }
-
         if (userEmailExist && !userIdUpdate.getEmail().equals(user.email())) {
             throw new EmailExistingException();
         }
