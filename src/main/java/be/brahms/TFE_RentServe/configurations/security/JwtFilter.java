@@ -59,7 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 String type = authorizations[0]; // "Bearer"
                 String token = authorizations[1]; // Le JWT token
 
-                if (type.equals("Bearer ") && !token.isEmpty()) { // Check if it's a Bearer token and not empty
+                if (type.equals("Bearer") && !token.isEmpty()) { // Check if it's a Bearer token and not empty
                     if (JwtUtil.isValidToken(token)) { // Check valid token
                         String pseudo = JwtUtil.getPseudo(token);
 
