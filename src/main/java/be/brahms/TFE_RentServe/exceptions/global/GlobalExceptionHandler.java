@@ -71,6 +71,25 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
     }
 
+    /**
+     * Handles AccessNotAuthorizedException and sends a 403 Forbidden error.
+     * <p>
+     * This method is called automatically when the user try to use another identifier to check or update
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (AccessNotAuthorizedException).
+     * @return A response with an apiError and HTTP status 401 (UNAUTHORIZED).
+     */
+    @ExceptionHandler(AccessNotAuthorizedException.class)
+    public ResponseEntity<ApiError> handleAccessNotAuthorizedException(AccessNotAuthorizedException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
+    }
+
     // Email
 
     /**
