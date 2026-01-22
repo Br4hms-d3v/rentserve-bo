@@ -10,12 +10,13 @@ import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 /**
  * Mapper for user data
  * It converts User
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
 
     // Entity to Data Access Object

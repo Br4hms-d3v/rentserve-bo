@@ -4,12 +4,13 @@ import be.brahms.TFE_RentServe.models.dtos.user.UserTokenDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserForm;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 /**
  * Mapper for auth data.
  * It converts User and UserForm objects
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface AuthMapper {
     /**
      * Create a UserTokenDTO from a User and a token.
