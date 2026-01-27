@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
  * This controller manages authentication.
  * It has a method to register a new user.
  * It has a method to sign in a user.
+ *
+ * @author Brahim k
  */
 @RestController
 @RequestMapping("/api/auth/")

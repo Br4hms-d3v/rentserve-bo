@@ -1,6 +1,7 @@
 package be.brahms.TFE_RentServe.exceptions.global;
 
 import be.brahms.TFE_RentServe.exceptions.dto.ApiError;
+import be.brahms.TFE_RentServe.exceptions.email.EmailException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailExistingException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.user.*;
@@ -13,6 +14,12 @@ import org.springframework.web.servlet.View;
 /**
  * Global exception handler for the application.
  * This class catches exceptions thrown by controllers and handles them.
+ * Exception :
+ * - Authenticate
+ * - Email
+ * - User
+ *
+ * @author Brahim K
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -70,7 +77,42 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
     }
 
+    /**
+     * Handles AccessNotAuthorizedException and sends a 403 Forbidden error.
+     * <p>
+     * This method is called automatically when the user try to use another identifier to check or update
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (AccessNotAuthorizedException).
+     * @return A response with an apiError and HTTP status 401 (UNAUTHORIZED).
+     */
+    @ExceptionHandler(AccessNotAuthorizedException.class)
+    public ResponseEntity<ApiError> handleAccessNotAuthorizedException(AccessNotAuthorizedException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
+    }
+
     // Email
+
+    /**
+     * Handles errors specific to email operations.
+     *
+     * @param except the EmailException containing the error message
+     * @return a response with the error message and HTTP 400 status
+     */
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<ApiError> handleEmailException(EmailException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
 
     /**
      * Handles EmailExistingException and sends a 302 FOUND error.
@@ -158,6 +200,25 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(PseudoNotFoundException.class)
     public ResponseEntity<ApiError> handlePseudoNotFoundException(PseudoNotFoundException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handles UserNotFoundException and sends a 404 NOT_FOUND error.
+     * <p>
+     * This method is called automatically when the user doesn't exist.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (UserNotFoundException).
+     * @return A response with an apiError and HTTP status 404 (NOT_FOUND).
+     */
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiError> handleUserNotFoundException(UserNotFoundException except) {
         ApiError apiError = ApiError.of(
                 HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),

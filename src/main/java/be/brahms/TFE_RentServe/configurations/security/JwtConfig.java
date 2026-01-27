@@ -28,12 +28,13 @@ public class JwtConfig {
      * It is a byte array that starts with "secret key".
      */
     private final byte[] secret = System.getenv("SECRET_KEY").getBytes(StandardCharsets.UTF_8);
+//    private final byte[] secret = "Put_Your_Key_To_Clean_Gradle".getBytes(StandardCharsets.UTF_8);
 
     /**
      * The time in seconds before the JWT expires.
-     * This is set to 10.800 seconds, which is 3 hours.
+     * This is set to 5.400.000 seconds, which is 1.5 hours.
      */
-    public int expireAt = 10_800;
+    public int expireAt = 5_400_000;
 
     /**
      * This method returns the secret key for HMAC SHA-384.

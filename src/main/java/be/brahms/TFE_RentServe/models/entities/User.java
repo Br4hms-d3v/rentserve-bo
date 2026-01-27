@@ -5,9 +5,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,7 +24,7 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
-public class User extends BaseEntity {
+public class User extends BaseEntity implements UserDetails {
 
 
     /**
@@ -100,85 +104,6 @@ public class User extends BaseEntity {
     public User() {
     }
 
-    /**
-     * This constructor makes a new user.
-     * You give name, first name, birthdate, pseudo, password, role,
-     * street, city, zip code, and if the user is active.
-     *
-     * @param name      the last name
-     * @param firstName the first name
-     * @param birthdate the birthdate
-     * @param pseudo    the username
-     * @param email     the email
-     * @param password  the password
-     * @param street    the street name
-     * @param city      the city
-     * @param zipCode   the postal code
-     */
-    public User(String name, String firstName, LocalDate birthdate, String pseudo, String email, String password, String street, String city, String zipCode) {
-        this();
-        this.name = name;
-        this.firstName = firstName;
-        this.birthdate = birthdate;
-        this.pseudo = pseudo;
-        this.email = email;
-        this.password = password;
-        this.street = street;
-        this.city = city;
-        this.zipCode = zipCode;
-    }
-
-    /**
-     * This constructor is a log-in for a user who as an account
-     * Introduce in the form an email or pseudo with password
-     *
-     * @param email    the email
-     * @param pseudo   the pseudo
-     * @param password the password
-     */
-    public User(String email, String pseudo, String password) {
-        this();
-        this.email = email;
-        this.pseudo = pseudo;
-        this.password = password;
-    }
-
-    /**
-     * Creates a new user with form data.
-     *
-     * @param name      the last name
-     * @param firstName the first name
-     * @param birthdate the birth date
-     * @param pseudo    the username
-     * @param email     the email address
-     * @param street    the street name
-     * @param city      the city
-     * @param zipCode   the postal code
-     */
-    public User(String name, String firstName, LocalDate birthdate, String pseudo, String email, String street, String city, String zipCode) {
-        this();
-        this.name = name;
-        this.firstName = firstName;
-        this.birthdate = birthdate;
-        this.pseudo = pseudo;
-        this.email = email;
-        this.street = street;
-        this.city = city;
-        this.zipCode = zipCode;
-    }
-
-    /**
-     * Update password for the user using form.
-     *
-     * @param email    the email address
-     * @param password the password
-     */
-    public User(String email, String password) {
-        this();
-        this.email = email;
-        this.password = password;
-    }
-
     // OneToMany
     /**
      * A set of second residences linked to the user.
@@ -214,4 +139,18 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Review> reviews = new HashSet<>();
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public String getUsername() {
+        return pseudo;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActive;
+    }
 }
