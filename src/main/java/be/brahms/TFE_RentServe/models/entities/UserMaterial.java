@@ -10,6 +10,10 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This class represents the link between a user and a material.
+ * It extends the BaseEntity class and includes relationships to pictures, rentals, and reviews.
+ */
 @Entity
 @Getter
 @Setter

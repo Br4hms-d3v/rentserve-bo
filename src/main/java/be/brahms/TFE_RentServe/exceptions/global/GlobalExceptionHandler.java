@@ -14,6 +14,12 @@ import org.springframework.web.servlet.View;
 /**
  * Global exception handler for the application.
  * This class catches exceptions thrown by controllers and handles them.
+ * Exception :
+ * - Authenticate
+ * - Email
+ * - User
+ *
+ * @author Brahim K
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {

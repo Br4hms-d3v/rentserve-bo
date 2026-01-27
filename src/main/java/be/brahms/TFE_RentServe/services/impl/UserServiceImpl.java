@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -36,7 +35,6 @@ public class UserServiceImpl implements UserService {
     private final AuthMapper authMapper;
     private final UserMapper userMapper;
     private final EmailService emailService;
-    private final PasswordEncoder passwordEncoder;
 
     /**
      * Constructor to create UserServiceImpl with UserRepository.
@@ -48,13 +46,12 @@ public class UserServiceImpl implements UserService {
      * @param emailService          email confirm or update password
      */
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthMapper authMapper, UserMapper userMapper, EmailService emailService, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthMapper authMapper, UserMapper userMapper, EmailService emailService) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.authMapper = authMapper;
         this.userMapper = userMapper;
         this.emailService = emailService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -316,7 +313,7 @@ public class UserServiceImpl implements UserService {
             throw new EmailException("L'email fourni est incorrect");
         }
         // Compare the password
-        if (!passwordEncoder.matches(form.password(), userId.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(form.password(), userId.getPassword())) {
             throw new InvalidPasswordException();
         }
         // Map the form

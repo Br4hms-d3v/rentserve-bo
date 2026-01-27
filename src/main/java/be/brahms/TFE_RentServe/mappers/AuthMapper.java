@@ -7,30 +7,30 @@ import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 /**
- * Mapper for auth data.
- * It converts User and UserForm objects
+ * Mapper responsible for authentication-related conversions.
+ *
+ * <p>This mapper handles transformations between user domain objects
+ * and authentication-related DTOs.</p>
+ *
+ * @author Brahim K
+ *
  */
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface AuthMapper {
     /**
-     * Create a UserTokenDTO from a User and a token.
+     * Create a UserTokenDTO from a User and a token value.
      *
      * @param user  the user data
      * @param token the token value
-     * @return a UserTokenDTO
+     * @return a UserTokenDTO containing the user information and token
      */
-
     UserTokenDTO toTokenDTO(User user, String token);
 
     /**
      * Create a User from a UserForm.
-     * Some fields are ignored.
-     * Role is always MEMBER.
-     * isActive is always false.
      *
      * @param form the user form
      * @return a new User
      */
-
     User fromUserForm(UserForm form);
 }

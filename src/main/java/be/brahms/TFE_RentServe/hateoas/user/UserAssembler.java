@@ -10,6 +10,13 @@ import org.springframework.stereotype.Component;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * This assembler adds useful navigation links related to user
+ * operations such as retrieving
+ * updating
+ * deleting a user
+ * changing the user's password.
+ */
 @Component
 public class UserAssembler implements RepresentationModelAssembler<UserDTO, EntityModel<UserDTO>> {
 
@@ -24,6 +31,15 @@ public class UserAssembler implements RepresentationModelAssembler<UserDTO, Enti
      * <p>
      * This method adds useful links to the UserDto,
      * like a link to the user itself and to the user list.
+     * <p>
+     * The generated model contains links to:
+     * <ul>
+     * <li>Retrieve the user</li>
+     * <li>Retrieve all users</li>
+     * <li>Update the user</li>
+     * <li>Change the user's password</li>
+     * <li>Delete the user account</li>
+     * </ul>
      *
      * @param user the user data to wrap
      * @return an EntityModel with the user data and HATEOAS links
@@ -39,6 +55,13 @@ public class UserAssembler implements RepresentationModelAssembler<UserDTO, Enti
         );
     }
 
+    /**
+     * Converts UserPasswordDTO into an entity
+     * containing a self link to the password change operation.
+     *
+     * @param dto the password data transfer object
+     * @return an EntityModel with a self HATEOAS link
+     */
     public EntityModel<UserPasswordDTO> toModel1(UserPasswordDTO dto) {
         return EntityModel.of(
                 dto,
@@ -47,7 +70,7 @@ public class UserAssembler implements RepresentationModelAssembler<UserDTO, Enti
     }
 
     /**
-     * Hateoas to delete an account
+     * Create a HATEOAS to delete a user account
      *
      * @param id the identifier
      * @return a message to confirm the account deleted

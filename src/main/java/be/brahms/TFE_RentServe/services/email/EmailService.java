@@ -1,5 +1,9 @@
 package be.brahms.TFE_RentServe.services.email;
 
+/**
+ * Service interface for managing email.
+ * Defines business operations related to Email entities.
+ */
 public interface EmailService {
 
     /**

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * This controller manages email.
  * It has method to send an email.
+ *
+ * @author Brahim K
  */
 @RestController
 @RequestMapping("/api/mail")

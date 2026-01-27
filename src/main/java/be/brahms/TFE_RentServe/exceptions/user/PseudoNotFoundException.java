@@ -13,6 +13,11 @@ public class PseudoNotFoundException extends UserException {
         super(message);
     }
 
+    /**
+     * Create a new pseudo not found exception.
+     * <p>
+     * Send a message for a pseudo doesn't found
+     */
     public PseudoNotFoundException() {
         super("Le pseudo n'existe pas ou n'a pas été retrouvé");
     }

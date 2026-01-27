@@ -80,7 +80,8 @@ public interface UserService {
     /**
      * Soft delete of an account from user
      *
-     * @param id the identifier of user
+     * @param id   the identifier of user
+     * @param user the user updated
      */
     void deleteAccount(long id, UserDeleteForm user);
 }
