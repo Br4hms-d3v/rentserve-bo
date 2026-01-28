@@ -47,6 +47,8 @@ public class SecurityConf {
         return http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // Spring actuator
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
                         // Authentification
                         .requestMatchers("/api/auth/**").permitAll()
                         // Users
