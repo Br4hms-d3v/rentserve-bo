@@ -13,6 +13,20 @@
           }
         ]
       }
+    },
+    {
+      "changeSet": {
+        "id": "update-sequence-after-inserts-categories",
+        "author": "Brahms",
+        "changes": [
+          {
+            "sql": {
+              "dbms": "postgresql",
+              "sql": "SELECT setval('categories_id_seq', (SELECT MAX(id) FROM categories));"
+            }
+          }
+        ]
+      }
     }
   ]
 }
