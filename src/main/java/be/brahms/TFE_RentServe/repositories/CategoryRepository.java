@@ -1,6 +1,8 @@
 package be.brahms.TFE_RentServe.repositories;
 
 import be.brahms.TFE_RentServe.models.entities.Category;
+import be.brahms.TFE_RentServe.models.forms.category.CategoryUpdateForm;
+import jakarta.validation.Valid;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

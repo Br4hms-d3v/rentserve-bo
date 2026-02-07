@@ -10,6 +10,7 @@ import be.brahms.TFE_RentServe.repositories.CategoryRepository;
 import be.brahms.TFE_RentServe.services.CategoryService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -50,5 +51,22 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         return categoryRepository.save(category);
+    }
+
+    @Override
+    public Category updateCategory(long id, CategoryForm form) {
+        Category categoryId = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
+
+        boolean categoryNameExists = categoryRepository.existsCategoryByNameCategory(categoryId.getNameCategory());
+
+        if (categoryNameExists && categoryId.getNameCategory().equals(form.nameCategory())) {
+            throw new CategoryExistingException();
+        }
+
+        categoryId.setNameCategory(form.nameCategory());
+        categoryId.setUpdatedAt(LocalDate.now());
+        categoryMapper.fromUpdateCategoryForm(form, categoryId);
+
+        return categoryRepository.save(categoryId);
     }
 }

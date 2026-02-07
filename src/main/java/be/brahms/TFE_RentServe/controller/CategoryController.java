@@ -56,4 +56,12 @@ public class CategoryController {
         CategoryDTO categoryDTO = categoryMapper.toDto(category);
         return ResponseEntity.ok().body(categoryAssembler.toModel(categoryDTO));
     }
+
+    @PutMapping("edit/{id}")
+    public ResponseEntity<EntityModel<CategoryDTO>> updateCategory(@PathVariable long id, @RequestBody CategoryForm form) {
+        Category category = categoryService.updateCategory(id, form);
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
+        return ResponseEntity.ok().body(categoryAssembler.toModel(categoryDTO));
+    }
+
 }

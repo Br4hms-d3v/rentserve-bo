@@ -5,6 +5,7 @@ import be.brahms.TFE_RentServe.models.dtos.category.CategoryIdDTO;
 import be.brahms.TFE_RentServe.models.entities.Category;
 import be.brahms.TFE_RentServe.models.forms.category.CategoryForm;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -17,4 +18,6 @@ public interface CategoryMapper {
 
     // Form to Entity
     Category fromCategoryForm(CategoryForm form);
+
+    Category fromUpdateCategoryForm(CategoryForm form, @MappingTarget Category category);
 }

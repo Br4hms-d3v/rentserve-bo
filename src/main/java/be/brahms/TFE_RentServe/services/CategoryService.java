@@ -30,4 +30,6 @@ public interface CategoryService {
      * @return the saved category
      */
     Category createCategory(@Valid CategoryForm form);
+
+    Category updateCategory(long id, @Valid CategoryForm form);
 }
