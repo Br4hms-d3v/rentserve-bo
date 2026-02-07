@@ -1,5 +1,7 @@
 package be.brahms.TFE_RentServe.exceptions.global;
 
+import be.brahms.TFE_RentServe.exceptions.category.CategoryException;
+import be.brahms.TFE_RentServe.exceptions.category.CategoryNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.dto.ApiError;
 import be.brahms.TFE_RentServe.exceptions.email.EmailException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailExistingException;
@@ -219,6 +221,43 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ApiError> handleUserNotFoundException(UserNotFoundException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+    }
+
+    // Category
+
+    /**
+     * Handles errors specific to category operations.
+     *
+     * @param except the CategoryException containing the error message
+     * @return a response with the error message and HTTP 400 status
+     */
+    @ExceptionHandler(CategoryException.class)
+    public ResponseEntity<ApiError> handleCategoryException(CategoryException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles CategoryNotFoundException and sends a 404 NOT_FOUND error.
+     * <p>
+     * This method is called automatically when the category doesn't exist.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (CategoryNotFoundException).
+     * @return A response with an apiError and HTTP status 404 (NOT_FOUND).
+     */
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ApiError> handleCategoryNotFoundException(CategoryNotFoundException except) {
         ApiError apiError = ApiError.of(
                 HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
