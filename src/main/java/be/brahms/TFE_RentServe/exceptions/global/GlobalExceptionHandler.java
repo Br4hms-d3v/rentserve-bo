@@ -1,6 +1,7 @@
 package be.brahms.TFE_RentServe.exceptions.global;
 
 import be.brahms.TFE_RentServe.exceptions.category.CategoryException;
+import be.brahms.TFE_RentServe.exceptions.category.CategoryExistingException;
 import be.brahms.TFE_RentServe.exceptions.category.CategoryNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.dto.ApiError;
 import be.brahms.TFE_RentServe.exceptions.email.EmailException;
@@ -264,6 +265,25 @@ public class GlobalExceptionHandler {
                 except.getMessage()
         );
         return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handles CategoryExistingException and sends a 302 FOUND error.
+     * <p>
+     * This method is called automatically when the category already exists.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (CategoryExistingException).
+     * @return A response with an apiError and HTTP status 302 (FOUND).
+     */
+    @ExceptionHandler(CategoryExistingException.class)
+    public ResponseEntity<ApiError> handleCategoryExistingException(CategoryExistingException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.FOUND.value(),
+                HttpStatus.FOUND.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.FOUND);
     }
 
 }
