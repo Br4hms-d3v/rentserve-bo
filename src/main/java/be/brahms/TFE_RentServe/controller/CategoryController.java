@@ -5,14 +5,13 @@ import be.brahms.TFE_RentServe.mappers.CategoryMapper;
 import be.brahms.TFE_RentServe.models.dtos.category.CategoryDTO;
 import be.brahms.TFE_RentServe.models.dtos.category.CategoryIdDTO;
 import be.brahms.TFE_RentServe.models.entities.Category;
+import be.brahms.TFE_RentServe.models.forms.category.CategoryForm;
 import be.brahms.TFE_RentServe.services.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,5 +48,12 @@ public class CategoryController {
         Category categoryId = categoryService.findCategoryById(id);
         CategoryIdDTO categoryIdDTO = categoryMapper.toIdDto(categoryId);
         return ResponseEntity.ok(categoryAssembler.toIdModel(categoryIdDTO));
+    }
+
+    @PostMapping("{new}")
+    public ResponseEntity<EntityModel<CategoryDTO>> createCategory(@RequestBody @Valid CategoryForm form) {
+        Category category = categoryService.createCategory(form);
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
+        return ResponseEntity.ok().body(categoryAssembler.toModel(categoryDTO));
     }
 }

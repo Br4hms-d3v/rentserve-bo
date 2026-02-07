@@ -3,6 +3,7 @@ package be.brahms.TFE_RentServe.mappers;
 import be.brahms.TFE_RentServe.models.dtos.category.CategoryDTO;
 import be.brahms.TFE_RentServe.models.dtos.category.CategoryIdDTO;
 import be.brahms.TFE_RentServe.models.entities.Category;
+import be.brahms.TFE_RentServe.models.forms.category.CategoryForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -13,4 +14,7 @@ public interface CategoryMapper {
     CategoryDTO toDto(Category category);
 
     CategoryIdDTO toIdDto(Category category);
+
+    // Form to Entity
+    Category fromCategoryForm(CategoryForm form);
 }
