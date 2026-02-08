@@ -20,7 +20,8 @@ public class CategoryAssembler implements RepresentationModelAssembler<CategoryD
                 linkTo(methodOn(CategoryController.class).getCategory(category.id())).withRel("Get Category by ID"),
                 linkTo(methodOn(CategoryController.class).createCategory(null)).withRel("Create a new category"),
                 linkTo(methodOn(CategoryController.class).updateCategory(category.id(), null)).withRel("Edit category"),
-                linkTo(methodOn(CategoryController.class).searchCategory(null)).withRel("Search category by name")
+                linkTo(methodOn(CategoryController.class).searchCategory(null)).withRel("Search category by name"),
+                linkTo(methodOn(CategoryController.class).deleteCategory(category.id())).withRel("Delete a category")
         );
     }
 
