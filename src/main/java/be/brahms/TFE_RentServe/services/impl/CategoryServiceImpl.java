@@ -69,4 +69,16 @@ public class CategoryServiceImpl implements CategoryService {
 
         return categoryRepository.save(categoryId);
     }
+
+    @Override
+    public List<Category> searchCategory(String nameCategory) {
+        List<Category> categories = categoryRepository.searchCategory(nameCategory);
+
+        if (categories.isEmpty()) {
+            throw new CategoryNotFoundException("La liste est vide");
+        }
+
+        return categories;
+
+    }
 }

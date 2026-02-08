@@ -64,4 +64,11 @@ public class CategoryController {
         return ResponseEntity.ok().body(categoryAssembler.toModel(categoryDTO));
     }
 
+    @GetMapping("search/{nameCategory}")
+    public ResponseEntity<CollectionModel<CategoryDTO>> searchCategory(@PathVariable String nameCategory) {
+        List<Category> categories = categoryService.searchCategory(nameCategory);
+        List<CategoryDTO> categoriesDTO = categoryMapper.toListDto(categories);
+        return ResponseEntity.ok().body(CollectionModel.of(categoriesDTO));
+    }
+
 }

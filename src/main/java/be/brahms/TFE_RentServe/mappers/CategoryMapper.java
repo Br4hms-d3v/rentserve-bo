@@ -8,6 +8,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CategoryMapper {
 
@@ -15,6 +17,8 @@ public interface CategoryMapper {
     CategoryDTO toDto(Category category);
 
     CategoryIdDTO toIdDto(Category category);
+
+    List<CategoryDTO> toListDto(List<Category> categories);
 
     // Form to Entity
     Category fromCategoryForm(CategoryForm form);
