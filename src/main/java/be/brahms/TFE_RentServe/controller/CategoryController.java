@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class CategoryController {
     }
 
     @GetMapping("list")
+    @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
     public ResponseEntity<CollectionModel<CategoryDTO>> getAllCategories() {
         List<Category> categories = categoryService.findAllCategories();
         List<CategoryDTO> listCategoriesDto = categories
@@ -44,6 +46,7 @@ public class CategoryController {
     }
 
     @GetMapping("{id}")
+    @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
     public ResponseEntity<EntityModel<CategoryIdDTO>> getCategory(@PathVariable long id) {
         Category categoryId = categoryService.findCategoryById(id);
         CategoryIdDTO categoryIdDTO = categoryMapper.toIdDto(categoryId);
@@ -51,6 +54,7 @@ public class CategoryController {
     }
 
     @PostMapping("{new}")
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
     public ResponseEntity<EntityModel<CategoryDTO>> createCategory(@RequestBody @Valid CategoryForm form) {
         Category category = categoryService.createCategory(form);
         CategoryDTO categoryDTO = categoryMapper.toDto(category);
@@ -58,6 +62,7 @@ public class CategoryController {
     }
 
     @PutMapping("edit/{id}")
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
     public ResponseEntity<EntityModel<CategoryDTO>> updateCategory(@PathVariable long id, @RequestBody CategoryForm form) {
         Category category = categoryService.updateCategory(id, form);
         CategoryDTO categoryDTO = categoryMapper.toDto(category);
@@ -65,6 +70,7 @@ public class CategoryController {
     }
 
     @GetMapping("search/{nameCategory}")
+    @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
     public ResponseEntity<CollectionModel<CategoryDTO>> searchCategory(@PathVariable String nameCategory) {
         List<Category> categories = categoryService.searchCategory(nameCategory);
         List<CategoryDTO> categoriesDTO = categoryMapper.toListDto(categories);
@@ -72,6 +78,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteCategory(@PathVariable long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.ok().body("La catégorie a été supprimée avec succès.");
