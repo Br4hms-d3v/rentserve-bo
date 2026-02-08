@@ -34,4 +34,6 @@ public interface CategoryService {
     Category updateCategory(long id, @Valid CategoryForm form);
 
     List<Category> searchCategory(String nameCategory);
+
+    void deleteCategory(long id);
 }

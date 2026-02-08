@@ -71,4 +71,10 @@ public class CategoryController {
         return ResponseEntity.ok().body(CollectionModel.of(categoriesDTO));
     }
 
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<String> deleteCategory(@PathVariable long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.ok().body("La catégorie a été supprimée avec succès.");
+    }
+
 }
