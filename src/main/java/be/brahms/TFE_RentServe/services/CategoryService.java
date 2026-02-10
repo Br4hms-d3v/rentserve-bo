@@ -6,6 +6,10 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
+/**
+ * Service interface for managing category.
+ * Defines business operations related to category entities.
+ */
 public interface CategoryService {
 
     /**
@@ -31,9 +35,27 @@ public interface CategoryService {
      */
     Category createCategory(@Valid CategoryForm form);
 
+    /**
+     * This method edit the category
+     *
+     * @param id   the identifier of category
+     * @param form the form to edit the category
+     * @return the updated category
+     */
     Category updateCategory(long id, @Valid CategoryForm form);
 
+    /**
+     * This method search a category by his name
+     *
+     * @param nameCategory the name of category
+     * @return a list of category
+     */
     List<Category> searchCategory(String nameCategory);
 
+    /**
+     * Soft delete category
+     *
+     * @param id the identifier of category
+     */
     void deleteCategory(long id);
 }
