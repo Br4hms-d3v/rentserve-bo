@@ -13,14 +13,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 /**
  * CategoryAssembler is a class that helps to convert CategoryDto objects
  * into EntityModel objects. It creates models with links for category data.
- * <p>
  */
 @Component
 public class CategoryAssembler implements RepresentationModelAssembler<CategoryDTO, EntityModel<CategoryDTO>> {
 
     /**
+     * Constructor by default for CategoryAssembler
+     */
+    public CategoryAssembler() {
+
+    }
+
+    /**
      * Convert a CategoryDto to an EntityModel with HATEOAS links.
-     * <p>
      * This method adds useful links to the CategoryDto,
      * - a link for category:
      * - get category
@@ -50,6 +55,7 @@ public class CategoryAssembler implements RepresentationModelAssembler<CategoryD
      * <p>
      * This method adds useful links to the CategoryIdDto,
      * a link for category by id
+     * </p>
      *
      * @param category the category data to wrap
      * @return an EntityModel with the category details and HATEOAS links

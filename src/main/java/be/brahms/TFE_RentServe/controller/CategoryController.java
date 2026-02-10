@@ -25,6 +25,7 @@ import java.util.List;
  * It has a method to search by name of category
  * It has a method to delete a category
  *
+ * @author Brahim K
  */
 @RestController
 @RequestMapping("/api/category")
