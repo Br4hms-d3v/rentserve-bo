@@ -130,10 +130,7 @@ public class CategoryController {
      * @return a message to confirm deleting
      */
     @DeleteMapping("delete/{id}")
-<<<<<<< HEAD
-=======
     @PreAuthorize("hasRole('ADMIN')")
->>>>>>> Category
     public ResponseEntity<String> deleteCategory(@PathVariable long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.ok().body("La catégorie a été supprimée avec succès.");
