@@ -11,4 +11,6 @@ import java.util.List;
 public interface FavorService {
 
     List<Favor> findAllFavour();
+
+    Favor findFavourById(Long id);
 }

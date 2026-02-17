@@ -1,10 +1,12 @@
 package be.brahms.TFE_RentServe.services.impl;
 
+import be.brahms.TFE_RentServe.exceptions.favor.FavorNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.favor.FavourException;
 import be.brahms.TFE_RentServe.models.entities.Favor;
 import be.brahms.TFE_RentServe.repositories.FavorRepository;
 import be.brahms.TFE_RentServe.services.FavorService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,6 +14,7 @@ import java.util.List;
  * Service implementation for managing Favor.
  * Uses FavorRepository to perform database operations.
  */
+@Transactional(readOnly = true)
 @Service
 public class FavorServiceImpl implements FavorService {
 
@@ -30,6 +33,11 @@ public class FavorServiceImpl implements FavorService {
         }
 
         return favour;
+    }
+
+    @Override
+    public Favor findFavourById(Long id) {
+        return favorRepository.findById(id).orElseThrow(FavorNotFoundException::new);
     }
 
 }
