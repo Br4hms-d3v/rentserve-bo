@@ -1,8 +1,6 @@
 package be.brahms.TFE_RentServe.exceptions.global;
 
-import be.brahms.TFE_RentServe.exceptions.category.CategoryException;
-import be.brahms.TFE_RentServe.exceptions.category.CategoryExistingException;
-import be.brahms.TFE_RentServe.exceptions.category.CategoryNotFoundException;
+import be.brahms.TFE_RentServe.exceptions.category.*;
 import be.brahms.TFE_RentServe.exceptions.dto.ApiError;
 import be.brahms.TFE_RentServe.exceptions.email.EmailException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailExistingException;
@@ -285,5 +283,43 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(apiError, HttpStatus.FOUND);
     }
+    /**
+     * Handles CategoryNotEmptyException and sends a 404 NOT_FOUND error.
+     * <p>
+     * This method is called automatically when the category is empty.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (CategoryNotEmptyException).
+     * @return A response with an apiError and HTTP status 404 (NOT_FOUND).
+     */
+    @ExceptionHandler(CategoryNotEmptyException.class)
+    public ResponseEntity<ApiError> handleCategoryNotEmptyException(CategoryNotEmptyException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles CategoryNotExistingException and sends a 404 NOT FOUND error.
+     * <p>
+     * This method is called automatically when the category is not existing id DB.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (CategoryNotExistingException).
+     * @return A response with an apiError and HTTP status 404 (NOT FOUND).
+     */
+    @ExceptionHandler(CategoryNotExistingException.class)
+    public ResponseEntity<ApiError> handleCategoryNotExistingException(CategoryNotExistingException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+    }
+
 
 }
