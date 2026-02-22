@@ -16,12 +16,13 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     /**
-     * Check if a category exists with the given name.
+     * Search a name of category
+     * It's search only one name of category
      *
-     * @param nameCategory the name of the category
-     * @return true if the category exists, false otherwise
+     * @param nameCategory the name of category
+     * @return a category name
      */
-    boolean existsCategoryByNameCategory(String nameCategory);
+    Category findCategoryByNameCategory(String nameCategory);
 
     /**
      * Search categories by name.

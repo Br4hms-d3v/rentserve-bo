@@ -27,6 +27,20 @@
           }
         ]
       }
+    },
+    {
+      "changeSet": {
+        "id": "update-sequence-after-inserts-favor",
+        "author": "Brahms",
+        "changes": [
+          {
+            "sql": {
+              "dbms": "postgresql",
+              "sql": "SELECT setval('favour_id_seq', (SELECT MAX(id) FROM favour));"
+            }
+          }
+        ]
+      }
     }
   ]
 }

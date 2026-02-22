@@ -76,11 +76,13 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     public Category createCategory(CategoryForm form) {
-        Category category = categoryMapper.fromCategoryForm(form);
+        Category categoryNameExists = categoryRepository.findCategoryByNameCategory(form.nameCategory());
 
-        if (categoryRepository.existsCategoryByNameCategory(category.getNameCategory())) {
+        if (categoryNameExists != null) {
             throw new CategoryExistingException();
         }
+
+        Category category = categoryMapper.fromCategoryForm(form);
 
         return categoryRepository.save(category);
     }
@@ -96,9 +98,9 @@ public class CategoryServiceImpl implements CategoryService {
     public Category updateCategory(long id, CategoryForm form) {
         Category categoryId = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
 
-        boolean categoryNameExists = categoryRepository.existsCategoryByNameCategory(categoryId.getNameCategory());
+        Category categoryNameExists = categoryRepository.findCategoryByNameCategory(categoryId.getNameCategory());
 
-        if (categoryNameExists && categoryId.getNameCategory().equals(form.nameCategory())) {
+        if (categoryNameExists.getNameCategory().equals(form.nameCategory())) {
             throw new CategoryExistingException();
         }
 

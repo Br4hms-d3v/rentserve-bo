@@ -1,12 +1,14 @@
 package be.brahms.TFE_RentServe.exceptions.global;
 
-import be.brahms.TFE_RentServe.exceptions.category.CategoryException;
-import be.brahms.TFE_RentServe.exceptions.category.CategoryExistingException;
-import be.brahms.TFE_RentServe.exceptions.category.CategoryNotFoundException;
+import be.brahms.TFE_RentServe.exceptions.category.*;
 import be.brahms.TFE_RentServe.exceptions.dto.ApiError;
 import be.brahms.TFE_RentServe.exceptions.email.EmailException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailExistingException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailNotFoundException;
+import be.brahms.TFE_RentServe.exceptions.favor.FavorAlreadyExistingException;
+import be.brahms.TFE_RentServe.exceptions.favor.FavorException;
+import be.brahms.TFE_RentServe.exceptions.favor.FavorNotEmptyException;
+import be.brahms.TFE_RentServe.exceptions.favor.FavorNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.user.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -285,5 +287,119 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(apiError, HttpStatus.FOUND);
     }
+
+    /**
+     * Handles CategoryNotEmptyException and sends a 400 BAD REQUEST error.
+     * <p>
+     * This method is called automatically when the category is empty.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (CategoryNotEmptyException).
+     * @return A response with an apiError and HTTP status 400 (BAD REQUEST).
+     */
+    @ExceptionHandler(CategoryNotEmptyException.class)
+    public ResponseEntity<ApiError> handleCategoryNotEmptyException(CategoryNotEmptyException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles CategoryNotExistingException and sends a 404 NOT FOUND error.
+     * <p>
+     * This method is called automatically when the category is not existing id DB.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (CategoryNotExistingException).
+     * @return A response with an apiError and HTTP status 404 (NOT FOUND).
+     */
+    @ExceptionHandler(CategoryNotExistingException.class)
+    public ResponseEntity<ApiError> handleCategoryNotExistingException(CategoryNotExistingException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+    }
+
+    // Favor
+
+    /**
+     * Handles errors specific to favor operations.
+     *
+     * @param except the FavorException containing the error message
+     * @return a response with the error message and HTTP 400 status
+     */
+    @ExceptionHandler(FavorException.class)
+    public ResponseEntity<ApiError> handleFavorException(FavorException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles FavorNotFoundException and sends a 404 NOT_FOUND error.
+     * <p>
+     * This method is called automatically when the favor doesn't exist.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (FavorNotFoundException).
+     * @return A response with an apiError and HTTP status 404 (NOT_FOUND).
+     */
+    @ExceptionHandler(FavorNotFoundException.class)
+    public ResponseEntity<ApiError> handleFavorNotFoundException(FavorNotFoundException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handles FavorAlreadyExistingException and sends a 302 FOUND error.
+     * <p>
+     * This method is called automatically when the favor already exists.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (FavorAlreadyExistingException).
+     * @return A response with an apiError and HTTP status 302 (FOUND).
+     */
+    @ExceptionHandler(FavorAlreadyExistingException.class)
+    public ResponseEntity<ApiError> handleFavorAlreadyExistingException(FavorAlreadyExistingException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.FOUND.value(),
+                HttpStatus.FOUND.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.FOUND);
+    }
+
+    /**
+     * Handles FavorNotEmptyException and sends a BAD REQUEST error.
+     * <p>
+     * This method is called automatically when the category is empty.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (FavorNotEmptyException).
+     * @return A response with an apiError and HTTP status 400 (BAD REQUEST).
+     */
+    @ExceptionHandler(FavorNotEmptyException.class)
+    public ResponseEntity<ApiError> handleFavorNotEmptyException(FavorNotEmptyException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
 
 }
