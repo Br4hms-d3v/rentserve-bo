@@ -1,4 +1,4 @@
-package be.brahms.TFE_RentServe.models.dtos.favor;
+package be.brahms.TFE_RentServe.models.forms.favor;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

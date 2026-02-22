@@ -1,8 +1,8 @@
 package be.brahms.TFE_RentServe.services;
 
 import be.brahms.TFE_RentServe.models.dtos.favor.FavorDTO;
-import be.brahms.TFE_RentServe.models.dtos.favor.FavorFormDTO;
-import be.brahms.TFE_RentServe.models.dtos.favor.UpdateFavorFormDTO;
+import be.brahms.TFE_RentServe.models.forms.favor.FavorFormDTO;
+import be.brahms.TFE_RentServe.models.forms.favor.UpdateFavorFormDTO;
 import be.brahms.TFE_RentServe.models.entities.Favor;
 import org.springframework.data.repository.query.Param;
 
