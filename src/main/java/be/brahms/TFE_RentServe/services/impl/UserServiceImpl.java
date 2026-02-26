@@ -8,6 +8,9 @@ import be.brahms.TFE_RentServe.exceptions.user.*;
 import be.brahms.TFE_RentServe.mappers.AuthMapper;
 import be.brahms.TFE_RentServe.mappers.UserMapper;
 import be.brahms.TFE_RentServe.models.dtos.email.EmailTokenDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.*;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
@@ -36,11 +39,12 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final EmailService emailService;
 
+
     /**
      * Constructor to create UserServiceImpl with UserRepository.
      *
      * @param userRepository        the repository to access user data
-     * @param bCryptPasswordEncoder encode password with BCrypt
+     * @param bCryptPasswordEncoder encode password with Bcrypt
      * @param authMapper            map between form auth to entity
      * @param userMapper            map between form user to entity
      * @param emailService          email confirm or update password
@@ -65,11 +69,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User register(UserForm form) {
-        /**
-         * Map the UserForm to a new User.
-         * Default values are set in the mapper.
-         * Some fields are ignored.
-         */
+
+        //Map the UserForm to a new User.
         User user = authMapper.fromUserForm(form);
 
         // Check if exist an email
@@ -119,15 +120,18 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userActivated);
     }
 
+    /**
+     * This method connect to the app
+     *
+     * @param form the user for log in
+     * @return a user connected with
+     */
     @Override
     public User login(UserLoginForm form) {
         Optional<User> foundEmailOrPseudo = userRepository.findByEmailOrPseudo(form.email(), form.pseudo());
 
-        /**
-         * Check the email or pseudo
-         * If it doesn't exist in the DB
-         * Send Exception
-         */
+
+        // If it doesn't exist in the DB
         if (foundEmailOrPseudo.isEmpty()) {
 
             boolean userLoginWithEmail = userRepository.existsByEmail(form.email());
@@ -142,11 +146,8 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        /**
-         * Check the account boolean
-         * If it's true the account is available
-         * If it's false the account isn't available
-         */
+
+        // Check the account boolean
         User user = foundEmailOrPseudo.get();
 
         if (!user.getIsActive()) {
@@ -169,7 +170,7 @@ public class UserServiceImpl implements UserService {
      * @return data about user
      */
     @Override
-    public User userFindById(long id) {
+    public UserDTO userFindById(long id) {
         String currentPseudo = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User currentUser = userRepository.findByPseudo(currentPseudo).orElseThrow(UserNotFoundException::new);
@@ -177,7 +178,7 @@ public class UserServiceImpl implements UserService {
         if (currentUser.getId() != id) {
             throw new AccessNotAuthorizedException();
         }
-        return currentUser;
+        return userMapper.toDto(currentUser);
 
     }
 
@@ -188,7 +189,7 @@ public class UserServiceImpl implements UserService {
      * @return a list of all users
      */
     @Override
-    public List<User> findAllUsers() {
+    public List<UserDTO> findAllUsers() {
         List<User> listOfUsers = userRepository.findAll();
 
         // If the list is empty, send a message exception
@@ -196,7 +197,10 @@ public class UserServiceImpl implements UserService {
             throw new UserException("La liste est vide !");
         }
 
-        return listOfUsers;
+        return listOfUsers
+                .stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
     /**
@@ -205,14 +209,18 @@ public class UserServiceImpl implements UserService {
      * @param role The role of user (Member, Moderator or Admin)
      * @return a list of users
      */
-    public List<User> findUsersByRole(Role role) {
+    @Override
+    public List<UserRoleDTO> findUsersByRole(Role role) {
         List<User> listUserByRole = userRepository.listUsersByRole(role);
 
         if (listUserByRole.isEmpty()) {
             throw new UserException("Aucun n'a le role: " + role);
         }
 
-        return listUserByRole;
+        return listUserByRole
+                .stream()
+                .map(userMapper::listRoleToDto)
+                .toList();
     }
 
     /**
@@ -223,7 +231,7 @@ public class UserServiceImpl implements UserService {
      * @param user the data user
      * @return a user with data updated
      */
-    public User updateUser(long id, UserUpdateForm user) {
+    public UserDTO updateUser(long id, UserUpdateForm user) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User userIdUpdate = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
@@ -249,17 +257,25 @@ public class UserServiceImpl implements UserService {
         userIdUpdate.setCity(user.city());
         userIdUpdate.setZipCode(user.zipCode());
 
-        // map from Form to Entity
+        // map Form to Entity
         userMapper.fromUpdateUserForm(user, userIdUpdate);
 
-        return userRepository.save(userIdUpdate);
+        User savedUser = userRepository.save(userIdUpdate);
+
+        // Entity to Dto
+        return userMapper.toDto(savedUser);
     }
 
     @Override
-    public User changePassword(long id, UserChangePasswordForm user) {
-
+    public UserPasswordDTO changePassword(long id, UserChangePasswordForm user) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User userUpdatePassword = userRepository.findByEmail(user.email());
+        User userId = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
+        // Check if the user who use the form is the same as the identifier about the user
+        if (!authentication.getName().equals(userId.getPseudo())) {
+            throw new AccessNotAuthorizedException();
+        }
         // Check the email exist or not => send a message with exception
         if (userUpdatePassword.getEmail() == null) {
             throw new EmailNotFoundException();
@@ -267,22 +283,17 @@ public class UserServiceImpl implements UserService {
         if (!user.email().equals(userUpdatePassword.getEmail())) {
             throw new EmailException("Votre email n'est pas identique à votre compte");
         }
-
         if (!user.password().equals(user.comparePassword())) {
             throw new InvalidPasswordException("Le mot de passe doit être identique");
         }
-
         if (user.email().isEmpty() || user.email().isBlank()) {
             throw new EmailException("Veuillez entrez une adresse email");
         }
         userMapper.fromUserChangePasswordForm(user, userUpdatePassword);
-
         // Hash the password
         userUpdatePassword.setPassword(bCryptPasswordEncoder.encode(user.password()));
 
-
         userRepository.save(userUpdatePassword);
-
         // Generate a token for email
         EmailTokenDTO emailTokenDTO = new EmailTokenDTO();
 
@@ -290,7 +301,7 @@ public class UserServiceImpl implements UserService {
 
         emailService.sendEmailUpdatePassword(user.email(), warnUpdatePasswordConfirmationUrl);
 
-        return userUpdatePassword;
+        return userMapper.toUserPasswordDto(userUpdatePassword);
     }
 
     /**
@@ -301,9 +312,13 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void deleteAccount(long id, UserDeleteForm form) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // Get user id from form delete
         User userId = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
+        if (!authentication.getName().equals(userId.getPseudo())) {
+            throw new AccessNotAuthorizedException();
+        }
         // Check if it's already deactivated
         if (!userId.getIsActive()) {
             throw new UserException("Le compte est déjà supprimé");
