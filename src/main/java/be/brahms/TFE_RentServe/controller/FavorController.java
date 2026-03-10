@@ -98,6 +98,12 @@ public class FavorController {
         return ResponseEntity.ok().body(favorAssembler.toModel(favorDTO));
     }
 
+    /**
+     * Get a list of favour grouped by name of category
+     *
+     * @param nameCategory name of category
+     * @return a list of favour grouped by name of category
+     */
     @GetMapping("category/{nameCategory}")
     @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
     public ResponseEntity<CollectionModel<FavorDTO>> getAllFavourByNameCategory(@PathVariable String nameCategory) {
@@ -122,6 +128,7 @@ public class FavorController {
         EntityModel<FavorDTO> modelFavor = favorAssembler.toModel(favorDto);
         return ResponseEntity.ok().body(modelFavor);
     }
+
     /**
      * This method to delete
      *

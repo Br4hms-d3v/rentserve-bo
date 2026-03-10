@@ -46,7 +46,7 @@ public interface FavorMapper {
     FavorByIdDTO toDtoById(Favor favor);
 
     /**
-     * Convert Favor to a List<FavorDto>
+     * Convert Favor to a {@code List<FavorDto>}
      *
      * @param favors the list of favor Entity
      * @return the list of Favor Dto
