@@ -1,6 +1,7 @@
 package be.brahms.TFE_RentServe.services;
 
-import be.brahms.TFE_RentServe.models.entities.Category;
+import be.brahms.TFE_RentServe.models.dtos.category.CategoryDTO;
+import be.brahms.TFE_RentServe.models.dtos.category.CategoryIdDTO;
 import be.brahms.TFE_RentServe.models.forms.category.CategoryForm;
 import jakarta.validation.Valid;
 
@@ -17,7 +18,7 @@ public interface CategoryService {
      *
      * @return list of categories
      */
-    List<Category> findAllCategories();
+    List<CategoryDTO> findAllCategories();
 
     /**
      * This method get a category by ID
@@ -25,7 +26,7 @@ public interface CategoryService {
      * @param id the identifier of category
      * @return details about the category
      */
-    Category findCategoryById(long id);
+    CategoryIdDTO findCategoryById(long id);
 
     /**
      * This method saves a new category.
@@ -33,7 +34,7 @@ public interface CategoryService {
      * @param form the form to create a new category
      * @return the saved category
      */
-    Category createCategory(@Valid CategoryForm form);
+    CategoryDTO createCategory(@Valid CategoryForm form);
 
     /**
      * This method edit the category
@@ -42,7 +43,7 @@ public interface CategoryService {
      * @param form the form to edit the category
      * @return the updated category
      */
-    Category updateCategory(long id, @Valid CategoryForm form);
+    CategoryDTO updateCategory(long id, @Valid CategoryForm form);
 
     /**
      * This method search a category by his name
@@ -50,7 +51,7 @@ public interface CategoryService {
      * @param nameCategory the name of category
      * @return a list of category
      */
-    List<Category> searchCategory(String nameCategory);
+    List<CategoryDTO> searchCategory(String nameCategory);
 
     /**
      * Soft delete category
