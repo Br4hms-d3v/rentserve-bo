@@ -1,10 +1,8 @@
 package be.brahms.TFE_RentServe.controller;
 
 import be.brahms.TFE_RentServe.hateoas.category.CategoryAssembler;
-import be.brahms.TFE_RentServe.mappers.CategoryMapper;
 import be.brahms.TFE_RentServe.models.dtos.category.CategoryDTO;
 import be.brahms.TFE_RentServe.models.dtos.category.CategoryIdDTO;
-import be.brahms.TFE_RentServe.models.entities.Category;
 import be.brahms.TFE_RentServe.models.forms.category.CategoryForm;
 import be.brahms.TFE_RentServe.services.CategoryService;
 import jakarta.validation.Valid;
@@ -33,19 +31,16 @@ public class CategoryController {
 
     private final CategoryService categoryService;
     private final CategoryAssembler categoryAssembler;
-    private final CategoryMapper categoryMapper;
 
     /**
      * This constructor is used to inject the necessary services for handling category-related request.
      *
      * @param categoryService   the service used for category management
      * @param categoryAssembler the assembler used to convert Category object to into CategoryDto models
-     * @param categoryMapper    hateoas create the link to redirect to endPoints
      */
-    public CategoryController(CategoryService categoryService, CategoryAssembler categoryAssembler, CategoryMapper categoryMapper) {
+    public CategoryController(CategoryService categoryService, CategoryAssembler categoryAssembler) {
         this.categoryService = categoryService;
         this.categoryAssembler = categoryAssembler;
-        this.categoryMapper = categoryMapper;
     }
 
     /**
@@ -56,13 +51,8 @@ public class CategoryController {
     @GetMapping("list")
     @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
     public ResponseEntity<CollectionModel<CategoryDTO>> getAllCategories() {
-        List<Category> categories = categoryService.findAllCategories();
-        List<CategoryDTO> listCategoriesDto = categories
-                .stream()
-                .map(categoryMapper::toDto)
-                .toList();
-
-        return ResponseEntity.ok().body(CollectionModel.of(listCategoriesDto));
+        List<CategoryDTO> categories = categoryService.findAllCategories();
+        return ResponseEntity.ok().body(CollectionModel.of(categories));
     }
 
     /**
@@ -74,9 +64,8 @@ public class CategoryController {
     @GetMapping("{id}")
     @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
     public ResponseEntity<EntityModel<CategoryIdDTO>> getCategory(@PathVariable long id) {
-        Category categoryId = categoryService.findCategoryById(id);
-        CategoryIdDTO categoryIdDTO = categoryMapper.toIdDto(categoryId);
-        return ResponseEntity.ok(categoryAssembler.toIdModel(categoryIdDTO));
+        CategoryIdDTO categoryId = categoryService.findCategoryById(id);
+        return ResponseEntity.ok(categoryAssembler.toIdModel(categoryId));
     }
 
     /**
@@ -88,9 +77,8 @@ public class CategoryController {
     @PostMapping("{new}")
     @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
     public ResponseEntity<EntityModel<CategoryDTO>> createCategory(@RequestBody @Valid CategoryForm form) {
-        Category category = categoryService.createCategory(form);
-        CategoryDTO categoryDTO = categoryMapper.toDto(category);
-        return ResponseEntity.ok().body(categoryAssembler.toModel(categoryDTO));
+        CategoryDTO category = categoryService.createCategory(form);
+        return ResponseEntity.ok().body(categoryAssembler.toModel(category));
     }
 
     /**
@@ -104,9 +92,8 @@ public class CategoryController {
     @PutMapping("edit/{id}")
     @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
     public ResponseEntity<EntityModel<CategoryDTO>> updateCategory(@PathVariable long id, @RequestBody CategoryForm form) {
-        Category category = categoryService.updateCategory(id, form);
-        CategoryDTO categoryDTO = categoryMapper.toDto(category);
-        return ResponseEntity.ok().body(categoryAssembler.toModel(categoryDTO));
+        CategoryDTO category = categoryService.updateCategory(id, form);
+        return ResponseEntity.ok().body(categoryAssembler.toModel(category));
     }
 
     /**
@@ -118,9 +105,8 @@ public class CategoryController {
     @GetMapping("search/{nameCategory}")
     @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
     public ResponseEntity<CollectionModel<CategoryDTO>> searchCategory(@PathVariable String nameCategory) {
-        List<Category> categories = categoryService.searchCategory(nameCategory);
-        List<CategoryDTO> categoriesDTO = categoryMapper.toListDto(categories);
-        return ResponseEntity.ok().body(CollectionModel.of(categoriesDTO));
+        List<CategoryDTO> categories = categoryService.searchCategory(nameCategory);
+        return ResponseEntity.ok().body(CollectionModel.of(categories));
     }
 
     /**
