@@ -1,9 +1,9 @@
 package be.brahms.TFE_RentServe.services;
 
+import be.brahms.TFE_RentServe.models.dtos.favor.FavorByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.favor.FavorDTO;
 import be.brahms.TFE_RentServe.models.forms.favor.FavorFormDTO;
 import be.brahms.TFE_RentServe.models.forms.favor.UpdateFavorFormDTO;
-import be.brahms.TFE_RentServe.models.entities.Favor;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public interface FavorService {
      *
      * @return list of favour
      */
-    List<Favor> findAllFavour();
+    List<FavorDTO> findAllFavour();
 
     /**
      * This method get a favor by ID
@@ -27,7 +27,7 @@ public interface FavorService {
      * @param id the identifier of favor
      * @return details about the favor
      */
-    Favor findFavourById(Long id);
+    FavorByIdDTO findFavourById(Long id);
 
     /**
      * This method saves a new favor.
@@ -35,7 +35,7 @@ public interface FavorService {
      * @param form the form to create a new favor
      * @return the saved favor
      */
-    Favor createFavor(FavorFormDTO form);
+    FavorDTO createFavor(FavorFormDTO form);
 
     /**
      * This method get a list of favour groups by his name of category
@@ -43,7 +43,7 @@ public interface FavorService {
      * @param categoryName the name of category
      * @return a list of favor grouped by name of category
      */
-    List<Favor> findFavourByCategoryName(@Param("categoryName") String categoryName);
+    List<FavorDTO> findFavourByCategoryName(@Param("categoryName") String categoryName);
 
     /**
      * This method edit the favor
@@ -59,5 +59,5 @@ public interface FavorService {
      *
      * @param id the identifier of favor
      */
-    void deleteFavor(Long id);
+    void deleteFavor(long id);
 }

@@ -2,6 +2,7 @@ package be.brahms.TFE_RentServe.mappers;
 
 import be.brahms.TFE_RentServe.models.dtos.favor.FavorByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.favor.FavorDTO;
+import be.brahms.TFE_RentServe.models.forms.favor.FavorFormDTO;
 import be.brahms.TFE_RentServe.models.forms.favor.UpdateFavorFormDTO;
 import be.brahms.TFE_RentServe.models.entities.Favor;
 import org.mapstruct.Mapper;
@@ -46,7 +47,7 @@ public interface FavorMapper {
     FavorByIdDTO toDtoById(Favor favor);
 
     /**
-     * Convert Favor to a List<FavorDto>
+     * Convert Favor to a {@code List<FavorDto>}
      *
      * @param favors the list of favor Entity
      * @return the list of Favor Dto
@@ -54,6 +55,16 @@ public interface FavorMapper {
     List<FavorDTO> toListDto(List<Favor> favors);
 
     // Form to Entity
+
+    /**
+     * Convert CreateFavorForm to a Favor entity.
+     * Used when create a favor
+     *
+     * @param form  the favor form
+     * @return the favor entity
+     */
+    @Mapping(target = "category", ignore = true)
+    Favor fromCreateFavorForm(FavorFormDTO form);
 
     /**
      * Update an existing Favor entity with data from a UpdateFavorForm.

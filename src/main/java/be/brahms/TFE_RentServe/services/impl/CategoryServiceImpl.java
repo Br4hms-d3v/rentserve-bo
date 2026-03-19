@@ -3,11 +3,15 @@ package be.brahms.TFE_RentServe.services.impl;
 import be.brahms.TFE_RentServe.exceptions.category.CategoryException;
 import be.brahms.TFE_RentServe.exceptions.category.CategoryExistingException;
 import be.brahms.TFE_RentServe.exceptions.category.CategoryNotFoundException;
+import be.brahms.TFE_RentServe.exceptions.database.DatabaseConstraintException;
 import be.brahms.TFE_RentServe.mappers.CategoryMapper;
+import be.brahms.TFE_RentServe.models.dtos.category.CategoryDTO;
+import be.brahms.TFE_RentServe.models.dtos.category.CategoryIdDTO;
 import be.brahms.TFE_RentServe.models.entities.Category;
 import be.brahms.TFE_RentServe.models.forms.category.CategoryForm;
 import be.brahms.TFE_RentServe.repositories.CategoryRepository;
 import be.brahms.TFE_RentServe.services.CategoryService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -42,14 +46,14 @@ public class CategoryServiceImpl implements CategoryService {
      * @return a list of categories
      */
     @Override
-    public List<Category> findAllCategories() {
+    public List<CategoryDTO> findAllCategories() {
 
         List<Category> categories = categoryRepository.findAll();
 
         if (categories.isEmpty()) {
             throw new CategoryException("La liste est vide");
         }
-        return categories;
+        return categoryMapper.toListDto(categories);
     }
 
     /**
@@ -60,10 +64,10 @@ public class CategoryServiceImpl implements CategoryService {
      * @return a details about category
      */
     @Override
-    public Category findCategoryById(long id) {
+    public CategoryIdDTO findCategoryById(long id) {
         Category category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
 
-        return category;
+        return categoryMapper.toIdDto(category);
     }
 
     /**
@@ -75,16 +79,18 @@ public class CategoryServiceImpl implements CategoryService {
      * @return the save category
      */
     @Override
-    public Category createCategory(CategoryForm form) {
-        Category categoryNameExists = categoryRepository.findCategoryByNameCategory(form.nameCategory());
+    public CategoryDTO createCategory(CategoryForm form) {
+
+        Category category = categoryMapper.fromCategoryForm(form);
+        Category categoryNameExists = categoryRepository.findCategoryByNameCategory(category.getNameCategory());
 
         if (categoryNameExists != null) {
             throw new CategoryExistingException();
         }
 
-        Category category = categoryMapper.fromCategoryForm(form);
+        categoryRepository.save(category);
 
-        return categoryRepository.save(category);
+        return categoryMapper.toDto(category);
     }
 
     /**
@@ -95,7 +101,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return a category updated
      */
     @Override
-    public Category updateCategory(long id, CategoryForm form) {
+    public CategoryDTO updateCategory(long id, CategoryForm form) {
         Category categoryId = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
 
         Category categoryNameExists = categoryRepository.findCategoryByNameCategory(categoryId.getNameCategory());
@@ -106,9 +112,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         categoryId.setNameCategory(form.nameCategory());
         categoryId.setUpdatedAt(LocalDate.now());
+
         categoryMapper.fromUpdateCategoryForm(form, categoryId);
 
-        return categoryRepository.save(categoryId);
+        return categoryMapper.toDto(categoryRepository.save(categoryId));
     }
 
     /**
@@ -119,26 +126,36 @@ public class CategoryServiceImpl implements CategoryService {
      * @return a list of categories
      */
     @Override
-    public List<Category> searchCategory(String nameCategory) {
+    public List<CategoryDTO> searchCategory(String nameCategory) {
         List<Category> categories = categoryRepository.searchCategory(nameCategory);
 
         if (categories.isEmpty()) {
-            throw new CategoryNotFoundException("La liste est vide");
+            throw new CategoryNotFoundException("The list is empty");
         }
 
-        return categories;
+        return categories
+                .stream()
+                .map(categoryMapper::toDto)
+                .toList();
 
     }
 
     /**
      * Soft dele of category
-     *
+     * If data is used by another tables send a message exception
+     * If not used by another, delete it
      * @param id the identifier of category
      */
     @Override
     public void deleteCategory(long id) {
-        Category categoryId = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
+        Category category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
 
-        categoryRepository.delete(categoryId);
+        try {
+            categoryRepository.delete(category);
+            categoryRepository.flush(); // Force to execute SQL now and after that, it sends a message exception
+        } catch (DataIntegrityViolationException exception) {
+            throw new DatabaseConstraintException("Can't delete category because it is used by another database");
+        }
+
     }
 }

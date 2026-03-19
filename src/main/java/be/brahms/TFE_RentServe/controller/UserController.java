@@ -3,11 +3,9 @@ package be.brahms.TFE_RentServe.controller;
 import be.brahms.TFE_RentServe.enums.Role;
 import be.brahms.TFE_RentServe.hateoas.user.UserAssembler;
 import be.brahms.TFE_RentServe.hateoas.user.UserRoleAssembler;
-import be.brahms.TFE_RentServe.mappers.UserMapper;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
-import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserDeleteForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
@@ -37,7 +35,6 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final UserMapper userMapper;
     private final UserAssembler userAssembler;
     private final UserRoleAssembler userRoleAssembler;
 
@@ -49,13 +46,11 @@ public class UserController {
      * - user and user role Assembler
      *
      * @param userService       service for user management
-     * @param userMapper        mapper entity to Dto or form to entity
      * @param userAssembler     hateoas create the link to redirect to endPoints
      * @param userRoleAssembler hateoas create the link to redirect to user role
      */
-    public UserController(UserService userService, UserMapper userMapper, UserAssembler userAssembler, UserRoleAssembler userRoleAssembler) {
+    public UserController(UserService userService, UserAssembler userAssembler, UserRoleAssembler userRoleAssembler) {
         this.userService = userService;
-        this.userMapper = userMapper;
         this.userAssembler = userAssembler;
         this.userRoleAssembler = userRoleAssembler;
     }
@@ -69,10 +64,8 @@ public class UserController {
     @GetMapping("{id}")
     @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
     public ResponseEntity<EntityModel<UserDTO>> getUser(@PathVariable long id) {
-        User userById = userService.userFindById(id);
-        UserDTO userDto = userMapper.toDto(userById);
-
-        return ResponseEntity.ok(userAssembler.toModel(userDto));
+        UserDTO userById = userService.userFindById(id);
+        return ResponseEntity.ok(userAssembler.toModel(userById));
     }
 
     /**
@@ -83,13 +76,8 @@ public class UserController {
     @GetMapping("list")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CollectionModel<UserDTO>> getAllUsers() {
-        List<User> users = userService.findAllUsers();
-        List<UserDTO> listUsersDto = users
-                .stream()
-                .map(userMapper::toDto)
-                .toList();
-
-        return ResponseEntity.ok(CollectionModel.of(listUsersDto));
+        List<UserDTO> users = userService.findAllUsers();
+        return ResponseEntity.ok(CollectionModel.of(users));
     }
 
     /**
@@ -100,18 +88,16 @@ public class UserController {
      */
     @GetMapping("list/{role}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CollectionModel<EntityModel<UserRoleDTO>>> getUsersByRole(@PathVariable Role role) {
-        List<UserRoleDTO> usersRoleDTO = userService.findUsersByRole(role)
-                .stream()
-                .map(userMapper::listRoleToDto)
-                .toList();
+    public ResponseEntity<CollectionModel<UserRoleDTO>> getUsersByRole(@PathVariable Role role) {
+        List<UserRoleDTO> usersListByRole = userService.findUsersByRole(role);
 
-        List<EntityModel<UserRoleDTO>> usersRoleListToModel = usersRoleDTO
-                .stream()
-                .map(userRoleAssembler::toModel)
-                .toList();
+        List<EntityModel<UserRoleDTO>> usersList =
+                usersListByRole
+                        .stream()
+                        .map(userRoleAssembler::toModel)
+                        .toList();
 
-        return ResponseEntity.ok(CollectionModel.of(usersRoleListToModel));
+        return ResponseEntity.ok(CollectionModel.of(usersListByRole));
     }
 
     /**
@@ -125,10 +111,8 @@ public class UserController {
     @PutMapping("{id}/edit")
     @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
     public ResponseEntity<EntityModel<UserDTO>> putUserUpdate(@PathVariable long id, @RequestBody @Valid UserUpdateForm form) {
-        User user = userService.updateUser(id, form);
-        UserDTO userUpdatedDTO = userMapper.toDto(user);
-        return ResponseEntity.ok(userAssembler.toModel(userUpdatedDTO));
-
+        UserDTO user = userService.updateUser(id, form);
+        return ResponseEntity.ok(userAssembler.toModel(user));
     }
 
     /**
@@ -142,10 +126,8 @@ public class UserController {
     @PatchMapping("{id}/change-password")
     @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
     public ResponseEntity<?> changePassword(@PathVariable long id, @RequestBody @Valid UserChangePasswordForm form) {
-        User user = userService.changePassword(id, form);
-        UserPasswordDTO userUpdatedDTO = userMapper.toUserPasswordDto(user);
-        userAssembler.toModel1(userUpdatedDTO);
-
+        UserPasswordDTO userPassword = userService.changePassword(id, form);
+        userAssembler.toModel1(userPassword);
         return ResponseEntity.ok("Mot de passe changé avec succès");
     }
 

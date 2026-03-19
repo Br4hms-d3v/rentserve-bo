@@ -1,6 +1,7 @@
 package be.brahms.TFE_RentServe.exceptions.global;
 
 import be.brahms.TFE_RentServe.exceptions.category.*;
+import be.brahms.TFE_RentServe.exceptions.database.DatabaseConstraintException;
 import be.brahms.TFE_RentServe.exceptions.dto.ApiError;
 import be.brahms.TFE_RentServe.exceptions.email.EmailException;
 import be.brahms.TFE_RentServe.exceptions.email.EmailExistingException;
@@ -393,6 +394,27 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(FavorNotEmptyException.class)
     public ResponseEntity<ApiError> handleFavorNotEmptyException(FavorNotEmptyException except) {
+        ApiError apiError = ApiError.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                except.getMessage()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    // Database
+
+    /**
+     * Handles DatabaseConstraintException and sends a BAD REQUEST error.
+     * <p>
+     * This method is called automatically when the user delete a category who's used by another data.
+     * It creates an ApiError and sends it to the frontend.
+     *
+     * @param except The exception that was thrown (DatabaseConstraintException).
+     * @return A response with an apiError and HTTP status 400 (BAD REQUEST).
+     */
+    @ExceptionHandler(DatabaseConstraintException.class)
+    public ResponseEntity<ApiError> handleDatabaseConstraintException(DatabaseConstraintException except) {
         ApiError apiError = ApiError.of(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),

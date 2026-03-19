@@ -2,11 +2,13 @@ package be.brahms.TFE_RentServe.services.impl;
 
 import be.brahms.TFE_RentServe.exceptions.category.CategoryNotEmptyException;
 import be.brahms.TFE_RentServe.exceptions.category.CategoryNotExistingException;
+import be.brahms.TFE_RentServe.exceptions.database.DatabaseConstraintException;
 import be.brahms.TFE_RentServe.exceptions.favor.FavorAlreadyExistingException;
 import be.brahms.TFE_RentServe.exceptions.favor.FavorNotEmptyException;
 import be.brahms.TFE_RentServe.exceptions.favor.FavorNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.favor.FavorException;
 import be.brahms.TFE_RentServe.mappers.FavorMapper;
+import be.brahms.TFE_RentServe.models.dtos.favor.FavorByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.favor.FavorDTO;
 import be.brahms.TFE_RentServe.models.forms.favor.FavorFormDTO;
 import be.brahms.TFE_RentServe.models.forms.favor.UpdateFavorFormDTO;
@@ -15,6 +17,7 @@ import be.brahms.TFE_RentServe.models.entities.Favor;
 import be.brahms.TFE_RentServe.repositories.CategoryRepository;
 import be.brahms.TFE_RentServe.repositories.FavorRepository;
 import be.brahms.TFE_RentServe.services.FavorService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,14 +58,14 @@ public class FavorServiceImpl implements FavorService {
      * @return a list of categories
      */
     @Override
-    public List<Favor> findAllFavour() {
+    public List<FavorDTO> findAllFavour() {
         List<Favor> favour = favorRepository.findAll();
 
         if (favour.isEmpty()) {
             throw new FavorException("The list is empty");
         }
 
-        return favour;
+        return favorMapper.toListDto(favour);
     }
 
     /**
@@ -73,8 +76,10 @@ public class FavorServiceImpl implements FavorService {
      * @return a details about favor
      */
     @Override
-    public Favor findFavourById(Long id) {
-        return favorRepository.findById(id).orElseThrow(FavorNotFoundException::new);
+    public FavorByIdDTO findFavourById(Long id) {
+        Favor favor = favorRepository.findById(id).orElseThrow(FavorNotFoundException::new);
+
+        return favorMapper.toDtoById(favor);
     }
 
     /**
@@ -89,11 +94,10 @@ public class FavorServiceImpl implements FavorService {
      * @return the save category
      */
     @Override
-    public Favor createFavor(FavorFormDTO form) {
-
-        Favor newFavor = new Favor();
+    public FavorDTO createFavor(FavorFormDTO form) {
+        Favor favor = favorMapper.fromCreateFavorForm(form);
         Category categoryExist = categoryRepository.findCategoryByNameCategory(form.category());
-        Boolean favorExist = favorRepository.existsFavorByNameFavor(form.nameFavor());
+        Boolean favorExist = favorRepository.existsFavorByNameFavor(favor.getNameFavor());
 
         if (form.category().isEmpty() || form.category().isBlank()) {
             throw new CategoryNotEmptyException();
@@ -111,11 +115,13 @@ public class FavorServiceImpl implements FavorService {
             throw new FavorNotEmptyException();
         }
 
-        newFavor.setNameFavor(form.nameFavor());
-        newFavor.setAvailable(form.isAvailable());
-        newFavor.setCategory(categoryExist);
-        System.out.println(categoryExist);
-        return favorRepository.save(newFavor);
+        favor.setNameFavor(form.nameFavor());
+        favor.setAvailable(form.isAvailable());
+        favor.setCategory(categoryExist);
+
+        favorRepository.save(favor);
+
+        return favorMapper.toDto(favor);
     }
 
     /**
@@ -127,7 +133,7 @@ public class FavorServiceImpl implements FavorService {
      * @return a list of favour grouped by
      */
     @Override
-    public List<Favor> findFavourByCategoryName(String categoryName) {
+    public List<FavorDTO> findFavourByCategoryName(String categoryName) {
         Category categoryExist = categoryRepository.findCategoryByNameCategory(categoryName);
         List<Favor> listFavour = favorRepository.findFavorsByCategoryName(categoryName);
 
@@ -147,8 +153,7 @@ public class FavorServiceImpl implements FavorService {
             throw new FavorException("The list is empty");
         }
 
-
-        return listFavour;
+        return favorMapper.toListDto(listFavour);
     }
 
     /**
@@ -201,12 +206,15 @@ public class FavorServiceImpl implements FavorService {
      * @param id the identifier of favor
      */
     @Override
-    public void deleteFavor(Long id) {
+    public void deleteFavor(long id) {
         Favor favor = favorRepository.findById(id).orElseThrow(FavorNotFoundException::new);
+        try {
+            favorRepository.delete(favor);
+            favorRepository.flush();
+        } catch (DataIntegrityViolationException cause) {
+            throw new DatabaseConstraintException("Can't delete category because it is used by another database");
+        }
 
-        favorMapper.toDto(favor);
-
-        favorRepository.delete(favor);
     }
 
 }

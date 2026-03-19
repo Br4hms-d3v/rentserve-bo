@@ -2,12 +2,10 @@ package be.brahms.TFE_RentServe.controller;
 
 import be.brahms.TFE_RentServe.hateoas.favor.FavorAssembler;
 import be.brahms.TFE_RentServe.hateoas.favor.FavorByIdAssembler;
-import be.brahms.TFE_RentServe.mappers.FavorMapper;
 import be.brahms.TFE_RentServe.models.dtos.favor.FavorByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.favor.FavorDTO;
 import be.brahms.TFE_RentServe.models.forms.favor.FavorFormDTO;
 import be.brahms.TFE_RentServe.models.forms.favor.UpdateFavorFormDTO;
-import be.brahms.TFE_RentServe.models.entities.Favor;
 import be.brahms.TFE_RentServe.services.FavorService;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.CollectionModel;
@@ -36,7 +34,6 @@ public class FavorController {
     private final FavorService favorService;
     private final FavorAssembler favorAssembler;
     private final FavorByIdAssembler favorByIdAssembler;
-    private final FavorMapper favorMapper;
 
     /**
      * This constructor is used to inject the necessary service for handling favor-related request.
@@ -44,13 +41,11 @@ public class FavorController {
      * @param favorService       the service used for favor management
      * @param favorAssembler     the assembler used to convert Favor object to into FavorDto models
      * @param favorByIdAssembler the assembler used to convert Favor object to into FavorByIdDto models
-     * @param favorMapper        hateoas create the link to redirect to endPoints
      */
-    public FavorController(FavorService favorService, FavorAssembler favorAssembler, FavorByIdAssembler favorByIdAssembler, FavorMapper favorMapper) {
+    public FavorController(FavorService favorService, FavorAssembler favorAssembler, FavorByIdAssembler favorByIdAssembler) {
         this.favorService = favorService;
         this.favorAssembler = favorAssembler;
         this.favorByIdAssembler = favorByIdAssembler;
-        this.favorMapper = favorMapper;
     }
 
     /**
@@ -61,12 +56,8 @@ public class FavorController {
     @GetMapping("list")
     @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
     public ResponseEntity<CollectionModel<FavorDTO>> getAllFavors() {
-        List<Favor> favour = favorService.findAllFavour();
-        List<FavorDTO> favourDto = favour
-                .stream()
-                .map(favorMapper::toDto)
-                .toList();
-        return ResponseEntity.ok(CollectionModel.of(favourDto));
+        List<FavorDTO> favour = favorService.findAllFavour();
+        return ResponseEntity.ok(CollectionModel.of(favour));
     }
 
     /**
@@ -78,9 +69,8 @@ public class FavorController {
     @GetMapping("{id}")
     @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
     public ResponseEntity<EntityModel<FavorByIdDTO>> getFavorById(@PathVariable Long id) {
-        Favor favorId = favorService.findFavourById(id);
-        FavorByIdDTO favorByIdDTO = favorMapper.toDtoById(favorId);
-        EntityModel<FavorByIdDTO> modelFavorId = favorByIdAssembler.toModel(favorByIdDTO);
+        FavorByIdDTO favorId = favorService.findFavourById(id);
+        EntityModel<FavorByIdDTO> modelFavorId = favorByIdAssembler.toModel(favorId);
         return ResponseEntity.ok(modelFavorId);
     }
 
@@ -93,17 +83,22 @@ public class FavorController {
     @PostMapping("new")
     @PreAuthorize("hasAnyRole('MODERATOR','ADMIN')")
     public ResponseEntity<EntityModel<FavorDTO>> createFavor(@RequestBody @Valid FavorFormDTO form) {
-        Favor favor = favorService.createFavor(form);
-        FavorDTO favorDTO = favorMapper.toDto(favor);
-        return ResponseEntity.ok().body(favorAssembler.toModel(favorDTO));
+        FavorDTO favor = favorService.createFavor(form);
+        EntityModel<FavorDTO> modelFavor = favorAssembler.toModel(favor);
+        return ResponseEntity.ok().body(modelFavor);
     }
 
+    /**
+     * Get a list of favour grouped by name of category
+     *
+     * @param nameCategory name of category
+     * @return a list of favour grouped by name of category
+     */
     @GetMapping("category/{nameCategory}")
     @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
     public ResponseEntity<CollectionModel<FavorDTO>> getAllFavourByNameCategory(@PathVariable String nameCategory) {
-        List<Favor> favour = favorService.findFavourByCategoryName(nameCategory);
-        List<FavorDTO> favourDto = favorMapper.toListDto(favour);
-        CollectionModel<FavorDTO> favourToCollectionModel = favorAssembler.toCollectionModel(favourDto);
+        List<FavorDTO> favour = favorService.findFavourByCategoryName(nameCategory);
+        CollectionModel<FavorDTO> favourToCollectionModel = favorAssembler.toCollectionModel(favour);
         return ResponseEntity.ok().body(favourToCollectionModel);
     }
 
@@ -122,6 +117,7 @@ public class FavorController {
         EntityModel<FavorDTO> modelFavor = favorAssembler.toModel(favorDto);
         return ResponseEntity.ok().body(modelFavor);
     }
+
     /**
      * This method to delete
      *
@@ -130,7 +126,7 @@ public class FavorController {
      */
     @DeleteMapping("delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> deleteFavor(@PathVariable Long id) {
+    public ResponseEntity<String> deleteFavor(@PathVariable long id) {
         favorService.deleteFavor(id);
         return ResponseEntity.ok().body("The favor has been deleted");
     }

@@ -1,6 +1,9 @@
 package be.brahms.TFE_RentServe.services;
 
 import be.brahms.TFE_RentServe.enums.Role;
+import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.*;
 import jakarta.validation.Valid;
@@ -42,14 +45,14 @@ public interface UserService {
      * @param id from the user
      * @return data's from user by id if exist
      */
-    User userFindById(long id);
+    UserDTO userFindById(long id);
 
     /**
      * This method get a list of users
      *
      * @return list of all users
      */
-    List<User> findAllUsers();
+    List<UserDTO> findAllUsers();
 
     /**
      * Get all users with a specific role.
@@ -57,7 +60,7 @@ public interface UserService {
      * @param role the role to filter users
      * @return list of users with the given role
      */
-    List<User> findUsersByRole(Role role);
+    List<UserRoleDTO> findUsersByRole(Role role);
 
     /**
      * Update the user
@@ -66,7 +69,7 @@ public interface UserService {
      * @param user the data user
      * @return the new user
      */
-    User updateUser(long id, UserUpdateForm user);
+    UserDTO updateUser(long id, UserUpdateForm user);
 
     /**
      * Change only the password
@@ -75,7 +78,7 @@ public interface UserService {
      * @param user the data's user
      * @return a password updated
      */
-    User changePassword(long id, UserChangePasswordForm user);
+    UserPasswordDTO changePassword(long id, UserChangePasswordForm user);
 
     /**
      * Soft delete of an account from user
