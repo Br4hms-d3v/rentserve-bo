@@ -148,16 +148,13 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     public void deleteCategory(long id) {
-        boolean categoryIdExist = categoryRepository.existsCategoryById(id);
         Category category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
 
-        if(categoryIdExist) {
-            throw new DatabaseConstraintException("Can't delete category because it is used by another database");
-        }
         try {
             categoryRepository.delete(category);
+            categoryRepository.flush(); // Force to execute SQL now and after that, it sends a message exception
         } catch (DataIntegrityViolationException exception) {
-            throw new DatabaseConstraintException("Can't delete: " + exception.getMessage());
+            throw new DatabaseConstraintException("Can't delete category because it is used by another database");
         }
 
     }
