@@ -34,12 +34,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
      */
     @Query("SELECT DISTINCT c FROM Category c WHERE c.nameCategory ILIKE %:nameCategory% ORDER BY c.nameCategory ASC")
     List<Category> searchCategory(@Param("nameCategory") String nameCategory);
-
-    /**
-     * Check if the category exist by id
-     *
-     * @param id the identifier of the category
-     * @return boolean, true if exist and false doesn't exit
-     */
-    boolean existsCategoryById(long id);
 }
