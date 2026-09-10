@@ -11,6 +11,7 @@ import be.brahms.TFE_RentServe.models.dtos.email.EmailTokenDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserTokenDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.*;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
@@ -19,6 +20,8 @@ import be.brahms.TFE_RentServe.services.email.EmailService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import be.brahms.TFE_RentServe.utilities.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +37,7 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final AuthMapper authMapper;
+  private final JwtUtil jwtUtil;
   private final UserMapper userMapper;
   private final EmailService emailService;
 
@@ -51,11 +55,13 @@ public class UserServiceImpl implements UserService {
       UserRepository userRepository,
       BCryptPasswordEncoder bCryptPasswordEncoder,
       AuthMapper authMapper,
+      JwtUtil jwtUtil,
       UserMapper userMapper,
       EmailService emailService) {
     this.userRepository = userRepository;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.authMapper = authMapper;
+    this.jwtUtil = jwtUtil;
     this.userMapper = userMapper;
     this.emailService = emailService;
   }
@@ -225,7 +231,7 @@ public class UserServiceImpl implements UserService {
    * @param user the data user
    * @return a user with data updated
    */
-  public UserDTO updateUser(long id, UserUpdateForm user) {
+  public UserTokenDTO updateUser(long id, UserUpdateForm user) {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     User userIdUpdate = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
@@ -256,8 +262,10 @@ public class UserServiceImpl implements UserService {
 
     User savedUser = userRepository.save(userIdUpdate);
 
+    String token = jwtUtil.generateToken(savedUser);
+
     // Entity to Dto
-    return userMapper.toDto(savedUser);
+    return userMapper.toTokenDto(savedUser, token);
   }
 
   @Override

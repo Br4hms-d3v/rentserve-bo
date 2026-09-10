@@ -6,6 +6,8 @@ import be.brahms.TFE_RentServe.hateoas.user.UserRoleAssembler;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserTokenDTO;
+import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserDeleteForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
@@ -101,10 +103,10 @@ public class UserController {
    */
   @PutMapping("{id}/edit")
   @PreAuthorize("hasAnyRole('MEMBER','MODERATOR','ADMIN')")
-  public ResponseEntity<EntityModel<UserDTO>> putUserUpdate(
+  public ResponseEntity<EntityModel<UserTokenDTO>> putUserUpdate(
       @PathVariable long id, @RequestBody @Valid UserUpdateForm form) {
-    UserDTO user = userService.updateUser(id, form);
-    return ResponseEntity.ok(userAssembler.toModel(user));
+    UserTokenDTO user = userService.updateUser(id, form);
+    return ResponseEntity.ok(userAssembler.toTokenModel(user));
   }
 
   /**

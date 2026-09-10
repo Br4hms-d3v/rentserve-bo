@@ -4,6 +4,7 @@ import be.brahms.TFE_RentServe.enums.Role;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserTokenDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.*;
 import jakarta.validation.Valid;
@@ -65,7 +66,7 @@ public interface UserService {
    * @param user the data user
    * @return the new user
    */
-  UserDTO updateUser(long id, UserUpdateForm user);
+  UserTokenDTO updateUser(long id, UserUpdateForm user);
 
   /**
    * Change only the password
