@@ -1,0 +1,17 @@
+[33mba68b53[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: commit (merge): Merge branch 'main' of C:\Users\khadr\IdeaProjects\TFE_RentServe_Backend with conflicts.
+[33m81049b5[m[33m ([m[1;31morigin/dev[m[33m, [m[1;32mdev[m[33m)[m HEAD@{1}: reset: moving to HEAD
+[33m81049b5[m[33m ([m[1;31morigin/dev[m[33m, [m[1;32mdev[m[33m)[m HEAD@{2}: pull origin dev: Fast-forward
+[33ma7ada5b[m HEAD@{3}: checkout: moving from dev to main
+[33m81049b5[m[33m ([m[1;31morigin/dev[m[33m, [m[1;32mdev[m[33m)[m HEAD@{4}: commit: Add route on properties, It help to read the schema on DB
+[33ma72a145[m HEAD@{5}: commit: Generate spotless and javaDoc
+[33mce95ebd[m HEAD@{6}: commit: Add token to response when the user update his account
+[33mdb734ff[m HEAD@{7}: commit: Remove the code wich cannot edit the favor
+[33m2a2df4d[m[33m ([m[1;31morigin/category[m[33m, [m[1;32mcategory[m[33m)[m HEAD@{8}: pull origin category: Fast-forward
+[33ma7ada5b[m HEAD@{9}: checkout: moving from category to dev
+[33m2a2df4d[m[33m ([m[1;31morigin/category[m[33m, [m[1;32mcategory[m[33m)[m HEAD@{10}: commit: List of category for favours
+[33mb1a3536[m HEAD@{11}: commit: Add list category for only material
+[33ma7ada5b[m HEAD@{12}: checkout: moving from dev to category
+[33ma7ada5b[m HEAD@{13}: checkout: moving from main to dev
+[33ma7ada5b[m HEAD@{14}: checkout: moving from dev to main
+[33ma7ada5b[m HEAD@{15}: pull origin main: Fast-forward
+[33m526fc5c[m[33m ([m[1;31morigin/userMaterial[m[33m, [m[1;32muserMaterial[m[33m)[m HEAD@{16}: checkout: moving from main to dev
