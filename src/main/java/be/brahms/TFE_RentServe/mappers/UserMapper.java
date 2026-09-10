@@ -25,84 +25,85 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
 
-    // Entity to Data Access Object
+  // Entity to Data Access Object
 
-    /**
-     * Maps the user to UserDTO
-     *
-     * @param user the user data
-     * @return a User dto
-     */
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "firstName", source = "firstName")
-    @Mapping(target = "birthdate", source = "birthdate")
-    @Mapping(target = "email", source = "email")
-    @Mapping(target = "isActive", source = "isActive")
-    UserDTO toDto(User user);
+  /**
+   * Maps the user to UserDTO
+   *
+   * @param user the user data
+   * @return a User dto
+   */
+  @Mapping(target = "id", source = "id")
+  @Mapping(target = "name", source = "name")
+  @Mapping(target = "firstName", source = "firstName")
+  @Mapping(target = "birthdate", source = "birthdate")
+  @Mapping(target = "email", source = "email")
+  @Mapping(target = "isActive", source = "isActive")
+  UserDTO toDto(User user);
 
-    /**
-     * Maps the user to UserTokenDTO
-     *
-     * @param user the user data and token
-     * @return a User with token dto
-     */
-    @Mapping(target = "id", source = "user.id")
-    @Mapping(target = "name", source = "user.name")
-    @Mapping(target = "firstName", source = "user.firstName")
-    @Mapping(target = "birthdate", source = "user.birthdate")
-    @Mapping(target = "email", source = "user.email")
-    @Mapping(target = "role", source = "user.role")
-    @Mapping(target = "isActive", source = "user.isActive")
-    @Mapping(target = "token", source = "token")
-    UserTokenDTO toTokenDto(User user, String token);
+  /**
+   * Maps the user to UserTokenDTO
+   *
+   * @param user the user data and token
+   * @param token get a token when the user is updated
+   * @return a User with token dto
+   */
+  @Mapping(target = "id", source = "user.id")
+  @Mapping(target = "name", source = "user.name")
+  @Mapping(target = "firstName", source = "user.firstName")
+  @Mapping(target = "birthdate", source = "user.birthdate")
+  @Mapping(target = "email", source = "user.email")
+  @Mapping(target = "role", source = "user.role")
+  @Mapping(target = "isActive", source = "user.isActive")
+  @Mapping(target = "token", source = "token")
+  UserTokenDTO toTokenDto(User user, String token);
 
-    /**
-     * Maps a user to userRoleDTO
-     *
-     * @param user the user data
-     * @return a UserRoleDTO
-     */
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "firstName", source = "firstName")
-    @Mapping(target = "pseudo", source = "pseudo")
-    @Mapping(target = "role", source = "role")
-    @Mapping(target = "createdAt", source = "createdAt")
-    UserRoleDTO listRoleToDto(User user);
+  /**
+   * Maps a user to userRoleDTO
+   *
+   * @param user the user data
+   * @return a UserRoleDTO
+   */
+  @Mapping(target = "name", source = "name")
+  @Mapping(target = "firstName", source = "firstName")
+  @Mapping(target = "pseudo", source = "pseudo")
+  @Mapping(target = "role", source = "role")
+  @Mapping(target = "createdAt", source = "createdAt")
+  UserRoleDTO listRoleToDto(User user);
 
-    /**
-     * Maps a user to a UserPassworDTO
-     *
-     * @param user the user to convert
-     * @return the user password DTO
-     */
-    @Mapping(target = "email", source = "email")
-    UserPasswordDTO toUserPasswordDto(User user);
+  /**
+   * Maps a user to a UserPassworDTO
+   *
+   * @param user the user to convert
+   * @return the user password DTO
+   */
+  @Mapping(target = "email", source = "email")
+  UserPasswordDTO toUserPasswordDto(User user);
 
-    // Form to Entity
+  // Form to Entity
 
-    /**
-     * Updates an existing User from a UserUpdateForm
-     *
-     * @param user the user entity to update
-     * @param form the user form to update
-     */
-    void fromUpdateUserForm(UserUpdateForm form, @MappingTarget User user);
+  /**
+   * Updates an existing User from a UserUpdateForm
+   *
+   * @param user the user entity to update
+   * @param form the user form to update
+   */
+  void fromUpdateUserForm(UserUpdateForm form, @MappingTarget User user);
 
-    /**
-     * Change the password of the user Update an existing User entity from a UserChangePasswordForm
-     *
-     * @param form the form containing the new password data
-     * @param user the user entity to update
-     * @return the updated User entity
-     */
-    User fromUserChangePasswordForm(UserChangePasswordForm form, @MappingTarget User user);
+  /**
+   * Change the password of the user Update an existing User entity from a UserChangePasswordForm
+   *
+   * @param form the form containing the new password data
+   * @param user the user entity to update
+   * @return the updated User entity
+   */
+  User fromUserChangePasswordForm(UserChangePasswordForm form, @MappingTarget User user);
 
-    /**
-     * Map the form to entity User
-     *
-     * @param form the delete form
-     * @param user the user entity to update
-     */
-    void fromDeleteForm(UserDeleteForm form, @MappingTarget User user);
+  /**
+   * Map the form to entity User
+   *
+   * @param form the delete form
+   * @param user the user entity to update
+   */
+  void fromDeleteForm(UserDeleteForm form, @MappingTarget User user);
 }

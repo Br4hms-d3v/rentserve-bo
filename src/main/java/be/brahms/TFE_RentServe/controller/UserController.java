@@ -7,7 +7,6 @@ import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserTokenDTO;
-import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserDeleteForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;

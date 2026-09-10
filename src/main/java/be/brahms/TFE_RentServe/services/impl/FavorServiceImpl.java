@@ -169,9 +169,9 @@ public class FavorServiceImpl implements FavorService {
       throw new CategoryNotExistingException();
     }
 
-//    if (favorId.getNameFavor().equals(form.nameFavor())) {
-//      throw new FavorAlreadyExistingException();
-//    }
+    //    if (favorId.getNameFavor().equals(form.nameFavor())) {
+    //      throw new FavorAlreadyExistingException();
+    //    }
 
     if (categoryExist.getNameCategory().isEmpty() || categoryExist.getNameCategory().isBlank()) {
       throw new CategoryNotEmptyException();

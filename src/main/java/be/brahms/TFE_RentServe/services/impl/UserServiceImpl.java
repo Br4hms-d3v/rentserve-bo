@@ -17,11 +17,10 @@ import be.brahms.TFE_RentServe.models.forms.user.*;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.UserService;
 import be.brahms.TFE_RentServe.services.email.EmailService;
+import be.brahms.TFE_RentServe.utilities.JwtUtil;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
-import be.brahms.TFE_RentServe.utilities.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,6 +46,7 @@ public class UserServiceImpl implements UserService {
    * @param userRepository the repository to access user data
    * @param bCryptPasswordEncoder encode password with Bcrypt
    * @param authMapper map between form auth to entity
+   * @param jwtUtil generate token for response user
    * @param userMapper map between form user to entity
    * @param emailService email confirm or update password
    */
