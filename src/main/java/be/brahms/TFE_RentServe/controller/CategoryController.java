@@ -124,10 +124,10 @@ public class CategoryController {
 
   /**
    * Get a list of categories .
-   * <p>
-   * This method returns a list of all categories based on material.
-   * Each category is converted to a CategoryDto (Data Transfer Object).
-   * Each CategoryDto is wrapped inside an EntityModel with HATEOAS links.
+   *
+   * <p>This method returns a list of all categories based on material. Each category is converted
+   * to a CategoryDto (Data Transfer Object). Each CategoryDto is wrapped inside an EntityModel with
+   * HATEOAS links.
    *
    * @return ResponseEntity with a list of category models
    */
@@ -140,10 +140,10 @@ public class CategoryController {
 
   /**
    * Get a list of categories .
-   * <p>
-   * This method returns a list of all categories based on service.
-   * Each category is converted to a CategoryDto (Data Transfer Object).
-   * Each CategoryDto is wrapped inside an EntityModel with HATEOAS links.
+   *
+   * <p>This method returns a list of all categories based on service. Each category is converted to
+   * a CategoryDto (Data Transfer Object). Each CategoryDto is wrapped inside an EntityModel with
+   * HATEOAS links.
    *
    * @return ResponseEntity with a list of category models
    */

@@ -3,6 +3,7 @@ package be.brahms.TFE_RentServe.mappers;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserTokenDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserDeleteForm;
@@ -39,6 +40,23 @@ public interface UserMapper {
   @Mapping(target = "email", source = "email")
   @Mapping(target = "isActive", source = "isActive")
   UserDTO toDto(User user);
+
+  /**
+   * Maps the user to UserTokenDTO
+   *
+   * @param user the user data and token
+   * @param token get a token when the user is updated
+   * @return a User with token dto
+   */
+  @Mapping(target = "id", source = "user.id")
+  @Mapping(target = "name", source = "user.name")
+  @Mapping(target = "firstName", source = "user.firstName")
+  @Mapping(target = "birthdate", source = "user.birthdate")
+  @Mapping(target = "email", source = "user.email")
+  @Mapping(target = "role", source = "user.role")
+  @Mapping(target = "isActive", source = "user.isActive")
+  @Mapping(target = "token", source = "token")
+  UserTokenDTO toTokenDto(User user, String token);
 
   /**
    * Maps a user to userRoleDTO

@@ -6,6 +6,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import be.brahms.TFE_RentServe.controller.UserController;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserTokenDTO;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -51,6 +52,19 @@ public class UserAssembler implements RepresentationModelAssembler<UserDTO, Enti
             .withRel("Change the password"),
         linkTo(methodOn(UserController.class).deleteAccount(user.id(), null))
             .withRel("Delete account"));
+  }
+
+  /**
+   * Convert a UserTokenDto to an EntityModel with HATEOAS links.
+   *
+   * @param user the user data to wrap
+   * @return an EntityModel with the user data and token
+   */
+  public EntityModel<UserTokenDTO> toTokenModel(UserTokenDTO user) {
+    return EntityModel.of(
+        user,
+        linkTo(methodOn(UserController.class).putUserUpdate(user.id(), null))
+            .withRel("Update the user: " + user.id()));
   }
 
   /**
