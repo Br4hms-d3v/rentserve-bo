@@ -341,9 +341,16 @@ public class UserServiceImpl implements UserService {
     }
     // Map the form
     userMapper.fromDeleteForm(form, userId);
+    // Put the data with *** for anonymous
+    userId.setName("*user*delete*");
+    userId.setFirstName("*user*delete*");
+    userId.setBirthdate(LocalDate.now());
+    userId.setEmail("*user*delete*");
+    userId.setStreet("*user*delete*");
+    userId.setPassword("*user*delete*");
     // Persist to DB
     userId.setIsActive(false);
 
-    userRepository.deleteAccount(id);
+    userRepository.save(userId);
   }
 }
