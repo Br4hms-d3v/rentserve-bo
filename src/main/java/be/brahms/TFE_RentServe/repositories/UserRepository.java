@@ -68,13 +68,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
   @Query("SELECT u FROM User u WHERE u.role = :role")
   List<User> listUsersByRole(@Param("role") Role role);
 
-  /**
-   * Delete an account user It is change the boolean from true to false
-   *
-   * @param id the identifier of user
-   */
-  @Modifying
-  @Transactional
-  @Query("UPDATE User u SET u.isActive = false WHERE u.id = :id")
-  void deleteAccount(@Param("id") Long id);
+//  /**
+//   * Delete an account user It is change the boolean from true to false
+//   *
+//   * @param id the identifier of user
+//   */
+//  @Modifying
+//  @Transactional
+//  @Query("UPDATE User u SET u.isActive = false WHERE u.id = :id")
+//  void deleteAccount(@Param("id") Long id);
 }
