@@ -41,6 +41,7 @@ public interface FavorMapper {
    * @return a FavorByIdDTO object with data from Favor
    */
   @Mapping(source = "category.nameCategory", target = "nameCategory")
+  @Mapping(source = "available", target = "isAvailable")
   FavorByIdDTO toDtoById(Favor favor);
 
   /**

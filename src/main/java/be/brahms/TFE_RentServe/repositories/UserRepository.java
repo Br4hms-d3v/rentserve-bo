@@ -5,11 +5,9 @@ import be.brahms.TFE_RentServe.models.entities.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Repository for managing User entities. Provides basic CRUD operations and more using
@@ -68,13 +66,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
   @Query("SELECT u FROM User u WHERE u.role = :role")
   List<User> listUsersByRole(@Param("role") Role role);
 
-//  /**
-//   * Delete an account user It is change the boolean from true to false
-//   *
-//   * @param id the identifier of user
-//   */
-//  @Modifying
-//  @Transactional
-//  @Query("UPDATE User u SET u.isActive = false WHERE u.id = :id")
-//  void deleteAccount(@Param("id") Long id);
+  //  /**
+  //   * Delete an account user It is change the boolean from true to false
+  //   *
+  //   * @param id the identifier of user
+  //   */
+  //  @Modifying
+  //  @Transactional
+  //  @Query("UPDATE User u SET u.isActive = false WHERE u.id = :id")
+  //  void deleteAccount(@Param("id") Long id);
 }
