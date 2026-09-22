@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,7 +34,7 @@ public class Picture extends BaseEntity {
    * user-material.
    */
   @ManyToMany(mappedBy = "pictures")
-  private List<UserMaterial> userMaterial;
+  private Set<UserMaterial> userMaterial;
 
   /**
    * The user-favor relationship to which this picture belongs. A picture is associated with one
