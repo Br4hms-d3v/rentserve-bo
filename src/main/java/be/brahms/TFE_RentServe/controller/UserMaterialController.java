@@ -117,6 +117,20 @@ public class UserMaterialController {
   }
 
   /**
+   * Get a detail about the user material by owner user
+   *
+   * @param id the identifier of User material
+   * @return a detail about the user material
+   */
+  @GetMapping("my-material/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR')")
+  public ResponseEntity<EntityModel<UserMaterialByIdDTO>> getUserMaterialDetailByOwnerId(
+          @PathVariable long id) {
+    UserMaterialByIdDTO userMaterialByIdDTO = userMaterialService.findUserMaterialByOwnerId(id);
+    return ResponseEntity.ok().body(userMaterialAssembler.toIdModel(userMaterialByIdDTO));
+  }
+
+  /**
    * Get a list of user material grouped by User
    *
    * @param id the identifier from User
