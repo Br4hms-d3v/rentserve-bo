@@ -125,7 +125,7 @@ public class UserMaterialController {
   @GetMapping("my-material/{id}")
   @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR')")
   public ResponseEntity<EntityModel<UserMaterialByIdDTO>> getUserMaterialDetailByOwnerId(
-          @PathVariable long id) {
+      @PathVariable long id) {
     UserMaterialByIdDTO userMaterialByIdDTO = userMaterialService.findUserMaterialByOwnerId(id);
     return ResponseEntity.ok().body(userMaterialAssembler.toIdModel(userMaterialByIdDTO));
   }
