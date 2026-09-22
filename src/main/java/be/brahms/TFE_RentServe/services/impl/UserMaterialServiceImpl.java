@@ -130,10 +130,6 @@ public class UserMaterialServiceImpl implements UserMaterialService {
     UserMaterial userMaterial =
         userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
 
-    if (userMaterial.getPictures() != null && !userMaterial.getPictures().isEmpty()) {
-      userMaterial.setPictures(null);
-    }
-
     return userMaterialMapper.toIdDto(userMaterial);
   }
 

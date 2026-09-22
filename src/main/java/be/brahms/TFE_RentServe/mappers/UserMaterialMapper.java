@@ -37,7 +37,7 @@ public interface UserMaterialMapper {
         userMaterial.getPictures().stream()
             .map(Picture::getNamePicture)
             .findFirst()
-            .orElse("imageByDefault.jpg");
+            .orElse("imageByDefault.png");
 
     // Get the name from material
     MaterialNameDTO nameMaterial =
@@ -68,12 +68,12 @@ public interface UserMaterialMapper {
    */
   default UserMaterialByIdDTO toIdDto(UserMaterial userMaterial) {
     List<String> pictures =
-        userMaterial.getPictures().stream().map(Picture::getNamePicture).toList();
+        userMaterial.getPictures() == null
+            ? List.of()
+            : userMaterial.getPictures().stream().map(Picture::getNamePicture).toList();
 
-    // Get the pseudo from user
     UserPseudoDTO userPseudo = new UserPseudoDTO(userMaterial.getUser().getPseudo());
 
-    // Get the name from material
     MaterialNameDTO nameMaterial =
         new MaterialNameDTO(userMaterial.getMaterial().getNameMaterial());
 
@@ -109,7 +109,7 @@ public interface UserMaterialMapper {
     Picture picture = new Picture();
 
     if (namePicture == null || namePicture.isBlank()) {
-      picture.setNamePicture("imageByDefault.jpg");
+      picture.setNamePicture("imageByDefault.png");
     } else {
       picture.setNamePicture(namePicture);
     }

@@ -38,7 +38,7 @@ public interface UserFavorMapper {
         userFavor.getPictures().stream()
             .map(Picture::getNamePicture)
             .findFirst()
-            .orElse("imageByDefault.jpg");
+            .orElse("imageByDefault.png");
 
     return new UserFavorDTO(
         userFavor.getId(), userFavor.getPriceHourFavor(), userFavor.isAvailable(), firstPicture);
@@ -99,7 +99,7 @@ public interface UserFavorMapper {
     Picture picture = new Picture();
 
     if (namePicture == null || namePicture.isBlank()) {
-      picture.setNamePicture("imageByDefault.jpg");
+      picture.setNamePicture("imageByDefault.png");
     } else {
       picture.setNamePicture(namePicture);
     }
