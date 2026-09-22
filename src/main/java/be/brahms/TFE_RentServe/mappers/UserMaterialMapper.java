@@ -68,24 +68,29 @@ public interface UserMaterialMapper {
    */
   default UserMaterialByIdDTO toIdDto(UserMaterial userMaterial) {
     List<String> pictures =
-        userMaterial.getPictures().stream().map(Picture::getNamePicture).toList();
+            userMaterial.getPictures() == null
+                    ? List.of()
+                    : userMaterial.getPictures()
+                    .stream()
+                    .map(Picture::getNamePicture)
+                    .toList();
 
-    // Get the pseudo from user
-    UserPseudoDTO userPseudo = new UserPseudoDTO(userMaterial.getUser().getPseudo());
+    UserPseudoDTO userPseudo =
+            new UserPseudoDTO(userMaterial.getUser().getPseudo());
 
-    // Get the name from material
     MaterialNameDTO nameMaterial =
-        new MaterialNameDTO(userMaterial.getMaterial().getNameMaterial());
+            new MaterialNameDTO(userMaterial.getMaterial().getNameMaterial());
 
     return new UserMaterialByIdDTO(
-        userMaterial.getId(),
-        userMaterial.getDescriptionMaterial(),
-        userMaterial.getPriceHourMaterial(),
-        userMaterial.isAvailable(),
-        pictures,
-        userPseudo,
-        nameMaterial,
-        userMaterial.getStateMaterial());
+            userMaterial.getId(),
+            userMaterial.getDescriptionMaterial(),
+            userMaterial.getPriceHourMaterial(),
+            userMaterial.isAvailable(),
+            pictures,
+            userPseudo,
+            nameMaterial,
+            userMaterial.getStateMaterial()
+    );
   }
 
   // Form to Entity
