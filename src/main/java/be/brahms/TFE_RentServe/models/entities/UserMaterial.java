@@ -96,6 +96,7 @@ public class UserMaterial extends BaseEntity {
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "picture_user_materials",
+      schema = "liquibase_rentserve",
       joinColumns = @JoinColumn(name = "user_material_id"),
       inverseJoinColumns = @JoinColumn(name = "picture_id"))
   private Set<Picture> pictures = new HashSet<>();
