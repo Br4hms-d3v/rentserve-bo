@@ -45,6 +45,14 @@ public interface UserMaterialService {
   UserMaterialByIdDTO findUserMaterialById(long id);
 
   /**
+   * This method get a detail of user material by owner user
+   *
+   * @param id the identifier of user material
+   * @return a detail about the user material only user can see
+   */
+  UserMaterialByIdDTO findUserMaterialByOwnerId(long id);
+
+  /**
    * This method get a list of user material by User ID
    *
    * @param userId the identifier of user

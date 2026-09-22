@@ -92,6 +92,8 @@ public class SecurityConf {
                     // UserMaterial
                     .requestMatchers("/api/user-material/user/{id}/activated")
                     .hasAnyRole("MEMBER", "MODERATOR")
+                    .requestMatchers("/api/user-material/my-material/")
+                    .hasAnyRole("MEMBER", "MODERATOR")
                     .requestMatchers("/api/user-material/user/{id}/deactivated")
                     .hasAnyRole("MEMBER", "MODERATOR")
                     .requestMatchers("/api/user-material/**")

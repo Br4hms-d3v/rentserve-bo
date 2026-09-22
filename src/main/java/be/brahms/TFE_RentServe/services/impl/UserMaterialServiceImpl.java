@@ -1,6 +1,7 @@
 package be.brahms.TFE_RentServe.services.impl;
 
 import be.brahms.TFE_RentServe.exceptions.material.MaterialNotFoundException;
+import be.brahms.TFE_RentServe.exceptions.user.AccessNotAuthorizedException;
 import be.brahms.TFE_RentServe.exceptions.user.UserNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.userMaterial.UserMaterialEmptyException;
 import be.brahms.TFE_RentServe.exceptions.userMaterial.UserMaterialException;
@@ -127,6 +128,32 @@ public class UserMaterialServiceImpl implements UserMaterialService {
    */
   @Override
   public UserMaterialByIdDTO findUserMaterialById(long id) {
+    UserMaterial userMaterial =
+        userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
+
+    return userMaterialMapper.toIdDto(userMaterial);
+  }
+
+  /**
+   * Get a user material by id only the owner can read
+   *
+   * @param id the identifier of user material
+   * @return a detail user material
+   */
+  @Override
+  public UserMaterialByIdDTO findUserMaterialByOwnerId(long id) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    UserMaterial userMaterialOwner =
+        userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
+
+    //    System.out.println(userMaterialOwner.getUser().getPseudo());
+    //    System.out.println(authentication.getName());
+
+    if (!userMaterialOwner.getUser().getPseudo().equals(authentication.getName())) {
+      throw new AccessNotAuthorizedException();
+    }
+
     UserMaterial userMaterial =
         userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
 
