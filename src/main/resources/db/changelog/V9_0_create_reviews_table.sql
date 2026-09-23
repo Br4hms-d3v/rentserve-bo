@@ -26,7 +26,7 @@ ALTER TABLE reviews
 
 ALTER TABLE reviews
     ADD CONSTRAINT fk_reviews_to_user_materials
-        FOREIGN KEY (user_material_id) REFERENCES user_materials (id);
+        FOREIGN KEY (user_material_id) REFERENCES user_materials (id) ON DELETE CASCADE;
 
 ALTER TABLE reviews
     ADD CONSTRAINT fk_review_comment_favor FOREIGN KEY (user_favor_id) REFERENCES user_favour (id);

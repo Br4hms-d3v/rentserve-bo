@@ -35,7 +35,7 @@ ALTER TABLE rentals
 
 ALTER TABLE rentals
     ADD CONSTRAINT fk_rental_to_user_material
-        FOREIGN KEY (user_material_id) REFERENCES user_materials (id);
+        FOREIGN KEY (user_material_id) REFERENCES user_materials (id) ON DELETE SET NULL ;
 
 ALTER TABLE rentals
     ADD CONSTRAINT fk_rental_to_bill
