@@ -240,6 +240,14 @@ public class UserMaterialServiceImpl implements UserMaterialService {
    */
   @Override
   public UserMaterialDTO updateUserMaterial(long id, UserMaterialUpdateForm form) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    UserMaterial userMaterialOwner =
+        userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
+
+    if (!userMaterialOwner.getUser().getPseudo().equals(authentication.getName())) {
+      throw new AccessNotAuthorizedException();
+    }
 
     Material materialById =
         materialRepository.findById(form.materialId()).orElseThrow(MaterialNotFoundException::new);
