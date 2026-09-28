@@ -6,10 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum UploadFolder {
-    USER_MATERIAL("userMaterials"),
-    USER_FAVOR("userFavors"),
-    USER_PHOTO("userPhotos");
+  USER_MATERIAL("userMaterials"),
+  USER_FAVOR("userFavors"),
+  USER_PHOTO("userPhotos");
 
-    private final String folderName;
-
+  private final String folderName;
 }

@@ -27,5 +27,5 @@ public record UserMaterialCreateForm(
     @NotNull Boolean isAvailable,
     @NotNull Long materialId,
     @NotNull State state,
-//    @NotNull List<String> pictures,
+    //    @NotNull List<String> pictures,
     Long userId) {}

@@ -157,7 +157,8 @@ public class UserMaterialController {
   @PostMapping(value = "new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
   public ResponseEntity<EntityModel<UserMaterialDTO>> createUserMaterial(
-      @Valid @ModelAttribute UserMaterialCreateForm form, @RequestPart("pictures") List<MultipartFile> pictures) {
+      @Valid @ModelAttribute UserMaterialCreateForm form,
+      @RequestPart("pictures") List<MultipartFile> pictures) {
     UserMaterialDTO newUserMaterial = userMaterialService.createUserMaterial(form, pictures);
     return ResponseEntity.ok().body(userMaterialAssembler.toModel(newUserMaterial));
   }

@@ -42,7 +42,8 @@ public interface UserMaterialMapper {
 
     // Get the name from material
     MaterialNameDTO nameMaterial =
-        new MaterialNameDTO(userMaterial.getMaterial().getId(), userMaterial.getMaterial().getNameMaterial());
+        new MaterialNameDTO(
+            userMaterial.getMaterial().getId(), userMaterial.getMaterial().getNameMaterial());
 
     return new UserMaterialDTO(
         userMaterial.getId(),
@@ -58,8 +59,8 @@ public interface UserMaterialMapper {
    * @param userMaterial the user material entity
    * @return the userMaterial dto
    */
-  default UserMaterialDTO toDto(UserMaterial userMaterial){
-   return toListDto(userMaterial);
+  default UserMaterialDTO toDto(UserMaterial userMaterial) {
+    return toListDto(userMaterial);
   }
 
   /**
@@ -78,7 +79,8 @@ public interface UserMaterialMapper {
     UserPseudoDTO userPseudo = new UserPseudoDTO(userMaterial.getUser().getPseudo());
 
     MaterialNameDTO nameMaterial =
-        new MaterialNameDTO(userMaterial.getMaterial().getId(), userMaterial.getMaterial().getNameMaterial());
+        new MaterialNameDTO(
+            userMaterial.getMaterial().getId(), userMaterial.getMaterial().getNameMaterial());
 
     return new UserMaterialByIdDTO(
         userMaterial.getId(),

@@ -23,13 +23,11 @@ import be.brahms.TFE_RentServe.repositories.UserMaterialRepository;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.FileStorageService;
 import be.brahms.TFE_RentServe.services.UserMaterialService;
-
+import jakarta.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,303 +42,304 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class UserMaterialServiceImpl implements UserMaterialService {
 
-    private final UserMaterialRepository userMaterialRepository;
-    private final UserMaterialMapper userMaterialMapper;
-    private final UserRepository userRepository;
-    private final MaterialRepository materialRepository;
-    private final PictureRepository pictureRepository;
-    private final FileStorageService fileStorageService;
+  private final UserMaterialRepository userMaterialRepository;
+  private final UserMaterialMapper userMaterialMapper;
+  private final UserRepository userRepository;
+  private final MaterialRepository materialRepository;
+  private final PictureRepository pictureRepository;
+  private final FileStorageService fileStorageService;
 
-    /**
-     * Constructor with parameters
-     *
-     * @param userMaterialRepository the userMaterialRepo to access userMaterial data
-     * @param userMaterialMapper     map between from userMaterial to entity or dto to entity
-     * @param userRepository         the userRepo to access User data
-     * @param materialRepository     the materialRepo to access Material data
-     * @param pictureRepository      the pictureRepo to access Picture data
-     */
-    @Autowired
-    public UserMaterialServiceImpl(
-            UserMaterialRepository userMaterialRepository,
-            UserMaterialMapper userMaterialMapper,
-            UserRepository userRepository,
-            MaterialRepository materialRepository,
-            PictureRepository pictureRepository,
-            FileStorageService fileStorageService) {
-        this.userMaterialRepository = userMaterialRepository;
-        this.userMaterialMapper = userMaterialMapper;
-        this.userRepository = userRepository;
-        this.materialRepository = materialRepository;
-        this.pictureRepository = pictureRepository;
-        this.fileStorageService = fileStorageService;
+  /**
+   * Constructor with parameters
+   *
+   * @param userMaterialRepository the userMaterialRepo to access userMaterial data
+   * @param userMaterialMapper map between from userMaterial to entity or dto to entity
+   * @param userRepository the userRepo to access User data
+   * @param materialRepository the materialRepo to access Material data
+   * @param pictureRepository the pictureRepo to access Picture data
+   */
+  @Autowired
+  public UserMaterialServiceImpl(
+      UserMaterialRepository userMaterialRepository,
+      UserMaterialMapper userMaterialMapper,
+      UserRepository userRepository,
+      MaterialRepository materialRepository,
+      PictureRepository pictureRepository,
+      FileStorageService fileStorageService) {
+    this.userMaterialRepository = userMaterialRepository;
+    this.userMaterialMapper = userMaterialMapper;
+    this.userRepository = userRepository;
+    this.materialRepository = materialRepository;
+    this.pictureRepository = pictureRepository;
+    this.fileStorageService = fileStorageService;
+  }
+
+  /**
+   * Get a list of all users material If list is empty, send an exception
+   *
+   * @return a list of user material
+   */
+  @Override
+  public List<UserMaterialDTO> findAllUserMaterials() {
+    List<UserMaterial> listUserMaterials = userMaterialRepository.findAll();
+
+    if (listUserMaterials.isEmpty()) {
+      throw new UserMaterialEmptyException();
     }
 
-    /**
-     * Get a list of all users material If list is empty, send an exception
-     *
-     * @return a list of user material
-     */
-    @Override
-    public List<UserMaterialDTO> findAllUserMaterials() {
-        List<UserMaterial> listUserMaterials = userMaterialRepository.findAll();
+    return listUserMaterials.stream().map(userMaterialMapper::toListDto).toList();
+  }
 
-        if (listUserMaterials.isEmpty()) {
-            throw new UserMaterialEmptyException();
-        }
+  /**
+   * Get a list of user material from the owner's user and available
+   *
+   * @param userId the user identifier
+   * @return a list of user material from user ID and available true
+   */
+  @Override
+  public List<UserMaterialDTO> findAllUserMaterialIsActivated(long userId) {
+    List<UserMaterial> userMaterialListAvailable =
+        userMaterialRepository.findAllUserMaterialIsActivated(userId);
 
-        return listUserMaterials.stream().map(userMaterialMapper::toListDto).toList();
+    userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+    if (userMaterialListAvailable.isEmpty()) {
+      throw new UserMaterialException("The list with user material is empty");
+    }
+    return userMaterialListAvailable.stream().map(userMaterialMapper::toListDto).toList();
+  }
+
+  /**
+   * Get a list of user material from the owner's user and is not available
+   *
+   * @param userId the user identifier
+   * @return a list of user material from user ID and available is false
+   */
+  @Override
+  public List<UserMaterialDTO> findAllUserMaterialIsDeactivated(long userId) {
+    List<UserMaterial> userMaterialListNotAvailable =
+        userMaterialRepository.findAllUserMaterialIsDeactivated(userId);
+
+    userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+    if (userMaterialListNotAvailable.isEmpty()) {
+      throw new UserMaterialException("The list with user material is empty");
+    }
+    return userMaterialListNotAvailable.stream().map(userMaterialMapper::toListDto).toList();
+  }
+
+  /**
+   * Get a user material by id
+   *
+   * @param id the identifier of user material
+   * @return a detail user material
+   */
+  @Override
+  public UserMaterialByIdDTO findUserMaterialById(long id) {
+    UserMaterial userMaterial =
+        userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
+
+    return userMaterialMapper.toIdDto(userMaterial);
+  }
+
+  /**
+   * Get a user material by id only the owner can read
+   *
+   * @param id the identifier of user material
+   * @return a detail user material
+   */
+  @Override
+  public UserMaterialByIdDTO findUserMaterialByOwnerId(long id) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    UserMaterial userMaterialOwner =
+        userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
+
+    //    System.out.println(userMaterialOwner.getUser().getPseudo());
+    //    System.out.println(authentication.getName());
+
+    if (!userMaterialOwner.getUser().getPseudo().equals(authentication.getName())) {
+      throw new AccessNotAuthorizedException();
     }
 
-    /**
-     * Get a list of user material from the owner's user and available
-     *
-     * @param userId the user identifier
-     * @return a list of user material from user ID and available true
-     */
-    @Override
-    public List<UserMaterialDTO> findAllUserMaterialIsActivated(long userId) {
-        List<UserMaterial> userMaterialListAvailable =
-                userMaterialRepository.findAllUserMaterialIsActivated(userId);
+    UserMaterial userMaterial =
+        userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
 
-        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    return userMaterialMapper.toIdDto(userMaterial);
+  }
 
-        if (userMaterialListAvailable.isEmpty()) {
-            throw new UserMaterialException("The list with user material is empty");
-        }
-        return userMaterialListAvailable.stream().map(userMaterialMapper::toListDto).toList();
+  /**
+   * Get a list of user material by user ID
+   *
+   * @param id the identifier of user
+   * @return get a list of user material grouped by user ID
+   */
+  @Override
+  public List<UserMaterialDTO> findAllUserMaterialByUserId(long id) {
+    List<UserMaterial> listUserMaterialByUser = userMaterialRepository.findUserMaterialByUserId(id);
+
+    if (userRepository.findById(id).isEmpty()) {
+      throw new UserNotFoundException();
     }
 
-    /**
-     * Get a list of user material from the owner's user and is not available
-     *
-     * @param userId the user identifier
-     * @return a list of user material from user ID and available is false
-     */
-    @Override
-    public List<UserMaterialDTO> findAllUserMaterialIsDeactivated(long userId) {
-        List<UserMaterial> userMaterialListNotAvailable =
-                userMaterialRepository.findAllUserMaterialIsDeactivated(userId);
-
-        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
-        if (userMaterialListNotAvailable.isEmpty()) {
-            throw new UserMaterialException("The list with user material is empty");
-        }
-        return userMaterialListNotAvailable.stream().map(userMaterialMapper::toListDto).toList();
+    if (listUserMaterialByUser.isEmpty()) {
+      throw new UserMaterialEmptyException();
     }
 
-    /**
-     * Get a user material by id
-     *
-     * @param id the identifier of user material
-     * @return a detail user material
-     */
-    @Override
-    public UserMaterialByIdDTO findUserMaterialById(long id) {
-        UserMaterial userMaterial =
-                userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
+    return listUserMaterialByUser.stream().map(userMaterialMapper::toListDto).toList();
+  }
 
-        return userMaterialMapper.toIdDto(userMaterial);
+  /**
+   * Create a new UserMaterial. It's Check if the Material exist. Must be connected to create a new
+   * userMaterial
+   *
+   * @param form the form to create a new user Material
+   * @return a new User material
+   */
+  @Override
+  @Transactional
+  public UserMaterialDTO createUserMaterial(
+      UserMaterialCreateForm form, List<MultipartFile> images) {
+
+    if (images == null || images.stream().allMatch(MultipartFile::isEmpty)) {
+      throw new PictureNotFound();
     }
 
-    /**
-     * Get a user material by id only the owner can read
-     *
-     * @param id the identifier of user material
-     * @return a detail user material
-     */
-    @Override
-    public UserMaterialByIdDTO findUserMaterialByOwnerId(long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Material materialById =
+        materialRepository.findById(form.materialId()).orElseThrow(MaterialNotFoundException::new);
 
-        UserMaterial userMaterialOwner =
-                userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
+    UserMaterial userMaterial = userMaterialMapper.fromUserMaterialForm(form);
 
-        //    System.out.println(userMaterialOwner.getUser().getPseudo());
-        //    System.out.println(authentication.getName());
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (!userMaterialOwner.getUser().getPseudo().equals(authentication.getName())) {
-            throw new AccessNotAuthorizedException();
-        }
+    if (authentication != null && authentication.isAuthenticated()) {
+      Object principal = authentication.getPrincipal();
 
-        UserMaterial userMaterial =
-                userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
+      if (principal instanceof UserDetails userDetails) {
+        String pseudo = userDetails.getUsername();
 
-        return userMaterialMapper.toIdDto(userMaterial);
+        User user = userRepository.findByPseudo(pseudo).orElseThrow(UserNotFoundException::new);
+        userMaterial.setUser(user);
+      }
+    }
+    userMaterial.setMaterial(materialById);
+    userMaterial.setDescriptionMaterial(form.descriptionMaterial());
+    userMaterial.setPriceHourMaterial(form.priceHourMaterial());
+    userMaterial.setStateMaterial(form.state());
+    userMaterial.setAvailable(form.isAvailable());
+
+    Set<Picture> pictures =
+        images.stream()
+            .filter(image -> !image.isEmpty())
+            .map(
+                image -> {
+                  String fileName = fileStorageService.store(image, UploadFolder.USER_MATERIAL);
+                  Picture picture = new Picture();
+                  picture.setNamePicture(fileName);
+                  return pictureRepository.save(picture);
+                })
+            .collect(Collectors.toSet());
+
+    userMaterial.setPictures(pictures);
+    userMaterialRepository.save(userMaterial);
+
+    return userMaterialMapper.toDto(userMaterial);
+  }
+
+  /**
+   * Update an userMaterial
+   *
+   * @param id the identifier of user material
+   * @param form the form to update the user material
+   * @return an updated user material
+   */
+  @Override
+  public UserMaterialDTO updateUserMaterial(long id, UserMaterialUpdateForm form) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    UserMaterial userMaterialOwner =
+        userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
+
+    if (!userMaterialOwner.getUser().getPseudo().equals(authentication.getName())) {
+      throw new AccessNotAuthorizedException();
     }
 
-    /**
-     * Get a list of user material by user ID
-     *
-     * @param id the identifier of user
-     * @return get a list of user material grouped by user ID
-     */
-    @Override
-    public List<UserMaterialDTO> findAllUserMaterialByUserId(long id) {
-        List<UserMaterial> listUserMaterialByUser = userMaterialRepository.findUserMaterialByUserId(id);
+    Material materialById =
+        materialRepository.findById(form.materialId()).orElseThrow(MaterialNotFoundException::new);
 
-        if (userRepository.findById(id).isEmpty()) {
-            throw new UserNotFoundException();
-        }
+    UserMaterial userMaterial =
+        userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
 
-        if (listUserMaterialByUser.isEmpty()) {
-            throw new UserMaterialEmptyException();
-        }
+    Long existingMaterialId = userMaterial.getMaterial().getId();
+    Long newMaterialId = form.materialId();
 
-        return listUserMaterialByUser.stream().map(userMaterialMapper::toListDto).toList();
+    if (newMaterialId != null && !newMaterialId.equals(existingMaterialId)) {
+      Material newMaterial =
+          materialRepository.findById(newMaterialId).orElseThrow(MaterialNotFoundException::new);
+      userMaterial.setMaterial(newMaterial);
     }
 
-    /**
-     * Create a new UserMaterial. It's Check if the Material exist. Must be connected to create a new
-     * userMaterial
-     *
-     * @param form the form to create a new user Material
-     * @return a new User material
-     */
-    @Override
-    @Transactional
-    public UserMaterialDTO createUserMaterial(UserMaterialCreateForm form, List<MultipartFile> images) {
+    userMaterial.setDescriptionMaterial(form.descriptionMaterial());
+    userMaterial.setPriceHourMaterial(form.priceHourMaterial());
+    userMaterial.setAvailable(form.isAvailable());
+    userMaterial.setStateMaterial(form.state());
 
-        if (images == null || images.stream().allMatch(MultipartFile::isEmpty)) {
-            throw new PictureNotFound();
-        }
+    userMaterialMapper.fromUpdateUserMaterialForm(form, userMaterial);
 
-        Material materialById =
-                materialRepository.findById(form.materialId()).orElseThrow(MaterialNotFoundException::new);
+    userMaterialRepository.save(userMaterial);
 
-        UserMaterial userMaterial = userMaterialMapper.fromUserMaterialForm(form);
+    return userMaterialMapper.toDto(userMaterial);
+  }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+  /**
+   * Delete a user material remove all identifier in relationship with picture_user_material remove
+   * all picture from picture database
+   *
+   * @param id the identifier of user material
+   */
+  @Override
+  public void deleteUserMaterialById(long id) {
+    UserMaterial userMaterial =
+        userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
 
-        if (authentication != null && authentication.isAuthenticated()) {
-            Object principal = authentication.getPrincipal();
+    // Copy the pictures before to break the relationShip UserMaterial to Picture
+    Set<Picture> pictures = new HashSet<>(userMaterial.getPictures());
 
-            if (principal instanceof UserDetails userDetails) {
-                String pseudo = userDetails.getUsername();
+    // Break the relationship and clears all pictures
+    userMaterial.getPictures().clear();
+    userMaterialRepository.save(userMaterial);
 
-                User user = userRepository.findByPseudo(pseudo).orElseThrow(UserNotFoundException::new);
-                userMaterial.setUser(user);
-            }
-        }
-        userMaterial.setMaterial(materialById);
-        userMaterial.setDescriptionMaterial(form.descriptionMaterial());
-        userMaterial.setPriceHourMaterial(form.priceHourMaterial());
-        userMaterial.setStateMaterial(form.state());
-        userMaterial.setAvailable(form.isAvailable());
+    // Delete user material
+    userMaterialRepository.delete(userMaterial);
 
-        Set<Picture> pictures =
-                images.stream()
-                        .filter(image -> !image.isEmpty())
-                        .map(
-                                image -> {
-                                    String fileName = fileStorageService.store(image, UploadFolder.USER_MATERIAL);
-                                    Picture picture = new Picture();
-                                    picture.setNamePicture(fileName);
-                                    return pictureRepository.save(picture);
-                                })
-                        .collect(Collectors.toSet());
+    // Remove picture like orphan remove
+    for (Picture p : pictures) {
+      boolean stillUsed = userMaterialRepository.existsByPictures_Id(p.getId());
+      if (!stillUsed) {
+        pictureRepository.delete(p);
+      }
+    }
+  }
 
-        userMaterial.setPictures(pictures);
-        userMaterialRepository.save(userMaterial);
+  /**
+   * Get a list of all users materials grouped by ID material
+   *
+   * @param materialId the identifier material
+   * @return a list of user material by material ID
+   */
+  @Override
+  public List<UserMaterialDTO> findAllUserMaterialsByMaterialId(long materialId) {
+    List<UserMaterial> listUserMaterials =
+        userMaterialRepository.findAllUserMaterialsByMaterialId(materialId);
 
-        return userMaterialMapper.toDto(userMaterial);
+    if (!userMaterialRepository.existsById(materialId)) {
+      throw new UserMaterialNotFoundException();
     }
 
-    /**
-     * Update an userMaterial
-     *
-     * @param id   the identifier of user material
-     * @param form the form to update the user material
-     * @return an updated user material
-     */
-    @Override
-    public UserMaterialDTO updateUserMaterial(long id, UserMaterialUpdateForm form) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        UserMaterial userMaterialOwner =
-                userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
-
-        if (!userMaterialOwner.getUser().getPseudo().equals(authentication.getName())) {
-            throw new AccessNotAuthorizedException();
-        }
-
-        Material materialById =
-                materialRepository.findById(form.materialId()).orElseThrow(MaterialNotFoundException::new);
-
-        UserMaterial userMaterial =
-                userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
-
-        Long existingMaterialId = userMaterial.getMaterial().getId();
-        Long newMaterialId = form.materialId();
-
-        if (newMaterialId != null && !newMaterialId.equals(existingMaterialId)) {
-            Material newMaterial =
-                    materialRepository.findById(newMaterialId).orElseThrow(MaterialNotFoundException::new);
-            userMaterial.setMaterial(newMaterial);
-        }
-
-        userMaterial.setDescriptionMaterial(form.descriptionMaterial());
-        userMaterial.setPriceHourMaterial(form.priceHourMaterial());
-        userMaterial.setAvailable(form.isAvailable());
-        userMaterial.setStateMaterial(form.state());
-
-        userMaterialMapper.fromUpdateUserMaterialForm(form, userMaterial);
-
-        userMaterialRepository.save(userMaterial);
-
-        return userMaterialMapper.toDto(userMaterial);
+    if (listUserMaterials.isEmpty()) {
+      throw new UserMaterialNotFoundException();
     }
 
-    /**
-     * Delete a user material remove all identifier in relationship with picture_user_material remove
-     * all picture from picture database
-     *
-     * @param id the identifier of user material
-     */
-    @Override
-    public void deleteUserMaterialById(long id) {
-        UserMaterial userMaterial =
-                userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
-
-        // Copy the pictures before to break the relationShip UserMaterial to Picture
-        Set<Picture> pictures = new HashSet<>(userMaterial.getPictures());
-
-        // Break the relationship and clears all pictures
-        userMaterial.getPictures().clear();
-        userMaterialRepository.save(userMaterial);
-
-        // Delete user material
-        userMaterialRepository.delete(userMaterial);
-
-        // Remove picture like orphan remove
-        for (Picture p : pictures) {
-            boolean stillUsed = userMaterialRepository.existsByPictures_Id(p.getId());
-            if (!stillUsed) {
-                pictureRepository.delete(p);
-            }
-        }
-    }
-
-    /**
-     * Get a list of all users materials grouped by ID material
-     *
-     * @param materialId the identifier material
-     * @return a list of user material by material ID
-     */
-    @Override
-    public List<UserMaterialDTO> findAllUserMaterialsByMaterialId(long materialId) {
-        List<UserMaterial> listUserMaterials =
-                userMaterialRepository.findAllUserMaterialsByMaterialId(materialId);
-
-        if (!userMaterialRepository.existsById(materialId)) {
-            throw new UserMaterialNotFoundException();
-        }
-
-        if (listUserMaterials.isEmpty()) {
-            throw new UserMaterialNotFoundException();
-        }
-
-        return listUserMaterials.stream().map(userMaterialMapper::toListDto).toList();
-    }
+    return listUserMaterials.stream().map(userMaterialMapper::toListDto).toList();
+  }
 }
