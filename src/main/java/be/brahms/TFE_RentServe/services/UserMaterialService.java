@@ -6,6 +6,7 @@ import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialCreateForm;
 import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialUpdateForm;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Service interface for managing user materials. Defines business operations related to
@@ -61,12 +62,14 @@ public interface UserMaterialService {
   List<UserMaterialDTO> findAllUserMaterialByUserId(long userId);
 
   /**
-   * This method saves a new UserMaterial
+   * Creates and saves a new user material.
    *
-   * @param form the form to create a new user Material
+   * @param form the form to create the user material
+   * @param images the pictures of the user material
    * @return the saved user material
    */
-  UserMaterialDTO createUserMaterial(@Valid UserMaterialCreateForm form);
+  UserMaterialDTO createUserMaterial(
+      @Valid UserMaterialCreateForm form, List<MultipartFile> images);
 
   /**
    * This method update the existing user material

@@ -87,9 +87,7 @@ public class UserMaterial extends BaseEntity {
   private Set<Rental> rentals = new HashSet<>();
 
   /** A set of reviews related to this user-material. Represents feedback left by other users. */
-  @OneToMany(
-      mappedBy = "userMaterial",
-      cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+  @OneToMany(mappedBy = "userMaterial", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<Review> reviews = new HashSet<>();
 
   // Relation ManyToMany

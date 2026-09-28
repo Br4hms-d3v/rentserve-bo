@@ -1,6 +1,8 @@
 package be.brahms.TFE_RentServe.services.impl;
 
+import be.brahms.TFE_RentServe.enums.UploadFolder;
 import be.brahms.TFE_RentServe.exceptions.material.MaterialNotFoundException;
+import be.brahms.TFE_RentServe.exceptions.picture.PictureNotFound;
 import be.brahms.TFE_RentServe.exceptions.user.AccessNotAuthorizedException;
 import be.brahms.TFE_RentServe.exceptions.user.UserNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.userMaterial.UserMaterialEmptyException;
@@ -19,7 +21,9 @@ import be.brahms.TFE_RentServe.repositories.MaterialRepository;
 import be.brahms.TFE_RentServe.repositories.PictureRepository;
 import be.brahms.TFE_RentServe.repositories.UserMaterialRepository;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
+import be.brahms.TFE_RentServe.services.FileStorageService;
 import be.brahms.TFE_RentServe.services.UserMaterialService;
+import jakarta.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +33,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Service implementation for managing UserMaterial. Uses UserMaterialRepository to perform database
@@ -42,6 +47,7 @@ public class UserMaterialServiceImpl implements UserMaterialService {
   private final UserRepository userRepository;
   private final MaterialRepository materialRepository;
   private final PictureRepository pictureRepository;
+  private final FileStorageService fileStorageService;
 
   /**
    * Constructor with parameters
@@ -51,6 +57,7 @@ public class UserMaterialServiceImpl implements UserMaterialService {
    * @param userRepository the userRepo to access User data
    * @param materialRepository the materialRepo to access Material data
    * @param pictureRepository the pictureRepo to access Picture data
+   * @param fileStorageService the service to send picture on the folder
    */
   @Autowired
   public UserMaterialServiceImpl(
@@ -58,12 +65,14 @@ public class UserMaterialServiceImpl implements UserMaterialService {
       UserMaterialMapper userMaterialMapper,
       UserRepository userRepository,
       MaterialRepository materialRepository,
-      PictureRepository pictureRepository) {
+      PictureRepository pictureRepository,
+      FileStorageService fileStorageService) {
     this.userMaterialRepository = userMaterialRepository;
     this.userMaterialMapper = userMaterialMapper;
     this.userRepository = userRepository;
     this.materialRepository = materialRepository;
     this.pictureRepository = pictureRepository;
+    this.fileStorageService = fileStorageService;
   }
 
   /**
@@ -189,7 +198,13 @@ public class UserMaterialServiceImpl implements UserMaterialService {
    * @return a new User material
    */
   @Override
-  public UserMaterialDTO createUserMaterial(UserMaterialCreateForm form) {
+  @Transactional
+  public UserMaterialDTO createUserMaterial(
+      UserMaterialCreateForm form, List<MultipartFile> images) {
+
+    if (images == null || images.stream().allMatch(MultipartFile::isEmpty)) {
+      throw new PictureNotFound();
+    }
 
     Material materialById =
         materialRepository.findById(form.materialId()).orElseThrow(MaterialNotFoundException::new);
@@ -207,27 +222,28 @@ public class UserMaterialServiceImpl implements UserMaterialService {
         User user = userRepository.findByPseudo(pseudo).orElseThrow(UserNotFoundException::new);
         userMaterial.setUser(user);
       }
-
-      userMaterial.setMaterial(materialById);
-      userMaterial.setDescriptionMaterial(form.descriptionMaterial());
-      userMaterial.setPriceHourMaterial(form.priceHourMaterial());
-      userMaterial.setStateMaterial(form.state());
-      userMaterial.setAvailable(form.isAvailable());
-
-      Set<Picture> picturesSource = userMaterial.getPictures();
-
-      if (picturesSource.isEmpty()) {
-        throw new UserMaterialException("Il n'y a aucune photo");
-      }
-
-      Set<Picture> pictures =
-          picturesSource.stream().map(pictureRepository::save).collect(Collectors.toSet());
-      ;
-
-      userMaterial.setPictures(pictures);
-
-      userMaterialRepository.save(userMaterial);
     }
+    userMaterial.setMaterial(materialById);
+    userMaterial.setDescriptionMaterial(form.descriptionMaterial());
+    userMaterial.setPriceHourMaterial(form.priceHourMaterial());
+    userMaterial.setStateMaterial(form.state());
+    userMaterial.setAvailable(form.isAvailable());
+
+    Set<Picture> pictures =
+        images.stream()
+            .filter(image -> !image.isEmpty())
+            .map(
+                image -> {
+                  String fileName = fileStorageService.store(image, UploadFolder.USER_MATERIAL);
+                  Picture picture = new Picture();
+                  picture.setNamePicture(fileName);
+                  return pictureRepository.save(picture);
+                })
+            .collect(Collectors.toSet());
+
+    userMaterial.setPictures(pictures);
+    userMaterialRepository.save(userMaterial);
+
     return userMaterialMapper.toDto(userMaterial);
   }
 
@@ -240,6 +256,14 @@ public class UserMaterialServiceImpl implements UserMaterialService {
    */
   @Override
   public UserMaterialDTO updateUserMaterial(long id, UserMaterialUpdateForm form) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    UserMaterial userMaterialOwner =
+        userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
+
+    if (!userMaterialOwner.getUser().getPseudo().equals(authentication.getName())) {
+      throw new AccessNotAuthorizedException();
+    }
 
     Material materialById =
         materialRepository.findById(form.materialId()).orElseThrow(MaterialNotFoundException::new);

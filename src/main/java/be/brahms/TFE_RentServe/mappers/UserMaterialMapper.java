@@ -10,6 +10,7 @@ import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialCreateForm;
 import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialUpdateForm;
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
@@ -41,7 +42,8 @@ public interface UserMaterialMapper {
 
     // Get the name from material
     MaterialNameDTO nameMaterial =
-        new MaterialNameDTO(userMaterial.getMaterial().getNameMaterial());
+        new MaterialNameDTO(
+            userMaterial.getMaterial().getId(), userMaterial.getMaterial().getNameMaterial());
 
     return new UserMaterialDTO(
         userMaterial.getId(),
@@ -57,7 +59,9 @@ public interface UserMaterialMapper {
    * @param userMaterial the user material entity
    * @return the userMaterial dto
    */
-  UserMaterialDTO toDto(UserMaterial userMaterial);
+  default UserMaterialDTO toDto(UserMaterial userMaterial) {
+    return toListDto(userMaterial);
+  }
 
   /**
    * Convert a user material to a UserMaterialByIdDTO Get more details : - description about the
@@ -75,7 +79,8 @@ public interface UserMaterialMapper {
     UserPseudoDTO userPseudo = new UserPseudoDTO(userMaterial.getUser().getPseudo());
 
     MaterialNameDTO nameMaterial =
-        new MaterialNameDTO(userMaterial.getMaterial().getNameMaterial());
+        new MaterialNameDTO(
+            userMaterial.getMaterial().getId(), userMaterial.getMaterial().getNameMaterial());
 
     return new UserMaterialByIdDTO(
         userMaterial.getId(),
@@ -123,6 +128,7 @@ public interface UserMaterialMapper {
    * @param form the user material update form
    * @param userMaterial the user material entity
    */
+  @Mapping(target = "pictures", ignore = true)
   void fromUpdateUserMaterialForm(
       UserMaterialUpdateForm form, @MappingTarget UserMaterial userMaterial);
 }

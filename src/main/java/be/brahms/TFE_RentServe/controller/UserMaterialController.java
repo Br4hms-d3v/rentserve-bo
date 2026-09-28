@@ -10,9 +10,11 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This controller manages user material
@@ -147,16 +149,18 @@ public class UserMaterialController {
   }
 
   /**
-   * Create a new UserMaterial
+   * Creates a new user material.
    *
-   * @param form the form to create a new User Material
-   * @return a new User material
+   * @param form the form to create the user material
+   * @param pictures the pictures of the user material
+   * @return the new user material
    */
-  @PostMapping("new")
+  @PostMapping(value = "new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
   public ResponseEntity<EntityModel<UserMaterialDTO>> createUserMaterial(
-      @RequestBody @Valid UserMaterialCreateForm form) {
-    UserMaterialDTO newUserMaterial = userMaterialService.createUserMaterial(form);
+      @Valid @ModelAttribute UserMaterialCreateForm form,
+      @RequestPart("pictures") List<MultipartFile> pictures) {
+    UserMaterialDTO newUserMaterial = userMaterialService.createUserMaterial(form, pictures);
     return ResponseEntity.ok().body(userMaterialAssembler.toModel(newUserMaterial));
   }
 
