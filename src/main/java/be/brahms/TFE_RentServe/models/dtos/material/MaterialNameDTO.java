@@ -5,4 +5,4 @@ package be.brahms.TFE_RentServe.models.dtos.material;
  *
  * @param nameMaterial the name of material
  */
-public record MaterialNameDTO(String nameMaterial) {}
+public record MaterialNameDTO(Long id, String nameMaterial) {}
