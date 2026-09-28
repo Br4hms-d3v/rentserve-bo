@@ -40,7 +40,7 @@ public class UserMaterialAssembler
             .withRel("List of users Materials"),
         linkTo(methodOn(UserMaterialController.class).getUserMaterialById(userMaterial.id()))
             .withRel("User material by ID"),
-        linkTo(methodOn(UserMaterialController.class).createUserMaterial(null))
+        linkTo(methodOn(UserMaterialController.class).createUserMaterial(null, null))
             .withRel("Create a new user material"),
         linkTo(methodOn(UserMaterialController.class).updateUserMaterial(userMaterial.id(), null))
             .withRel("Update user material"),

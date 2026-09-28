@@ -126,6 +126,7 @@ public interface UserMaterialMapper {
    * @param form the user material update form
    * @param userMaterial the user material entity
    */
+  @Mapping(target = "pictures", ignore = true)
   void fromUpdateUserMaterialForm(
       UserMaterialUpdateForm form, @MappingTarget UserMaterial userMaterial);
 }

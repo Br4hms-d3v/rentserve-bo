@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * Record UserMaterial CreateForm into a UserMaterial entity
@@ -16,7 +15,6 @@ import java.util.List;
  * @param isAvailable the know if is it available to rent
  * @param materialId the identifier material
  * @param state the state about quality of material
- * @param pictures the name of pictures
  * @param userId the identifier of user
  */
 public record UserMaterialCreateForm(
@@ -29,5 +27,5 @@ public record UserMaterialCreateForm(
     @NotNull Boolean isAvailable,
     @NotNull Long materialId,
     @NotNull State state,
-    @NotNull List<String> pictures,
+//    @NotNull List<String> pictures,
     Long userId) {}
