@@ -149,10 +149,11 @@ public class UserMaterialController {
   }
 
   /**
-   * Create a new UserMaterial
+   * Creates a new user material.
    *
-   * @param form the form to create a new User Material
-   * @return a new User material
+   * @param form the form to create the user material
+   * @param pictures the pictures of the user material
+   * @return the new user material
    */
   @PostMapping(value = "new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")

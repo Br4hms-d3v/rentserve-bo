@@ -62,9 +62,10 @@ public interface UserMaterialService {
   List<UserMaterialDTO> findAllUserMaterialByUserId(long userId);
 
   /**
-   * This method saves a new UserMaterial
+   * Creates and saves a new user material.
    *
-   * @param form the form to create a new user Material
+   * @param form the form to create the user material
+   * @param images the pictures of the user material
    * @return the saved user material
    */
   UserMaterialDTO createUserMaterial(

@@ -57,6 +57,7 @@ public class UserMaterialServiceImpl implements UserMaterialService {
    * @param userRepository the userRepo to access User data
    * @param materialRepository the materialRepo to access Material data
    * @param pictureRepository the pictureRepo to access Picture data
+   * @param fileStorageService the service to send picture on the folder
    */
   @Autowired
   public UserMaterialServiceImpl(

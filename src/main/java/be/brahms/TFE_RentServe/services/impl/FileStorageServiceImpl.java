@@ -13,11 +13,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+/** Service implementation to save pictures in storage. */
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
 
+  /** Main folder where files are stored. */
   private final Path rootDirectory;
 
+  /**
+   * Creates the file storage service.
+   *
+   * @param dir the main folder for uploaded files
+   * @throws IllegalStateException if the folder does not exist
+   */
   public FileStorageServiceImpl(@Value("${app.upload-dir}") String dir) {
     this.rootDirectory = Paths.get(dir).toAbsolutePath().normalize();
 
@@ -26,6 +34,15 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
   }
 
+  /**
+   * Saves a picture in the correct folder.
+   *
+   * @param file the picture to save
+   * @param folder the folder where the picture is saved
+   * @return the file name saved in storage
+   * @throws PictureException if the file is not an image or cannot be saved
+   * @throws SecurityException if the file path is not safe
+   */
   @Override
   public String store(MultipartFile file, UploadFolder folder) {
     String contentType = file.getContentType();
