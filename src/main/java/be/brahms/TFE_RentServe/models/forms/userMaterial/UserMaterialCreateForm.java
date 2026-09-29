@@ -21,8 +21,7 @@ public record UserMaterialCreateForm(
     @NotBlank String descriptionMaterial,
     @Digits(integer = 4, fraction = 2) // 4 numbers before the dot and 2 after the dot
         @DecimalMin(
-            value = "1.00",
-            inclusive = false) // The value can be start 5.0 or more but never under
+            value = "1.00") // The value can be start 5.0 or more but never under
         BigDecimal priceHourMaterial,
     @NotNull Boolean isAvailable,
     @NotNull Long materialId,
