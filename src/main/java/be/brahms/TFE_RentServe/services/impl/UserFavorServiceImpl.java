@@ -1,6 +1,7 @@
 package be.brahms.TFE_RentServe.services.impl;
 
 import be.brahms.TFE_RentServe.exceptions.favor.FavorNotFoundException;
+import be.brahms.TFE_RentServe.exceptions.user.AccessNotAuthorizedException;
 import be.brahms.TFE_RentServe.exceptions.user.UserNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.userFavor.UserFavorException;
 import be.brahms.TFE_RentServe.exceptions.userFavor.UserFavorNotFoundException;
@@ -109,6 +110,20 @@ public class UserFavorServiceImpl implements UserFavorService {
         userFavorRepository.findById(id).orElseThrow(UserFavorNotFoundException::new);
 
     return userFavorMapper.toIdDto(userFavorId);
+  }
+
+  @Override
+  public UserFavorByIdDTO findUserFavorByOwnerId(long id) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    UserFavor userFavorOwner =
+            userFavorRepository.findById(id).orElseThrow(UserFavorNotFoundException::new);
+
+    if(!userFavorOwner.getUser().getPseudo().equals(authentication.getName())) {
+      throw new AccessNotAuthorizedException();
+    }
+
+    return userFavorMapper.toIdDto(userFavorOwner);
   }
 
   /**

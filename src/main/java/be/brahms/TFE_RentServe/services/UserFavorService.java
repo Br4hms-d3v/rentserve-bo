@@ -37,6 +37,14 @@ public interface UserFavorService {
   UserFavorByIdDTO findUserFavorById(long id);
 
   /**
+   * This method get a detail of user favor by owner user
+   *
+   * @param id the identifier of user favor
+   * @return a detail about the user favor only user can see
+   */
+  UserFavorByIdDTO findUserFavorByOwnerId(long id);
+
+  /**
    * This method get a list of user favour by User ID
    *
    * @param userId the identifier of user

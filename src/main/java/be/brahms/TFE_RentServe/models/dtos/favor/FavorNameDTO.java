@@ -5,4 +5,4 @@ package be.brahms.TFE_RentServe.models.dtos.favor;
  *
  * @param nameFavor the name of favor
  */
-public record FavorNameDTO(String nameFavor) {}
+public record FavorNameDTO(Long id, String nameFavor) {}

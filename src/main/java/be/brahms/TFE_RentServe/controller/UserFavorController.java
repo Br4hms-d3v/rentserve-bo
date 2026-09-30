@@ -110,6 +110,20 @@ public class UserFavorController {
   }
 
   /**
+   * Get a list of user favor grouped by User
+   *
+   * @param id the identifier from User
+   * @return a list of user favor by user id
+   */
+  @GetMapping("my-favor/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<EntityModel<UserFavorByIdDTO>> getUserFavorDetailByOwnerId(
+          @PathVariable long id) {
+    UserFavorByIdDTO userFavorByUserId = userFavorService.findUserFavorByOwnerId(id);
+    return ResponseEntity.ok().body(userFavorAssembler.toIdModel(userFavorByUserId));
+  }
+
+  /**
    * Get a list of user favor activated from the user ID owner
    *
    * @param id the identifier user
