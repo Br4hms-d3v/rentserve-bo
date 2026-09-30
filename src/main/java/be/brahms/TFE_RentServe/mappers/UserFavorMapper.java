@@ -38,10 +38,15 @@ public interface UserFavorMapper {
         userFavor.getPictures().stream()
             .map(Picture::getNamePicture)
             .findFirst()
-            .orElse("imageByDefault.png");
+            .orElse("imageByDefaultFavor.png");
+
+    // Get name from favor
+    FavorNameDTO nameFavor =
+            new FavorNameDTO(
+                    userFavor.getFavor().getId(), userFavor.getFavor().getNameFavor());
 
     return new UserFavorDTO(
-        userFavor.getId(), userFavor.getPriceHourFavor(), userFavor.isAvailable(), firstPicture);
+        userFavor.getId(), nameFavor, userFavor.getPriceHourFavor(), userFavor.isAvailable(), firstPicture);
   }
 
   /**
@@ -66,7 +71,7 @@ public interface UserFavorMapper {
     UserPseudoDTO userPseudo = new UserPseudoDTO(userFavor.getUser().getPseudo());
 
     // Get the name from favor
-    FavorNameDTO favorName = new FavorNameDTO(userFavor.getFavor().getNameFavor());
+    FavorNameDTO favorName = new FavorNameDTO(userFavor.getId(), userFavor.getFavor().getNameFavor());
 
     return new UserFavorByIdDTO(
         userFavor.getId(),
@@ -99,7 +104,7 @@ public interface UserFavorMapper {
     Picture picture = new Picture();
 
     if (namePicture == null || namePicture.isBlank()) {
-      picture.setNamePicture("imageByDefault.png");
+      picture.setNamePicture("imageByDefaultFavor.png");
     } else {
       picture.setNamePicture(namePicture);
     }
