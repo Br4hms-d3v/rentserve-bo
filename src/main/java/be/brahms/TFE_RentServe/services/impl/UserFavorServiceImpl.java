@@ -1,6 +1,8 @@
 package be.brahms.TFE_RentServe.services.impl;
 
+import be.brahms.TFE_RentServe.enums.UploadFolder;
 import be.brahms.TFE_RentServe.exceptions.favor.FavorNotFoundException;
+import be.brahms.TFE_RentServe.exceptions.picture.PictureNotFound;
 import be.brahms.TFE_RentServe.exceptions.user.AccessNotAuthorizedException;
 import be.brahms.TFE_RentServe.exceptions.user.UserNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.userFavor.UserFavorException;
@@ -19,6 +21,7 @@ import be.brahms.TFE_RentServe.repositories.FavorRepository;
 import be.brahms.TFE_RentServe.repositories.PictureRepository;
 import be.brahms.TFE_RentServe.repositories.UserFavorRepository;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
+import be.brahms.TFE_RentServe.services.FileStorageService;
 import be.brahms.TFE_RentServe.services.UserFavorService;
 import jakarta.transaction.Transactional;
 import java.util.*;
@@ -27,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Service implementation for managing UserFavor. Uses UserFavorRepository to perform database
@@ -40,6 +44,7 @@ public class UserFavorServiceImpl implements UserFavorService {
   private final UserRepository userRepository;
   private final FavorRepository favorRepository;
   private final PictureRepository pictureRepository;
+  private final FileStorageService fileStorageService;
 
   /**
    * Constructor with parameters
@@ -49,18 +54,21 @@ public class UserFavorServiceImpl implements UserFavorService {
    * @param userRepository the userRepo to access User data
    * @param favorRepository the favorRepo to access Favor data
    * @param pictureRepository the pictureRepo to access Picture data
+   * @param fileStorageService the service to send picture on the folder
    */
   public UserFavorServiceImpl(
       UserFavorRepository userFavorRepository,
       UserFavorMapper userFavorMapper,
       UserRepository userRepository,
       FavorRepository favorRepository,
-      PictureRepository pictureRepository) {
+      PictureRepository pictureRepository,
+      FileStorageService fileStorageService) {
     this.userFavorRepository = userFavorRepository;
     this.userFavorMapper = userFavorMapper;
     this.userRepository = userRepository;
     this.favorRepository = favorRepository;
     this.pictureRepository = pictureRepository;
+    this.fileStorageService = fileStorageService;
   }
 
   /**
@@ -117,9 +125,9 @@ public class UserFavorServiceImpl implements UserFavorService {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
     UserFavor userFavorOwner =
-            userFavorRepository.findById(id).orElseThrow(UserFavorNotFoundException::new);
+        userFavorRepository.findById(id).orElseThrow(UserFavorNotFoundException::new);
 
-    if(!userFavorOwner.getUser().getPseudo().equals(authentication.getName())) {
+    if (!userFavorOwner.getUser().getPseudo().equals(authentication.getName())) {
       throw new AccessNotAuthorizedException();
     }
 
@@ -190,7 +198,13 @@ public class UserFavorServiceImpl implements UserFavorService {
    * @return a new User Favor
    */
   @Override
-  public UserFavorDTO createUserFavor(UserFavorCreateForm form) {
+  @Transactional
+  public UserFavorDTO createUserFavor(UserFavorCreateForm form, List<MultipartFile> images) {
+
+    if (images == null || images.stream().allMatch(MultipartFile::isEmpty)) {
+      throw new PictureNotFound();
+    }
+
     Favor favorById =
         favorRepository.findById(form.favorId()).orElseThrow(FavorNotFoundException::new);
 
@@ -214,12 +228,18 @@ public class UserFavorServiceImpl implements UserFavorService {
       userFavor.setAvailable(form.isAvailable());
 
       Set<Picture> pictures =
-          Optional.ofNullable(userFavor.getPictures()).orElse(Collections.emptySet()).stream()
-              .map(pictureRepository::save)
+          images.stream()
+              .filter(image -> !image.isEmpty())
+              .map(
+                  image -> {
+                    String fileName = fileStorageService.store(image, UploadFolder.USER_FAVOR);
+                    Picture picture = new Picture();
+                    picture.setNamePicture(fileName);
+                    return pictureRepository.save(picture);
+                  })
               .collect(Collectors.toSet());
 
       userFavor.setPictures(pictures);
-
       userFavorRepository.save(userFavor);
     }
     return userFavorMapper.toDto(userFavor);
@@ -234,13 +254,22 @@ public class UserFavorServiceImpl implements UserFavorService {
    */
   @Override
   public UserFavorDTO updateUserFavor(long id, UpdateUserFavorForm form) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    UserFavor userFavorOwner =
+        userFavorRepository.findById(id).orElseThrow(UserNotFoundException::new);
+
+    if (!userFavorOwner.getUser().getPseudo().equals(authentication.getName())) {
+      throw new AccessNotAuthorizedException();
+    }
 
     Favor favorById =
         favorRepository.findById(form.favorId()).orElseThrow(FavorNotFoundException::new);
+
     UserFavor userFavor = userFavorRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
-    Long existingFavorId = userFavor.getFavor() != null ? userFavor.getFavor().getId() : null;
-    Long newFavorId = userFavor.getFavor() != null ? userFavor.getFavor().getId() : null;
+    Long existingFavorId = userFavor.getFavor().getId();
+    Long newFavorId = form.favorId();
 
     if (newFavorId != null && !newFavorId.equals(existingFavorId)) {
       Favor newFavor =
