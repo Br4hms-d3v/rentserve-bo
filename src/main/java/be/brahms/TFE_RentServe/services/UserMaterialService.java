@@ -90,8 +90,8 @@ public interface UserMaterialService {
   /**
    * This method get a list of user materials by Material ID
    *
-   * @param materialId the identifier material
+   * @param nameMaterial the name material
    * @return a list of users materials grouped by material id
    */
-  List<UserMaterialDTO> findAllUserMaterialsByMaterialId(long materialId);
+  List<UserMaterialDTO> findAllUserMaterialsByNameMaterial(String nameMaterial);
 }
