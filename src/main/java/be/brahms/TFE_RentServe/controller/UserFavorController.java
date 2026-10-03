@@ -10,9 +10,11 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This controller manages user favor
@@ -110,6 +112,20 @@ public class UserFavorController {
   }
 
   /**
+   * Get a list of user favor grouped by User
+   *
+   * @param id the identifier from User
+   * @return a list of user favor by user id
+   */
+  @GetMapping("my-favor/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<EntityModel<UserFavorByIdDTO>> getUserFavorDetailByOwnerId(
+      @PathVariable long id) {
+    UserFavorByIdDTO userFavorByUserId = userFavorService.findUserFavorByOwnerId(id);
+    return ResponseEntity.ok().body(userFavorAssembler.toIdModel(userFavorByUserId));
+  }
+
+  /**
    * Get a list of user favor activated from the user ID owner
    *
    * @param id the identifier user
@@ -145,13 +161,15 @@ public class UserFavorController {
    * Create a new UseFavor
    *
    * @param form the form to create a new User Favor
+   * @param pictures the pictures of the user favor
    * @return a new User favor
    */
-  @PostMapping("{new}")
+  @PostMapping(value = "new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
   public ResponseEntity<EntityModel<UserFavorDTO>> createUserFavor(
-      @RequestBody @Valid UserFavorCreateForm form) {
-    UserFavorDTO newUserFavor = userFavorService.createUserFavor(form);
+      @Valid @ModelAttribute UserFavorCreateForm form,
+      @RequestPart("pictures") List<MultipartFile> pictures) {
+    UserFavorDTO newUserFavor = userFavorService.createUserFavor(form, pictures);
     return ResponseEntity.ok().body(userFavorAssembler.toModel(newUserFavor));
   }
 

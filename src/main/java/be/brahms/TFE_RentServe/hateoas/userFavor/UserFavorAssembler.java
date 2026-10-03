@@ -42,8 +42,10 @@ public class UserFavorAssembler
             .withRel("List of users favour grouped by favor ID"),
         linkTo(methodOn(UserFavorController.class).getUserFavorById(userFavor.id()))
             .withRel("User favor by id"),
-        linkTo(methodOn(UserFavorController.class).createUserFavor(null))
+        linkTo(methodOn(UserFavorController.class).createUserFavor(null, null))
             .withRel("Create a new user favor"),
+        linkTo(methodOn(UserFavorController.class).updateUserFavor(userFavor.id(), null))
+            .withRel("Update user favor"),
         linkTo(methodOn(UserFavorController.class).deleteUserFavorById(userFavor.id()))
             .withRel("Delete a user favor"));
   }
@@ -60,7 +62,7 @@ public class UserFavorAssembler
         userFavour,
         linkTo(methodOn(UserFavorController.class).getAllUserFavour())
             .withRel("List of users favour"),
-        linkTo(methodOn(UserFavorController.class).createUserFavor(null))
+        linkTo(methodOn(UserFavorController.class).createUserFavor(null, null))
             .withRel("Create a new user favor"));
   }
 

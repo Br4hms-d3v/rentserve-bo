@@ -6,6 +6,7 @@ import be.brahms.TFE_RentServe.models.forms.userFavor.UpdateUserFavorForm;
 import be.brahms.TFE_RentServe.models.forms.userFavor.UserFavorCreateForm;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Service interface for managing user favour. Defines business operations related to userFavor
@@ -37,6 +38,14 @@ public interface UserFavorService {
   UserFavorByIdDTO findUserFavorById(long id);
 
   /**
+   * This method get a detail of user favor by owner user
+   *
+   * @param id the identifier of user favor
+   * @return a detail about the user favor only user can see
+   */
+  UserFavorByIdDTO findUserFavorByOwnerId(long id);
+
+  /**
    * This method get a list of user favour by User ID
    *
    * @param userId the identifier of user
@@ -64,9 +73,10 @@ public interface UserFavorService {
    * This method saves a new UserFavor
    *
    * @param form the form to create a new user Favor
+   * @param pictures the pictures of the user favor
    * @return the saved user favor
    */
-  UserFavorDTO createUserFavor(@Valid UserFavorCreateForm form);
+  UserFavorDTO createUserFavor(@Valid UserFavorCreateForm form, List<MultipartFile> pictures);
 
   /**
    * This method update the existing user favor

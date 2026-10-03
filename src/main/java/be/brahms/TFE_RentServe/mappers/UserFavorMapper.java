@@ -10,6 +10,7 @@ import be.brahms.TFE_RentServe.models.forms.userFavor.UpdateUserFavorForm;
 import be.brahms.TFE_RentServe.models.forms.userFavor.UserFavorCreateForm;
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
@@ -38,10 +39,18 @@ public interface UserFavorMapper {
         userFavor.getPictures().stream()
             .map(Picture::getNamePicture)
             .findFirst()
-            .orElse("imageByDefault.png");
+            .orElse("imageByDefaultFavor.png");
+
+    // Get name from favor
+    FavorNameDTO nameFavor =
+        new FavorNameDTO(userFavor.getFavor().getId(), userFavor.getFavor().getNameFavor());
 
     return new UserFavorDTO(
-        userFavor.getId(), userFavor.getPriceHourFavor(), userFavor.isAvailable(), firstPicture);
+        userFavor.getId(),
+        nameFavor,
+        userFavor.getPriceHourFavor(),
+        userFavor.isAvailable(),
+        firstPicture);
   }
 
   /**
@@ -50,7 +59,9 @@ public interface UserFavorMapper {
    * @param userFavor the user Favor entity
    * @return the userFavor entity
    */
-  UserFavorDTO toDto(UserFavor userFavor);
+  default UserFavorDTO toDto(UserFavor userFavor) {
+    return toListDto(userFavor);
+  }
 
   /**
    * Convert a user favor to a UserFavorByIdDTO Get more details : - description about the favor -
@@ -66,7 +77,8 @@ public interface UserFavorMapper {
     UserPseudoDTO userPseudo = new UserPseudoDTO(userFavor.getUser().getPseudo());
 
     // Get the name from favor
-    FavorNameDTO favorName = new FavorNameDTO(userFavor.getFavor().getNameFavor());
+    FavorNameDTO favorName =
+        new FavorNameDTO(userFavor.getId(), userFavor.getFavor().getNameFavor());
 
     return new UserFavorByIdDTO(
         userFavor.getId(),
@@ -99,7 +111,7 @@ public interface UserFavorMapper {
     Picture picture = new Picture();
 
     if (namePicture == null || namePicture.isBlank()) {
-      picture.setNamePicture("imageByDefault.png");
+      picture.setNamePicture("imageByDefaultFavor.png");
     } else {
       picture.setNamePicture(namePicture);
     }
@@ -113,5 +125,6 @@ public interface UserFavorMapper {
    * @param form the user favor update form
    * @param userFavor the user favor entity
    */
+  @Mapping(target = "pictures", ignore = true)
   void fromUpdateUserFavorForm(UpdateUserFavorForm form, @MappingTarget UserFavor userFavor);
 }

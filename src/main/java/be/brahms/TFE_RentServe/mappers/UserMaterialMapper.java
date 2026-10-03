@@ -38,7 +38,7 @@ public interface UserMaterialMapper {
         userMaterial.getPictures().stream()
             .map(Picture::getNamePicture)
             .findFirst()
-            .orElse("imageByDefault.png");
+            .orElse("imageByDefaultMaterial.png");
 
     // Get the name from material
     MaterialNameDTO nameMaterial =
@@ -114,7 +114,7 @@ public interface UserMaterialMapper {
     Picture picture = new Picture();
 
     if (namePicture == null || namePicture.isBlank()) {
-      picture.setNamePicture("imageByDefault.png");
+      picture.setNamePicture("imageByDefaultMaterial.png");
     } else {
       picture.setNamePicture(namePicture);
     }
