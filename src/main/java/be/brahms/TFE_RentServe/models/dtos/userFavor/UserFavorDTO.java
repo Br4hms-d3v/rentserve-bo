@@ -1,7 +1,6 @@
 package be.brahms.TFE_RentServe.models.dtos.userFavor;
 
 import be.brahms.TFE_RentServe.models.dtos.favor.FavorNameDTO;
-
 import java.math.BigDecimal;
 
 /**
@@ -15,4 +14,8 @@ import java.math.BigDecimal;
  * @param picture the first picture of favor
  */
 public record UserFavorDTO(
-        Long id, FavorNameDTO nameFavor, BigDecimal priceHourFavor, Boolean isAvailable, String picture) {}
+    Long id,
+    FavorNameDTO nameFavor,
+    BigDecimal priceHourFavor,
+    Boolean isAvailable,
+    String picture) {}
