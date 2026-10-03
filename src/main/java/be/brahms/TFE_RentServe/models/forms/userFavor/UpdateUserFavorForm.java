@@ -18,9 +18,7 @@ import java.math.BigDecimal;
 public record UpdateUserFavorForm(
     @NotBlank String descriptionFavor,
     @Digits(integer = 4, fraction = 2) // 4 numbers before the dot and 2 after the dot
-        @DecimalMin(
-            value = "5.0",
-            inclusive = false) // The value can be start 5.0 or more but never under
+        @DecimalMin(value = "5.0") // The value can be start 5.0 or more but never under
         BigDecimal priceHourFavor,
     @NotNull Boolean isAvailable,
     @NotNull Long favorId,
