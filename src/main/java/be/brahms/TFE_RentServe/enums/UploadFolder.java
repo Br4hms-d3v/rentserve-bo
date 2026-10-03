@@ -10,7 +10,7 @@ public enum UploadFolder {
   /** Folder for user materials. */
   USER_MATERIAL("userMaterials"),
   /** Folder for user favours. */
-  USER_FAVOR("userFavors"),
+  USER_FAVOR("userFavour"),
   /** Folder for user photos. */
   USER_PHOTO("userPhotos");
 
