@@ -38,7 +38,7 @@ public class UserFavorAssembler
         userFavor,
         linkTo(methodOn(UserFavorController.class).getAllUserFavour())
             .withRel("List of users favour"),
-        linkTo(methodOn(UserFavorController.class).getUserFavourByFavorId(userFavor.id()))
+        linkTo(methodOn(UserFavorController.class).getUserFavorById(userFavor.id()))
             .withRel("List of users favour grouped by favor ID"),
         linkTo(methodOn(UserFavorController.class).getUserFavorById(userFavor.id()))
             .withRel("User favor by id"),

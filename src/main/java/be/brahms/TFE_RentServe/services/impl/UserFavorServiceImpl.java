@@ -89,19 +89,15 @@ public class UserFavorServiceImpl implements UserFavorService {
   /**
    * Get a list of all users favour grouped by ID favor
    *
-   * @param favorId the identifier favor
+   * @param nameFavor the name favor
    * @return a list of user favor by Favor ID
    */
   @Override
-  public List<UserFavorDTO> findAllUserFavourByFavorId(long favorId) {
-    List<UserFavor> listUserFavour = userFavorRepository.findAllUserFavourByFavorId(favorId);
-
-    if (!userFavorRepository.existsById(favorId)) {
-      throw new UserFavorNotFoundException();
-    }
+  public List<UserFavorDTO> findAllUserFavourByNameFavor(String nameFavor) {
+    List<UserFavor> listUserFavour = userFavorRepository.findAllUserFavourByNameFavor(nameFavor);
 
     if (listUserFavour.isEmpty()) {
-      throw new FavorNotFoundException();
+      throw new UserFavourEmptyException();
     }
     return listUserFavour.stream().map(userFavorMapper::toListDto).toList();
   }

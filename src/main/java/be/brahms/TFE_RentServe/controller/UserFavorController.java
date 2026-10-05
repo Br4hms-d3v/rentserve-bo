@@ -70,14 +70,14 @@ public class UserFavorController {
   /**
    * Get a list of all users favour
    *
-   * @param favorId the identifier favor
+   * @param favorName the identifier favor
    * @return a list of users favour grouped by favor ID
    */
-  @GetMapping("list/{favorId}")
+  @GetMapping("list/{favorName}")
   @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
-  public ResponseEntity<CollectionModel<UserFavorDTO>> getUserFavourByFavorId(
-      @PathVariable long favorId) {
-    List<UserFavorDTO> userFavor = userFavorService.findAllUserFavourByFavorId(favorId);
+  public ResponseEntity<CollectionModel<UserFavorDTO>> findAllUserFavourByFavorName(
+      @PathVariable String favorName) {
+    List<UserFavorDTO> userFavor = userFavorService.findAllUserFavourByNameFavor(favorName);
     CollectionModel<UserFavorDTO> userFavorDTOCollectionModel =
         userFavorAssembler.toCollectionModel(userFavor);
     return ResponseEntity.ok().body(userFavorDTOCollectionModel);
