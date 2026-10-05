@@ -195,15 +195,15 @@ public class UserMaterialController {
   /**
    * Get a list of all users materials grouped by ID material
    *
-   * @param materialId the identifier material
+   * @param materialName the identifier material
    * @return a list of user materials by Material ID
    */
-  @GetMapping("list/{materialId}")
+  @GetMapping("list/{materialName}")
   @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
   public ResponseEntity<CollectionModel<UserMaterialDTO>> findAllUserMaterialsByMaterialId(
-      @PathVariable long materialId) {
+      @PathVariable String materialName) {
     List<UserMaterialDTO> userMaterialDTOs =
-        userMaterialService.findAllUserMaterialsByMaterialId(materialId);
+        userMaterialService.findAllUserMaterialsByNameMaterial(materialName);
     CollectionModel<UserMaterialDTO> userMaterialDTOCollectionModel =
         userMaterialAssembler.toCollectionModel(userMaterialDTOs);
     return ResponseEntity.ok().body(userMaterialDTOCollectionModel);

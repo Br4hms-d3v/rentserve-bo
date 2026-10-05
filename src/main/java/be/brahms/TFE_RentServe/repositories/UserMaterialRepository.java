@@ -52,10 +52,18 @@ public interface UserMaterialRepository extends JpaRepository<UserMaterial, Long
   /**
    * Find all user materials by material ID
    *
-   * @param materialId the identifier material
+   * @param nameMaterial the identifier material
    * @return a list of user materials grouped by id material
    */
   @Query(
-      "SELECT um FROM UserMaterial um WHERE um.material.id =:materialId AND um.isAvailable = true ")
-  List<UserMaterial> findAllUserMaterialsByMaterialId(@Param("materialId") long materialId);
+      "SELECT um FROM UserMaterial um WHERE um.material.nameMaterial =:nameMaterial AND um.isAvailable = true ")
+  List<UserMaterial> findAllUserMaterialsByNameMaterial(@Param("nameMaterial") String nameMaterial);
+
+  /**
+   * Get a boolean true or false if the name of material exists or not
+   *
+   * @param nameMaterial the name of material
+   * @return a boolean true or false
+   */
+  boolean existsByMaterial_NameMaterial(String nameMaterial);
 }

@@ -325,20 +325,16 @@ public class UserMaterialServiceImpl implements UserMaterialService {
   /**
    * Get a list of all users materials grouped by ID material
    *
-   * @param materialId the identifier material
+   * @param nameMaterial the name material
    * @return a list of user material by material ID
    */
   @Override
-  public List<UserMaterialDTO> findAllUserMaterialsByMaterialId(long materialId) {
+  public List<UserMaterialDTO> findAllUserMaterialsByNameMaterial(String nameMaterial) {
     List<UserMaterial> listUserMaterials =
-        userMaterialRepository.findAllUserMaterialsByMaterialId(materialId);
-
-    if (!userMaterialRepository.existsById(materialId)) {
-      throw new UserMaterialNotFoundException();
-    }
+        userMaterialRepository.findAllUserMaterialsByNameMaterial(nameMaterial);
 
     if (listUserMaterials.isEmpty()) {
-      throw new UserMaterialNotFoundException();
+      throw new UserMaterialException("La liste est vide");
     }
 
     return listUserMaterials.stream().map(userMaterialMapper::toListDto).toList();

@@ -24,10 +24,10 @@ public interface UserFavorService {
   /**
    * This method get a list of user favour by Favor ID
    *
-   * @param favorId the identifier favor
+   * @param nameFavor the name of favor
    * @return a list of users favour grouped by favor id
    */
-  List<UserFavorDTO> findAllUserFavourByFavorId(long favorId);
+  List<UserFavorDTO> findAllUserFavourByNameFavor(String nameFavor);
 
   /**
    * This method get a list of user favor by ID
