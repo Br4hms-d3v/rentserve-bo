@@ -1,18 +1,20 @@
 package be.brahms.TFE_RentServe.controller;
 
 import be.brahms.TFE_RentServe.hateoas.review.ReviewAssembler;
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import be.brahms.TFE_RentServe.services.ReviewService;
 import java.util.List;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * This controller manages Review It has a method to display - a list of reviews only for user
- * material
+ * material - a list of reviews only for user favor
  *
  * @author Brahim K
  */
@@ -40,11 +42,26 @@ public class ReviewController {
    * @return a list of reviews
    */
   @GetMapping("list-material")
-  //    @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<CollectionModel<ReviewUserMaterialDTO>> getAllReviewsFromUserMaterial() {
     List<ReviewUserMaterialDTO> reviewList = reviewService.findReviewsUserMaterial();
     CollectionModel<ReviewUserMaterialDTO> reviewModel =
         reviewAssembler.toCollectionModel(reviewList);
+
+    return ResponseEntity.ok().body(reviewModel);
+  }
+
+  /**
+   * Get a list of reviews only for userFavor
+   *
+   * @return a list of reviews
+   */
+  @GetMapping("list-favor")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<CollectionModel<ReviewUserFavorDTO>> getAllReviewsFromUserFavor() {
+    List<ReviewUserFavorDTO> reviewList = reviewService.findReviewsUserFavor();
+    CollectionModel<ReviewUserFavorDTO> reviewModel =
+        reviewAssembler.toCollectionModelUF(reviewList);
 
     return ResponseEntity.ok().body(reviewModel);
   }

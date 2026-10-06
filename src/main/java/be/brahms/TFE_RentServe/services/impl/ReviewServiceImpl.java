@@ -1,6 +1,7 @@
 package be.brahms.TFE_RentServe.services.impl;
 
 import be.brahms.TFE_RentServe.mappers.ReviewMapper;
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import be.brahms.TFE_RentServe.models.entities.Review;
 import be.brahms.TFE_RentServe.repositories.ReviewRepository;
@@ -31,6 +32,11 @@ public class ReviewServiceImpl implements ReviewService {
     this.reviewMapper = reviewMapper;
   }
 
+  /**
+   * Finds all reviews for user materials.
+   *
+   * @return a list of review DTOs
+   */
   @Override
   public List<ReviewUserMaterialDTO> findReviewsUserMaterial() {
     List<Review> listReviewUM = reviewRepository.listReviewByUserMaterial();
@@ -40,5 +46,21 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     return listReviewUM.stream().map(reviewMapper::toListDto).toList();
+  }
+
+  /**
+   * Finds all reviews for user favour.
+   *
+   * @return a list of review DTOs
+   */
+  @Override
+  public List<ReviewUserFavorDTO> findReviewsUserFavor() {
+    List<Review> listReviewUF = reviewRepository.listReviewByUserFavor();
+
+    if (listReviewUF.isEmpty()) {
+      //            System.out.println("List reviews is empty ");
+    }
+
+    return listReviewUF.stream().map(reviewMapper::toListDtoUF).toList();
   }
 }

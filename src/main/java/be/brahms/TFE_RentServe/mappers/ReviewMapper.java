@@ -1,5 +1,6 @@
 package be.brahms.TFE_RentServe.mappers;
 
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPseudoDTO;
 import be.brahms.TFE_RentServe.models.dtos.userFavor.UserFavorNameDTO;
@@ -30,7 +31,6 @@ public interface ReviewMapper {
    */
   default ReviewUserMaterialDTO toListDto(Review review) {
     UserMaterialNameDTO userMaterial = null;
-    UserFavorNameDTO userFavor = null;
 
     // UserMaterial
     if (review.getUserMaterial() != null
@@ -52,6 +52,38 @@ public interface ReviewMapper {
         review.getIsActive(),
         userPseudo,
         userMaterial,
+        review.getCreatedAt(),
+        review.getUpdatedAt());
+  }
+
+  /**
+   * Converts a Review entity into a ReviewUserFavorDTO.*
+   *
+   * @param review the review to convert
+   * @return the review DTO with user and favor information
+   */
+  default ReviewUserFavorDTO toListDtoUF(Review review) {
+    UserFavorNameDTO userFavor = null;
+
+    // UserMaterial
+    if (review.getUserFavor() != null
+        && review.getUserFavor().getFavor() != null
+        && review.getUserFavor().getFavor().getNameFavor() != null) {
+
+      userFavor = new UserFavorNameDTO(review.getUserFavor().getFavor().getNameFavor());
+    }
+
+    // This is the same methode from userMaterialName but the code is short
+    UserPseudoDTO userPseudo =
+        review.getUser() != null ? new UserPseudoDTO(review.getUser().getPseudo()) : null;
+
+    return new ReviewUserFavorDTO(
+        review.getId(),
+        review.getComment(),
+        review.getRating(),
+        review.getIsActive(),
+        userPseudo,
+        userFavor,
         review.getCreatedAt(),
         review.getUpdatedAt());
   }

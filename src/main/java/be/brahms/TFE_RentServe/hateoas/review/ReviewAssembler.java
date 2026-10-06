@@ -4,6 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import be.brahms.TFE_RentServe.controller.ReviewController;
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import java.util.List;
 import org.springframework.hateoas.CollectionModel;
@@ -47,5 +48,18 @@ public class ReviewAssembler
         review,
         linkTo(methodOn(ReviewController.class).getAllReviewsFromUserMaterial())
             .withRel("List of reviews from user material"));
+  }
+
+  /**
+   * Creates a collection of review DTOs with a link to the list of reviews.
+   *
+   * @param review the list of reviews for user favor
+   * @return a collection of reviews with a link
+   */
+  public CollectionModel<ReviewUserFavorDTO> toCollectionModelUF(List<ReviewUserFavorDTO> review) {
+    return CollectionModel.of(
+        review,
+        linkTo(methodOn(ReviewController.class).getAllReviewsFromUserFavor())
+            .withRel("List of reviews from user favor"));
   }
 }
