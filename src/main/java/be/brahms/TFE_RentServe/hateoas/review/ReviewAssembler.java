@@ -4,6 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import be.brahms.TFE_RentServe.controller.ReviewController;
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import java.util.List;
@@ -61,5 +62,20 @@ public class ReviewAssembler
         review,
         linkTo(methodOn(ReviewController.class).getAllReviewsFromUserFavor())
             .withRel("List of reviews from user favor"));
+  }
+
+  /**
+   * Convert a ReviewByIdDto to an EntityModel with HATEOAS links.
+   *
+   * <p>This method adds useful links to the ReviewByIdDto, a link for review by id
+   *
+   * @param review the review data to wrap
+   * @return an EntityModel with the review details and HATEOAS links
+   */
+  public EntityModel<ReviewByIdDTO> toIdModel(ReviewByIdDTO review) {
+    return EntityModel.of(
+            review,
+            linkTo(methodOn(ReviewController.class).getReviewsById(review.id())).withRel("Get review by ID")
+    );
   }
 }

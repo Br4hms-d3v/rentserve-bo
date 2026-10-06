@@ -1,14 +1,17 @@
 package be.brahms.TFE_RentServe.controller;
 
 import be.brahms.TFE_RentServe.hateoas.review.ReviewAssembler;
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import be.brahms.TFE_RentServe.services.ReviewService;
 import java.util.List;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,4 +68,21 @@ public class ReviewController {
 
     return ResponseEntity.ok().body(reviewModel);
   }
+
+  /**
+   * Get review by id
+   *
+   * @return a review by his id
+   */
+  @GetMapping("{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<EntityModel<ReviewByIdDTO>> getReviewsById(@PathVariable long id) {
+    ReviewByIdDTO review = reviewService.findReviewById(id);
+    EntityModel<ReviewByIdDTO> reviewModel =
+            reviewAssembler.toIdModel(review);
+
+    return ResponseEntity.ok().body(reviewModel);
+  }
+
+
 }

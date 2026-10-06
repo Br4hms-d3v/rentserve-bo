@@ -1,6 +1,7 @@
 package be.brahms.TFE_RentServe.services.impl;
 
 import be.brahms.TFE_RentServe.mappers.ReviewMapper;
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import be.brahms.TFE_RentServe.models.entities.Review;
@@ -62,5 +63,16 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     return listReviewUF.stream().map(reviewMapper::toListDtoUF).toList();
+  }
+
+  /**
+   * Find review by ID
+   * @param id the identifier review
+   * @return a review by his ID
+   */
+  public ReviewByIdDTO findReviewById(Long id) {
+    Review review = reviewRepository.findById(id).orElseThrow();
+
+    return reviewMapper.toIdDto(review);
   }
 }

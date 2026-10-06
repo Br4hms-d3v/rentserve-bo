@@ -1,5 +1,6 @@
 package be.brahms.TFE_RentServe.services;
 
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import java.util.List;
@@ -22,4 +23,11 @@ public interface ReviewService {
    * @return a list of review from user favor
    */
   List<ReviewUserFavorDTO> findReviewsUserFavor();
+
+  /**
+   * This method get a review by id
+   *
+   * @return a review
+   */
+  ReviewByIdDTO findReviewById(Long id);
 }
