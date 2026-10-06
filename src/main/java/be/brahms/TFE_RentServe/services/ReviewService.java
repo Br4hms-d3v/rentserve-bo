@@ -1,3 +1,17 @@
 package be.brahms.TFE_RentServe.services;
 
-public interface ReviewService {}
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
+import java.util.List;
+
+/**
+ * Service interface for managing review. Defines business operations related to review entities.
+ */
+public interface ReviewService {
+
+  /**
+   * This method get a list of all review from all userMaterials
+   *
+   * @return a list of review from user material
+   */
+  List<ReviewUserMaterialDTO> findReviewsUserMaterial();
+}
