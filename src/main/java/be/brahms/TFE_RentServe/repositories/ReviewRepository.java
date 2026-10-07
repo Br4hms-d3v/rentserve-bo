@@ -27,4 +27,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
    */
   @Query("SELECT r FROM Review r WHERE r.userFavor.id IS NOT null")
   List<Review> listReviewByUserFavor();
+
+  /**
+   * Get a list of reviews
+   *
+   * @param id the identifier user
+   * @return a list of reviews from user
+   */
+  @Query("SELECT r FROM Review  r WHERE r.user.id =:id")
+  List<Review> findReviewByUserId(Long id);
 }

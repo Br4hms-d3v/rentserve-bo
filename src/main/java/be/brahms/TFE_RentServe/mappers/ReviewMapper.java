@@ -22,100 +22,106 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ReviewMapper {
 
-    // Entity to DTO
+  // Entity to DTO
 
-    /**
-     * Converts a Review entity into a ReviewUserMaterialDTO.
-     *
-     * @param review the review to convert
-     * @return the review DTO with user and material information
-     */
-    default ReviewUserMaterialDTO toListDto(Review review) {
-        UserMaterialNameDTO userMaterial = null;
+  /**
+   * Converts a Review entity into a ReviewUserMaterialDTO.
+   *
+   * @param review the review to convert
+   * @return the review DTO with user and material information
+   */
+  default ReviewUserMaterialDTO toListDto(Review review) {
+    UserMaterialNameDTO userMaterial = null;
 
-        // UserMaterial
-        if (review.getUserMaterial() != null
-                && review.getUserMaterial().getMaterial() != null
-                && review.getUserMaterial().getMaterial().getNameMaterial() != null) {
+    // UserMaterial
+    if (review.getUserMaterial() != null
+        && review.getUserMaterial().getMaterial() != null
+        && review.getUserMaterial().getMaterial().getNameMaterial() != null) {
 
-            userMaterial =
-                    new UserMaterialNameDTO(review.getUserMaterial().getMaterial().getNameMaterial());
-        }
-
-        // This is the same methode from userMaterialName but the code is short
-        UserPseudoDTO userPseudo =
-                review.getUser() != null ? new UserPseudoDTO(review.getUser().getPseudo()) : null;
-
-        return new ReviewUserMaterialDTO(
-                review.getId(),
-                review.getComment(),
-                review.getRating(),
-                review.getIsActive(),
-                userPseudo,
-                userMaterial,
-                review.getCreatedAt(),
-                review.getUpdatedAt());
+      userMaterial =
+          new UserMaterialNameDTO(review.getUserMaterial().getMaterial().getNameMaterial());
     }
 
-    /**
-     * Converts a Review entity into a ReviewUserFavorDTO.*
-     *
-     * @param review the review to convert
-     * @return the review DTO with user and favor information
-     */
-    default ReviewUserFavorDTO toListDtoUF(Review review) {
-        UserFavorNameDTO userFavor = null;
+    // This is the same methode from userMaterialName but the code is short
+    UserPseudoDTO userPseudo =
+        review.getUser() != null ? new UserPseudoDTO(review.getUser().getPseudo()) : null;
 
-        // UserMaterial
-        if (review.getUserFavor() != null
-                && review.getUserFavor().getFavor() != null
-                && review.getUserFavor().getFavor().getNameFavor() != null) {
+    return new ReviewUserMaterialDTO(
+        review.getId(),
+        review.getComment(),
+        review.getRating(),
+        review.getIsActive(),
+        userPseudo,
+        userMaterial,
+        review.getCreatedAt(),
+        review.getUpdatedAt());
+  }
 
-            userFavor = new UserFavorNameDTO(review.getUserFavor().getFavor().getNameFavor());
-        }
+  /**
+   * Converts a Review entity into a ReviewUserFavorDTO.*
+   *
+   * @param review the review to convert
+   * @return the review DTO with user and favor information
+   */
+  default ReviewUserFavorDTO toListDtoUF(Review review) {
+    UserFavorNameDTO userFavor = null;
 
-        // This is the same methode from userMaterialName but the code is short
-        UserPseudoDTO userPseudo =
-                review.getUser() != null ? new UserPseudoDTO(review.getUser().getPseudo()) : null;
+    // UserMaterial
+    if (review.getUserFavor() != null
+        && review.getUserFavor().getFavor() != null
+        && review.getUserFavor().getFavor().getNameFavor() != null) {
 
-        return new ReviewUserFavorDTO(
-                review.getId(),
-                review.getComment(),
-                review.getRating(),
-                review.getIsActive(),
-                userPseudo,
-                userFavor,
-                review.getCreatedAt(),
-                review.getUpdatedAt());
+      userFavor = new UserFavorNameDTO(review.getUserFavor().getFavor().getNameFavor());
     }
 
-    /**
-     * Convert a review entity to a reviewByIdDTO.
-     * This DTO contains only the id of the review.
-     *
-     * @param review the review entity
-     * @return the reviewByIdDTO
-     */
-    default ReviewByIdDTO toIdDto(Review review) {
+    // This is the same methode from userMaterialName but the code is short
+    UserPseudoDTO userPseudo =
+        review.getUser() != null ? new UserPseudoDTO(review.getUser().getPseudo()) : null;
 
-        // UserMaterial
-        UserMaterialNameDTO userMaterial = review.getUserMaterial() != null ? new UserMaterialNameDTO(review.getUserMaterial().getMaterial().getNameMaterial()) : null;
+    return new ReviewUserFavorDTO(
+        review.getId(),
+        review.getComment(),
+        review.getRating(),
+        review.getIsActive(),
+        userPseudo,
+        userFavor,
+        review.getCreatedAt(),
+        review.getUpdatedAt());
+  }
 
-        // UserFavor
-        UserFavorNameDTO userFavor = review.getUserFavor() != null ? new UserFavorNameDTO(review.getUserFavor().getFavor().getNameFavor()) : null;
+  /**
+   * Convert a review entity to a reviewByIdDTO. This DTO contains only the id of the review.
+   *
+   * @param review the review entity
+   * @return the reviewByIdDTO
+   */
+  default ReviewByIdDTO toIdDto(Review review) {
 
-        // UserPseudo
-        UserPseudoDTO userPseudo = review.getUser() != null ? new UserPseudoDTO(review.getUser().getPseudo()) : null;
+    // UserMaterial
+    UserMaterialNameDTO userMaterial =
+        review.getUserMaterial() != null
+            ? new UserMaterialNameDTO(review.getUserMaterial().getMaterial().getNameMaterial())
+            : null;
 
-        return new ReviewByIdDTO(
-                review.getId(),
-                review.getComment(),
-                review.getRating(),
-                review.getIsActive(),
-                userPseudo,
-                userMaterial,
-                userFavor,
-                review.getCreatedAt(),
-                review.getUpdatedAt());
-    }
+    // UserFavor
+    UserFavorNameDTO userFavor =
+        review.getUserFavor() != null
+            ? new UserFavorNameDTO(review.getUserFavor().getFavor().getNameFavor())
+            : null;
+
+    // UserPseudo
+    UserPseudoDTO userPseudo =
+        review.getUser() != null ? new UserPseudoDTO(review.getUser().getPseudo()) : null;
+
+    return new ReviewByIdDTO(
+        review.getId(),
+        review.getComment(),
+        review.getRating(),
+        review.getIsActive(),
+        userPseudo,
+        userMaterial,
+        userFavor,
+        review.getCreatedAt(),
+        review.getUpdatedAt());
+  }
 }

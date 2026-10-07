@@ -72,17 +72,30 @@ public class ReviewController {
   /**
    * Get review by id
    *
+   * @param id the identifier review
    * @return a review by his id
    */
   @GetMapping("{id}")
   @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
   public ResponseEntity<EntityModel<ReviewByIdDTO>> getReviewsById(@PathVariable long id) {
     ReviewByIdDTO review = reviewService.findReviewById(id);
-    EntityModel<ReviewByIdDTO> reviewModel =
-            reviewAssembler.toIdModel(review);
+    EntityModel<ReviewByIdDTO> reviewModel = reviewAssembler.toIdModel(review);
 
     return ResponseEntity.ok().body(reviewModel);
   }
 
+  /**
+   * Get review from userID
+   *
+   * @param id the identifier of user
+   * @return a list of reviews from user id
+   */
+  @GetMapping("user/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<CollectionModel<ReviewByIdDTO>> getReviewsByUserId(@PathVariable long id) {
+    List<ReviewByIdDTO> listReviewByUser = reviewService.findReviewByUserId(id);
+    CollectionModel<ReviewByIdDTO> reviewModel = reviewAssembler.toListModel(listReviewByUser, id);
 
+    return ResponseEntity.ok().body(reviewModel);
+  }
 }

@@ -27,7 +27,16 @@ public interface ReviewService {
   /**
    * This method get a review by id
    *
+   * @param id the identifier review
    * @return a review
    */
   ReviewByIdDTO findReviewById(Long id);
+
+  /**
+   * This method get a list of reviews from user
+   *
+   * @param id the identifier user
+   * @return a list of review (by user id)
+   */
+  List<ReviewByIdDTO> findReviewByUserId(Long id);
 }

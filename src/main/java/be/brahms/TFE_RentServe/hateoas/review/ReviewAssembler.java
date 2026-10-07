@@ -74,8 +74,24 @@ public class ReviewAssembler
    */
   public EntityModel<ReviewByIdDTO> toIdModel(ReviewByIdDTO review) {
     return EntityModel.of(
-            review,
-            linkTo(methodOn(ReviewController.class).getReviewsById(review.id())).withRel("Get review by ID")
-    );
+        review,
+        linkTo(methodOn(ReviewController.class).getReviewsById(review.id()))
+            .withRel("Get review by ID"));
+  }
+
+  /**
+   * Convert a ReviewByIdDto to a CollectionModel with HATEOAS links.
+   *
+   * <p>This method adds useful links to the ReviewByIdDto, a link for review by id
+   *
+   * @param review the review data to wrap
+   * @param userId the identifier from user
+   * @return a CollectionModel with a list the reviews from user and HATEOAS links
+   */
+  public CollectionModel<ReviewByIdDTO> toListModel(List<ReviewByIdDTO> review, long userId) {
+    return CollectionModel.of(
+        review,
+        linkTo(methodOn(ReviewController.class).getReviewsByUserId(userId))
+            .withRel("Get review by user ID"));
   }
 }
