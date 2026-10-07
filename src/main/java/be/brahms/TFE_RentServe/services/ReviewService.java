@@ -3,6 +3,7 @@ package be.brahms.TFE_RentServe.services;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
+import be.brahms.TFE_RentServe.models.forms.review.ReviewUserFavorForm;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserMaterialForm;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -65,4 +66,12 @@ public interface ReviewService {
    * @return a review
    */
   ReviewUserMaterialDTO createReviewUserMaterial(@Valid ReviewUserMaterialForm form);
+
+  /**
+   * This method create a review for user favor
+   *
+   * @param form the form to create a new review for user favor
+   * @return a review
+   */
+  ReviewUserFavorDTO createReviewUserFavor(@Valid ReviewUserFavorForm form);
 }

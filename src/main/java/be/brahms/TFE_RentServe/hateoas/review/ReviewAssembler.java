@@ -43,6 +43,22 @@ public class ReviewAssembler
   }
 
   /**
+   * Convert a ReviewDto to an EntityModel with HATEOAS links. These methods add links to the
+   * ReviewDto, a link for Review : - Get a list review for user favor
+   *
+   * @param review the review data to wrap
+   * @return an EntityModel with the Review data and HATEOAS links
+   */
+  public EntityModel<ReviewUserFavorDTO> toModelUF(ReviewUserFavorDTO review) {
+    return EntityModel.of(
+        review,
+        linkTo(methodOn(ReviewController.class).createReviewsUserFavor(null))
+            .withRel("Write a review"),
+        linkTo(methodOn(ReviewController.class).getReviewsByUserFavorId(review.id()))
+            .withRel("Read the review"));
+  }
+
+  /**
    * Creates a collection of review DTOs with a link to the list of reviews.
    *
    * @param review the list of reviews

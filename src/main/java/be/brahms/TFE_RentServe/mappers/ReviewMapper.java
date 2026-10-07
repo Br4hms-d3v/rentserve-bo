@@ -7,6 +7,7 @@ import be.brahms.TFE_RentServe.models.dtos.user.UserPseudoDTO;
 import be.brahms.TFE_RentServe.models.dtos.userFavor.UserFavorNameDTO;
 import be.brahms.TFE_RentServe.models.dtos.userMaterial.UserMaterialNameDTO;
 import be.brahms.TFE_RentServe.models.entities.Review;
+import be.brahms.TFE_RentServe.models.forms.review.ReviewUserFavorForm;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserMaterialForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -135,4 +136,12 @@ public interface ReviewMapper {
    * @return the review entity
    */
   Review fromReviewUMForm(ReviewUserMaterialForm form);
+
+  /**
+   * Convert a ReviewForm to a Review entity. Used when creating a new review
+   *
+   * @param form the review form
+   * @return the review entity
+   */
+  Review fromReviewUFForm(ReviewUserFavorForm form);
 }

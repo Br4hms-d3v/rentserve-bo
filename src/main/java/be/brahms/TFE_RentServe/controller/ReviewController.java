@@ -4,6 +4,7 @@ import be.brahms.TFE_RentServe.hateoas.review.ReviewAssembler;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
+import be.brahms.TFE_RentServe.models.forms.review.ReviewUserFavorForm;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserMaterialForm;
 import be.brahms.TFE_RentServe.services.ReviewService;
 import jakarta.validation.Valid;
@@ -143,5 +144,19 @@ public class ReviewController {
       @RequestBody @Valid ReviewUserMaterialForm form) {
     ReviewUserMaterialDTO newReview = reviewService.createReviewUserMaterial(form);
     return ResponseEntity.ok().body(reviewAssembler.toModel(newReview));
+  }
+
+  /**
+   * Write a review for user favor
+   *
+   * @param form the form to write a review for user favor
+   * @return a reviews favor with link
+   */
+  @PostMapping("favor")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<EntityModel<ReviewUserFavorDTO>> createReviewsUserFavor(
+      @RequestBody @Valid ReviewUserFavorForm form) {
+    ReviewUserFavorDTO newReview = reviewService.createReviewUserFavor(form);
+    return ResponseEntity.ok().body(reviewAssembler.toModelUF(newReview));
   }
 }

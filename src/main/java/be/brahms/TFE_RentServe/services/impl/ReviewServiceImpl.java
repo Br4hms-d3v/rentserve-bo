@@ -10,7 +10,9 @@ import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import be.brahms.TFE_RentServe.models.entities.Review;
 import be.brahms.TFE_RentServe.models.entities.User;
+import be.brahms.TFE_RentServe.models.entities.UserFavor;
 import be.brahms.TFE_RentServe.models.entities.UserMaterial;
+import be.brahms.TFE_RentServe.models.forms.review.ReviewUserFavorForm;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserMaterialForm;
 import be.brahms.TFE_RentServe.repositories.ReviewRepository;
 import be.brahms.TFE_RentServe.repositories.UserFavorRepository;
@@ -154,6 +156,12 @@ public class ReviewServiceImpl implements ReviewService {
     return reviewsUserFavorId.stream().map(reviewMapper::toListDtoUF).toList();
   }
 
+  /**
+   * Write a review for user material Get user id by authenticate
+   *
+   * @param form the form to create a new review for user material
+   * @return review for user material
+   */
   @Override
   @Transactional
   public ReviewUserMaterialDTO createReviewUserMaterial(ReviewUserMaterialForm form) {
@@ -181,5 +189,40 @@ public class ReviewServiceImpl implements ReviewService {
     reviewRepository.save(newReview);
 
     return reviewMapper.toListDto(newReview);
+  }
+
+  /**
+   * Write a review for user material Get user id by authenticate
+   *
+   * @param form the form to create a new review for user favor
+   * @return review user favor
+   */
+  @Override
+  @Transactional
+  public ReviewUserFavorDTO createReviewUserFavor(ReviewUserFavorForm form) {
+    Review newReview = reviewMapper.fromReviewUFForm(form);
+    UserFavor userFavor =
+        userFavorRepository
+            .findById(form.userFavorID())
+            .orElseThrow(UserFavorNotFoundException::new);
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    if (authentication != null && authentication.isAuthenticated()) {
+      Object principal = authentication.getPrincipal();
+
+      if (principal instanceof UserDetails userDetails) {
+        String pseudo = userDetails.getUsername();
+
+        User user = userRepository.findByPseudo(pseudo).orElseThrow(UserNotFoundException::new);
+        newReview.setUser(user);
+      }
+    }
+
+    newReview.setUserFavor(userFavor);
+
+    reviewRepository.save(newReview);
+
+    return reviewMapper.toListDtoUF(newReview);
   }
 }
