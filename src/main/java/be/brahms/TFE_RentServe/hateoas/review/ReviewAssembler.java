@@ -5,6 +5,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import be.brahms.TFE_RentServe.controller.ReviewController;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import java.util.List;
@@ -26,8 +27,8 @@ public class ReviewAssembler
   public ReviewAssembler() {}
 
   /**
-   * Convert a ReviewDto to an EntityModel with HATEOAS links. These methods add links to the
-   * ReviewDto, a link for Review : - Get a list review for user materials
+   * Convert a ReviewUserMaterialDTO to an EntityModel with HATEOAS links. These methods add links
+   * to the ReviewUserMaterialDTO, a link for Review : - Get a list review for user materials
    *
    * @param review the review data to wrap
    * @return an EntityModel with the Review data and HATEOAS links
@@ -43,8 +44,8 @@ public class ReviewAssembler
   }
 
   /**
-   * Convert a ReviewDto to an EntityModel with HATEOAS links. These methods add links to the
-   * ReviewDto, a link for Review : - Get a list review for user favor
+   * Convert a ReviewUserFavorDTO to an EntityModel with HATEOAS links. These methods add links to
+   * the ReviewUserFavorDTO, a link for Review : - Get a list review for user favor
    *
    * @param review the review data to wrap
    * @return an EntityModel with the Review data and HATEOAS links
@@ -55,6 +56,22 @@ public class ReviewAssembler
         linkTo(methodOn(ReviewController.class).createReviewsUserFavor(null))
             .withRel("Write a review"),
         linkTo(methodOn(ReviewController.class).getReviewsByUserFavorId(review.id()))
+            .withRel("Read the review"));
+  }
+
+  /**
+   * Convert a ReviewDTO to an EntityModel with HATEOAS links. These methods add links to the
+   * ReviewDTO, a link for Review : - Edit review
+   *
+   * @param review the review data to wrap
+   * @return an EntityModel with the Review data and HATEOAS links
+   */
+  public EntityModel<ReviewDTO> toModel(ReviewDTO review) {
+    return EntityModel.of(
+        review,
+        linkTo(methodOn(ReviewController.class).updateReview(review.id(), null))
+            .withRel("Write a review"),
+        linkTo(methodOn(ReviewController.class).getReviewsByUserMaterialId(review.id()))
             .withRel("Read the review"));
   }
 

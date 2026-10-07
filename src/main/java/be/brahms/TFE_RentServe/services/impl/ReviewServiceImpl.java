@@ -1,17 +1,20 @@
 package be.brahms.TFE_RentServe.services.impl;
 
 import be.brahms.TFE_RentServe.exceptions.review.ReviewException;
+import be.brahms.TFE_RentServe.exceptions.review.ReviewNotExistingException;
 import be.brahms.TFE_RentServe.exceptions.user.UserNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.userFavor.UserFavorNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.userMaterial.UserMaterialNotFoundException;
 import be.brahms.TFE_RentServe.mappers.ReviewMapper;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import be.brahms.TFE_RentServe.models.entities.Review;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.entities.UserFavor;
 import be.brahms.TFE_RentServe.models.entities.UserMaterial;
+import be.brahms.TFE_RentServe.models.forms.review.ReviewUpdateForm;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserFavorForm;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserMaterialForm;
 import be.brahms.TFE_RentServe.repositories.ReviewRepository;
@@ -19,6 +22,7 @@ import be.brahms.TFE_RentServe.repositories.UserFavorRepository;
 import be.brahms.TFE_RentServe.repositories.UserMaterialRepository;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.ReviewService;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -224,5 +228,36 @@ public class ReviewServiceImpl implements ReviewService {
     reviewRepository.save(newReview);
 
     return reviewMapper.toListDtoUF(newReview);
+  }
+
+  /**
+   * Edit a review for by id
+   *
+   * @param form the form to edit review
+   * @return review edited
+   */
+  @Override
+  @Transactional
+  public ReviewDTO updateReview(long id, ReviewUpdateForm form) {
+    Review reviewId = reviewRepository.findById(id).orElseThrow(ReviewNotExistingException::new);
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    if (authentication != null && authentication.isAuthenticated()) {
+      Object principal = authentication.getPrincipal();
+
+      if (principal instanceof UserDetails userDetails) {
+        String pseudo = userDetails.getUsername();
+
+        User user = userRepository.findByPseudo(pseudo).orElseThrow(UserNotFoundException::new);
+        reviewId.setUser(user);
+      }
+    }
+
+    reviewId.setUpdatedAt(LocalDate.now());
+
+    reviewMapper.fromReviewUpdateForm(form, reviewId);
+
+    return reviewMapper.toDto(reviewRepository.save(reviewId));
   }
 }

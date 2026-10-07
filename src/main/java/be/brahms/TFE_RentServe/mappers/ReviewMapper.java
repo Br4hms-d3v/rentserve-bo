@@ -1,15 +1,18 @@
 package be.brahms.TFE_RentServe.mappers;
 
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPseudoDTO;
 import be.brahms.TFE_RentServe.models.dtos.userFavor.UserFavorNameDTO;
 import be.brahms.TFE_RentServe.models.dtos.userMaterial.UserMaterialNameDTO;
 import be.brahms.TFE_RentServe.models.entities.Review;
+import be.brahms.TFE_RentServe.models.forms.review.ReviewUpdateForm;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserFavorForm;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserMaterialForm;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
 /**
@@ -127,6 +130,18 @@ public interface ReviewMapper {
         review.getUpdatedAt());
   }
 
+  /**
+   * Convert a review entity to a reviewDTO. This DTO contains the edited review.
+   *
+   * @param review the review entity
+   * @return the reviewByIdDTO
+   */
+  default ReviewDTO toDto(Review review) {
+
+    return new ReviewDTO(
+        review.getId(), review.getComment(), review.getRating(), review.getIsActive());
+  }
+
   // Form to Entity
 
   /**
@@ -144,4 +159,13 @@ public interface ReviewMapper {
    * @return the review entity
    */
   Review fromReviewUFForm(ReviewUserFavorForm form);
+
+  /**
+   * Convert a ReviewForm to a Review entity. Used when update review
+   *
+   * @param form the review form
+   * @param review the identifier review
+   * @return the review entity
+   */
+  Review fromReviewUpdateForm(ReviewUpdateForm form, @MappingTarget Review review);
 }

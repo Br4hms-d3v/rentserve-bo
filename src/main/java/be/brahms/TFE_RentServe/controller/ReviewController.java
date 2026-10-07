@@ -2,8 +2,10 @@ package be.brahms.TFE_RentServe.controller;
 
 import be.brahms.TFE_RentServe.hateoas.review.ReviewAssembler;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
+import be.brahms.TFE_RentServe.models.dtos.review.ReviewDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
+import be.brahms.TFE_RentServe.models.forms.review.ReviewUpdateForm;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserFavorForm;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserMaterialForm;
 import be.brahms.TFE_RentServe.services.ReviewService;
@@ -158,5 +160,20 @@ public class ReviewController {
       @RequestBody @Valid ReviewUserFavorForm form) {
     ReviewUserFavorDTO newReview = reviewService.createReviewUserFavor(form);
     return ResponseEntity.ok().body(reviewAssembler.toModelUF(newReview));
+  }
+
+  /**
+   * Edit the review by id
+   *
+   * @param form the form to edit review
+   * @param id the identifier
+   * @return review edited
+   */
+  @PutMapping("edit/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<EntityModel<ReviewDTO>> updateReview(
+      @PathVariable long id, @RequestBody @Valid ReviewUpdateForm form) {
+    ReviewDTO editReview = reviewService.updateReview(id, form);
+    return ResponseEntity.ok().body(reviewAssembler.toModel(editReview));
   }
 }
