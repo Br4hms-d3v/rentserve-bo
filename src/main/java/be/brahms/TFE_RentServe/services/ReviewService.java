@@ -85,4 +85,11 @@ public interface ReviewService {
    * @return a review edited
    */
   ReviewDTO updateReview(long id, @Valid ReviewUpdateForm form);
+
+  /**
+   * Delete review
+   *
+   * @param id the identifier
+   */
+  void deleteReview(long id);
 }

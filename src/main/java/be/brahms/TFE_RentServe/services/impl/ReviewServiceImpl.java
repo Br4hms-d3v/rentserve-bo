@@ -260,4 +260,16 @@ public class ReviewServiceImpl implements ReviewService {
 
     return reviewMapper.toDto(reviewRepository.save(reviewId));
   }
+
+  /**
+   * Method to delete the review
+   *
+   * @param id the identifier
+   */
+  @Override
+  public void deleteReview(long id) {
+    Review review = reviewRepository.findById(id).orElseThrow(ReviewNotExistingException::new);
+
+    reviewRepository.delete(review);
+  }
 }

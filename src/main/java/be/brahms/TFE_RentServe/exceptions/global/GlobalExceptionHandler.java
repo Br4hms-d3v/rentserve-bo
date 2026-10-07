@@ -15,6 +15,7 @@ import be.brahms.TFE_RentServe.exceptions.material.MaterialException;
 import be.brahms.TFE_RentServe.exceptions.material.MaterialNotEmptyException;
 import be.brahms.TFE_RentServe.exceptions.picture.PictureException;
 import be.brahms.TFE_RentServe.exceptions.review.ReviewException;
+import be.brahms.TFE_RentServe.exceptions.review.ReviewNotExistingException;
 import be.brahms.TFE_RentServe.exceptions.user.*;
 import be.brahms.TFE_RentServe.exceptions.userFavor.UserFavorException;
 import be.brahms.TFE_RentServe.exceptions.userFavor.UserFavorNotFoundException;
@@ -595,6 +596,26 @@ public class GlobalExceptionHandler {
             HttpStatus.BAD_REQUEST.getReasonPhrase(),
             except.getMessage());
     return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * Handles ReviewNotExistingException and sends a 404 NOT_FOUND error.
+   *
+   * <p>This method is called automatically when the review doesn't exist. It creates an ApiError
+   * and sends it to the frontend.
+   *
+   * @param except The exception that was thrown (ReviewNotExistingException).
+   * @return A response with an apiError and HTTP status 404 (NOT_FOUND).
+   */
+  @ExceptionHandler(ReviewNotExistingException.class)
+  public ResponseEntity<ApiError> handleReviewNotExistingException(
+      ReviewNotExistingException except) {
+    ApiError apiError =
+        ApiError.of(
+            HttpStatus.NOT_FOUND.value(),
+            HttpStatus.NOT_FOUND.getReasonPhrase(),
+            except.getMessage());
+    return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
   }
 
   // Picture

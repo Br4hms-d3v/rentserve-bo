@@ -14,6 +14,6 @@ public class ReviewNotExistingException extends RuntimeException {
 
   /** This exception is used when a review doesn't exist */
   public ReviewNotExistingException() {
-    super();
+    super("Le message n'existe pas");
   }
 }

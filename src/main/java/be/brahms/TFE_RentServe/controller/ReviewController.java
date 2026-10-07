@@ -176,4 +176,17 @@ public class ReviewController {
     ReviewDTO editReview = reviewService.updateReview(id, form);
     return ResponseEntity.ok().body(reviewAssembler.toModel(editReview));
   }
+
+  /**
+   * Delete the review
+   *
+   * @param id the identifier
+   * @return a message to confirm has been deleting
+   */
+  @DeleteMapping("delete/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<String> deleteReview(@PathVariable long id) {
+    reviewService.deleteReview(id);
+    return ResponseEntity.ok().body("Le commentaire a été supprimée avec succès.");
+  }
 }
