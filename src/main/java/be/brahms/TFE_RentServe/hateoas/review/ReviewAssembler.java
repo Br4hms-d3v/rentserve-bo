@@ -34,7 +34,12 @@ public class ReviewAssembler
    */
   @Override
   public EntityModel<ReviewUserMaterialDTO> toModel(ReviewUserMaterialDTO review) {
-    return null;
+    return EntityModel.of(
+        review,
+        linkTo(methodOn(ReviewController.class).createReviewsUserMaterial(null))
+            .withRel("Write a review"),
+        linkTo(methodOn(ReviewController.class).getReviewsByUserMaterialId(review.id()))
+            .withRel("Read the review"));
   }
 
   /**

@@ -5,7 +5,6 @@ import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserMaterialForm;
 import jakarta.validation.Valid;
-
 import java.util.List;
 
 /**
@@ -59,5 +58,11 @@ public interface ReviewService {
    */
   List<ReviewUserFavorDTO> findReviewsUserFavorById(long id);
 
+  /**
+   * This method create a review for user material
+   *
+   * @param form the form to create a new review for user material
+   * @return a review
+   */
   ReviewUserMaterialDTO createReviewUserMaterial(@Valid ReviewUserMaterialForm form);
 }

@@ -128,5 +128,11 @@ public interface ReviewMapper {
 
   // Form to Entity
 
+  /**
+   * Convert a ReviewForm to a Review entity. Used when creating a new review
+   *
+   * @param form the review form
+   * @return the review entity
+   */
   Review fromReviewUMForm(ReviewUserMaterialForm form);
 }

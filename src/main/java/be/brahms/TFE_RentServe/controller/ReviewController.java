@@ -6,9 +6,8 @@ import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import be.brahms.TFE_RentServe.models.forms.review.ReviewUserMaterialForm;
 import be.brahms.TFE_RentServe.services.ReviewService;
-import java.util.List;
-
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -132,10 +131,17 @@ public class ReviewController {
     return ResponseEntity.ok().body(reviewsModel);
   }
 
+  /**
+   * Write a review for user material
+   *
+   * @param form the form to write a review for user material
+   * @return a reviews with link
+   */
   @PostMapping("material")
   @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
-  public ResponseEntity<EntityModel<ReviewUserMaterialDTO>> createReviewsUserMaterial(@RequestBody @Valid ReviewUserMaterialForm form){
+  public ResponseEntity<EntityModel<ReviewUserMaterialDTO>> createReviewsUserMaterial(
+      @RequestBody @Valid ReviewUserMaterialForm form) {
     ReviewUserMaterialDTO newReview = reviewService.createReviewUserMaterial(form);
-    return null;
+    return ResponseEntity.ok().body(reviewAssembler.toModel(newReview));
   }
 }
