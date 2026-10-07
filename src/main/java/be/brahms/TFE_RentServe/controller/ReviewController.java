@@ -115,4 +115,20 @@ public class ReviewController {
         reviewAssembler.toCollectionModelID(listReviewUserMaterialID, id);
     return ResponseEntity.ok().body(reviewsModel);
   }
+
+  /**
+   * Get a list review from user favor ID
+   *
+   * @param id the identifier of user favor
+   * @return a list of reviews
+   */
+  @GetMapping("user-favor/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<CollectionModel<ReviewUserFavorDTO>> getReviewsByUserFavorId(
+      @PathVariable long id) {
+    List<ReviewUserFavorDTO> listReviewUserFavorID = reviewService.findReviewsUserFavorById(id);
+    CollectionModel<ReviewUserFavorDTO> reviewsModel =
+        reviewAssembler.toCollectionModelUFID(listReviewUserFavorID, id);
+    return ResponseEntity.ok().body(reviewsModel);
+  }
 }

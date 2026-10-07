@@ -2,6 +2,7 @@ package be.brahms.TFE_RentServe.services.impl;
 
 import be.brahms.TFE_RentServe.exceptions.review.ReviewException;
 import be.brahms.TFE_RentServe.exceptions.user.UserNotFoundException;
+import be.brahms.TFE_RentServe.exceptions.userFavor.UserFavorNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.userMaterial.UserMaterialNotFoundException;
 import be.brahms.TFE_RentServe.mappers.ReviewMapper;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
@@ -9,6 +10,7 @@ import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
 import be.brahms.TFE_RentServe.models.entities.Review;
 import be.brahms.TFE_RentServe.repositories.ReviewRepository;
+import be.brahms.TFE_RentServe.repositories.UserFavorRepository;
 import be.brahms.TFE_RentServe.repositories.UserMaterialRepository;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.ReviewService;
@@ -27,6 +29,7 @@ public class ReviewServiceImpl implements ReviewService {
   private final ReviewMapper reviewMapper;
   private final UserRepository userRepository;
   private final UserMaterialRepository userMaterialRepository;
+  private final UserFavorRepository userFavorRepository;
 
   /**
    * Constructor with parameters
@@ -34,18 +37,21 @@ public class ReviewServiceImpl implements ReviewService {
    * @param reviewRepository the reviewRepo to access review data
    * @param reviewMapper the reviewMapper
    * @param userRepository the userRepo to access user data
-   * @param userMaterialRepository the userMaterialRepo to access usermaterial data
+   * @param userMaterialRepository the userMaterialRepo to access user material data
+   * @param userFavorRepository the userFavorRepo to access user favor data
    */
   @Autowired
   public ReviewServiceImpl(
       ReviewRepository reviewRepository,
       ReviewMapper reviewMapper,
       UserRepository userRepository,
-      UserMaterialRepository userMaterialRepository) {
+      UserMaterialRepository userMaterialRepository,
+      UserFavorRepository userFavorRepository) {
     this.reviewRepository = reviewRepository;
     this.reviewMapper = reviewMapper;
     this.userRepository = userRepository;
     this.userMaterialRepository = userMaterialRepository;
+    this.userFavorRepository = userFavorRepository;
   }
 
   /**
@@ -124,5 +130,20 @@ public class ReviewServiceImpl implements ReviewService {
     userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
 
     return reviewsUserMaterialId.stream().map(reviewMapper::toListDto).toList();
+  }
+
+  /**
+   * Find all reviews by user favor id
+   *
+   * @param id the identifier of user favor
+   * @return a list of reviews from user favor ID
+   */
+  @Override
+  public List<ReviewUserFavorDTO> findReviewsUserFavorById(long id) {
+    List<Review> reviewsUserFavorId = reviewRepository.findReviewByUserFavorId(id);
+
+    userFavorRepository.findById(id).orElseThrow(UserFavorNotFoundException::new);
+
+    return reviewsUserFavorId.stream().map(reviewMapper::toListDtoUF).toList();
   }
 }

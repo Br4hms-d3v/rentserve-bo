@@ -47,4 +47,12 @@ public interface ReviewService {
    * @return a list of reviews from user material id
    */
   List<ReviewUserMaterialDTO> findReviewsUserMaterialById(long id);
+
+  /**
+   * This method get a list of reviews from user favor
+   *
+   * @param id the identifier of user favor
+   * @return a list of reviews from user favor id
+   */
+  List<ReviewUserFavorDTO> findReviewsUserFavorById(long id);
 }

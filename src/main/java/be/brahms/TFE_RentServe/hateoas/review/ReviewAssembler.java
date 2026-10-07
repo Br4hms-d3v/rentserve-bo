@@ -69,6 +69,23 @@ public class ReviewAssembler
   }
 
   /**
+   * Creates a collection of review DTOs with a link to the list of reviews from user favor ID.
+   *
+   * @param review the list of reviews from user favor ID
+   * @param id the identifier user favor
+   * @return a collection of reviews with a link
+   */
+  public CollectionModel<ReviewUserFavorDTO> toCollectionModelUFID(
+      List<ReviewUserFavorDTO> review, long id) {
+    return CollectionModel.of(
+        review,
+        linkTo(methodOn(ReviewController.class).getAllReviewsFromUserFavor())
+            .withRel("List of reviews from user favor"),
+        linkTo(methodOn(ReviewController.class).getReviewsByUserFavorId(id))
+            .withRel("List review from user favor ID"));
+  }
+
+  /**
    * Creates a collection of review DTOs with a link to the list of reviews.
    *
    * @param review the list of reviews for user favor
