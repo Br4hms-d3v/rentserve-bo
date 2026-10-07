@@ -4,16 +4,16 @@ import be.brahms.TFE_RentServe.hateoas.review.ReviewAssembler;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserFavorDTO;
 import be.brahms.TFE_RentServe.models.dtos.review.ReviewUserMaterialDTO;
+import be.brahms.TFE_RentServe.models.forms.review.ReviewUserMaterialForm;
 import be.brahms.TFE_RentServe.services.ReviewService;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * This controller manages Review It has a method to display - a list of reviews only for user
@@ -130,5 +130,12 @@ public class ReviewController {
     CollectionModel<ReviewUserFavorDTO> reviewsModel =
         reviewAssembler.toCollectionModelUFID(listReviewUserFavorID, id);
     return ResponseEntity.ok().body(reviewsModel);
+  }
+
+  @PostMapping("material")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<EntityModel<ReviewUserMaterialDTO>> createReviewsUserMaterial(@RequestBody @Valid ReviewUserMaterialForm form){
+    ReviewUserMaterialDTO newReview = reviewService.createReviewUserMaterial(form);
+    return null;
   }
 }
