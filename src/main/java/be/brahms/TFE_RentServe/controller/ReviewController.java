@@ -98,4 +98,21 @@ public class ReviewController {
 
     return ResponseEntity.ok().body(reviewModel);
   }
+
+  /**
+   * Get a list review from user material ID
+   *
+   * @param id the identifier of user material
+   * @return a list of reviews
+   */
+  @GetMapping("user-material/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<CollectionModel<ReviewUserMaterialDTO>> getReviewsByUserMaterialId(
+      @PathVariable long id) {
+    List<ReviewUserMaterialDTO> listReviewUserMaterialID =
+        reviewService.findReviewsUserMaterialById(id);
+    CollectionModel<ReviewUserMaterialDTO> reviewsModel =
+        reviewAssembler.toCollectionModelID(listReviewUserMaterialID, id);
+    return ResponseEntity.ok().body(reviewsModel);
+  }
 }

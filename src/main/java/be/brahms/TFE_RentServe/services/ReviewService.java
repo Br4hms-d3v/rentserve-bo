@@ -39,4 +39,12 @@ public interface ReviewService {
    * @return a list of review (by user id)
    */
   List<ReviewByIdDTO> findReviewByUserId(Long id);
+
+  /**
+   * This method get a list of reviews from user material
+   *
+   * @param id the identifier of user material
+   * @return a list of reviews from user material id
+   */
+  List<ReviewUserMaterialDTO> findReviewsUserMaterialById(long id);
 }

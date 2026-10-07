@@ -52,6 +52,23 @@ public class ReviewAssembler
   }
 
   /**
+   * Creates a collection of review DTOs with a link to the list of reviews from user material ID.
+   *
+   * @param review the list of reviews from user material ID
+   * @param id the identifier user material
+   * @return a collection of reviews with a link
+   */
+  public CollectionModel<ReviewUserMaterialDTO> toCollectionModelID(
+      List<ReviewUserMaterialDTO> review, long id) {
+    return CollectionModel.of(
+        review,
+        linkTo(methodOn(ReviewController.class).getAllReviewsFromUserMaterial())
+            .withRel("List of reviews from user material"),
+        linkTo(methodOn(ReviewController.class).getReviewsByUserMaterialId(id))
+            .withRel("List review from user material ID"));
+  }
+
+  /**
    * Creates a collection of review DTOs with a link to the list of reviews.
    *
    * @param review the list of reviews for user favor
