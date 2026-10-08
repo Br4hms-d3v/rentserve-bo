@@ -125,6 +125,20 @@
           }
         ]
       }
+    },
+    {
+      "changeSet": {
+        "id": "update-sequence-after-inserts-reviews",
+        "author": "Brahms",
+        "changes": [
+          {
+            "sql": {
+              "dbms": "postgresql",
+              "sql": "SELECT setval('reviews_id_seq', (SELECT MAX(id) FROM reviews));"
+            }
+          }
+        ]
+      }
     }
   ]
 }
