@@ -57,8 +57,9 @@ public class Rental extends BaseEntity {
    * The user-material relationship associated with the rental. A rental may involve a material that
    * belongs to a user.
    */
-  @Column(name = "user_material_id")
-  private Long userMaterial;
+  @ManyToOne
+  @JoinColumn(name = "user_material_id")
+  private UserMaterial userMaterial;
 
   /**
    * The user-favor relationship associated with the rental. A rental may involve a favor that
