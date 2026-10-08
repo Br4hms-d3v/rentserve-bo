@@ -3,13 +3,16 @@ package be.brahms.TFE_RentServe.services.impl;
 import be.brahms.TFE_RentServe.exceptions.user.UserException;
 import be.brahms.TFE_RentServe.exceptions.user.UserNotFoundException;
 import be.brahms.TFE_RentServe.mappers.RentalMapper;
+import be.brahms.TFE_RentServe.models.dtos.rental.RentalDetailEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalEarnDTO;
+import be.brahms.TFE_RentServe.models.entities.Rental;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.repositories.RentalRepository;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.RentalService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -125,5 +128,16 @@ public class RentalServiceImpl implements RentalService {
     BigDecimal totalEarned = rentalRepository.totalEarned(ownerUser.getId(), dateStart, dateEnd);
 
     return rentalMapper.toEarnDTO(totalEarned);
+  }
+
+  @Override
+  public List<RentalDetailEarnDTO> totalDetailEarned(
+      long userId, LocalDate dateStart, LocalDate dateEnd) {
+    List<Rental> listRentalDetail =
+        rentalRepository.findTotalDetailEarned(userId, dateStart, dateEnd);
+
+    userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+    return rentalMapper.toDetailEarnDTO(listRentalDetail);
   }
 }

@@ -3,6 +3,7 @@ package be.brahms.TFE_RentServe.repositories;
 import be.brahms.TFE_RentServe.models.entities.Rental;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,6 +29,21 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
   @Query(
       "SELECT COALESCE(SUM (r.amount),0) FROM Rental r LEFT JOIN r.userFavor uf LEFT JOIN r.userMaterial um JOIN r.bill b WHERE (uf.user.id = :userId OR um.user.id = :userId) AND b.isPaid = true AND r.createdAt >= :dateStart AND r.createdAt <= :dateEnd")
   BigDecimal totalEarned(
+      @Param("userId") Long userId,
+      @Param("dateStart") LocalDate dateStart,
+      @Param("dateEnd") LocalDate dateEnd);
+
+  /**
+   * Get detail about that earn from the first day util last day
+   *
+   * @param userId the owner identifier
+   * @param dateStart the date start
+   * @param dateEnd the end date
+   * @return a detail for each amount earn
+   */
+  @Query(
+      "SELECT r FROM Rental r LEFT JOIN r.userFavor uf LEFT JOIN r.userMaterial um JOIN r.bill b WHERE (uf.user.id = :userId OR um.user.id = :userId) AND b.isPaid = true AND r.createdAt >= :dateStart AND r.createdAt <= :dateEnd ORDER BY r.createdAt ASC")
+  List<Rental> findTotalDetailEarned(
       @Param("userId") Long userId,
       @Param("dateStart") LocalDate dateStart,
       @Param("dateEnd") LocalDate dateEnd);

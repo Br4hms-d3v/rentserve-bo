@@ -1,9 +1,12 @@
 package be.brahms.TFE_RentServe.controller;
 
 import be.brahms.TFE_RentServe.hateoas.rental.EarnAssembler;
+import be.brahms.TFE_RentServe.models.dtos.rental.RentalDetailEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalEarnDTO;
 import be.brahms.TFE_RentServe.services.RentalService;
 import java.time.LocalDate;
+import java.util.List;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -60,5 +63,24 @@ public class EarnController {
   public ResponseEntity<EntityModel<RentalEarnDTO>> totalEarnedThisMonth(@PathVariable long id) {
     RentalEarnDTO myEarned = rentalService.totalEarnedThisMonth(id);
     return ResponseEntity.ok().body(earnAssembler.toModel(myEarned));
+  }
+
+  /**
+   * Get detail about my earn between date start and date end
+   *
+   * @param id the identifier
+   * @param dateStart the date start
+   * @param dateEnd the date end
+   * @return the total amount
+   */
+  @GetMapping("/detail-earned/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<CollectionModel<RentalDetailEarnDTO>> totalDetailEarned(
+      @PathVariable long id, @RequestParam LocalDate dateStart, @RequestParam LocalDate dateEnd) {
+    List<RentalDetailEarnDTO> myEarnedDetail =
+        rentalService.totalDetailEarned(id, dateStart, dateEnd);
+    CollectionModel<RentalDetailEarnDTO> myEarnedDetailModel =
+        earnAssembler.toCollectionModel(myEarnedDetail);
+    return ResponseEntity.ok().body(myEarnedDetailModel);
   }
 }
