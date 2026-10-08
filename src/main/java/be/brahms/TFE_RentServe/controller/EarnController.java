@@ -48,4 +48,17 @@ public class EarnController {
     RentalEarnDTO myEarned = rentalService.totalEarned(id, dateStart, dateEnd);
     return ResponseEntity.ok().body(earnAssembler.toModel(myEarned));
   }
+
+  /**
+   * Get earned this month
+   *
+   * @param id the identifier of user
+   * @return the total amount
+   */
+  @GetMapping("/my-earned-this-month/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<EntityModel<RentalEarnDTO>> totalEarnedThisMonth(@PathVariable long id) {
+    RentalEarnDTO myEarned = rentalService.totalEarnedThisMonth(id);
+    return ResponseEntity.ok().body(earnAssembler.toModel(myEarned));
+  }
 }

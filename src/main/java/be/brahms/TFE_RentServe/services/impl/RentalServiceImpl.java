@@ -42,6 +42,14 @@ public class RentalServiceImpl implements RentalService {
     this.userRepository = userRepository;
   }
 
+  /**
+   * Get a total earn between two dates start and end
+   *
+   * @param userId the identifier user
+   * @param dateStart the date start
+   * @param dateEnd the date end
+   * @return an amount total
+   */
   @Override
   public RentalEarnDTO totalEarned(long userId, LocalDate dateStart, LocalDate dateEnd) {
 
@@ -69,6 +77,50 @@ public class RentalServiceImpl implements RentalService {
 
     // Check userId exists
     User ownerUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+    BigDecimal totalEarned = rentalRepository.totalEarned(ownerUser.getId(), dateStart, dateEnd);
+
+    return rentalMapper.toEarnDTO(totalEarned);
+  }
+
+  /**
+   * Get an amount this month
+   *
+   * @param userId the identifier user
+   * @return a total amount earn this month
+   */
+  @Override
+  public RentalEarnDTO totalEarnedThisMonth(long userId) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    if (authentication == null || !authentication.isAuthenticated()) {
+      throw new UserNotFoundException();
+    }
+
+    Object principal = authentication.getPrincipal();
+
+    if (!(principal instanceof UserDetails userDetails)) {
+      throw new UserNotFoundException();
+    }
+
+    String pseudo = userDetails.getUsername();
+
+    User authenticatedUser =
+        userRepository.findByPseudo(pseudo).orElseThrow(UserNotFoundException::new);
+
+    // Check if the owner is connected
+    if (authenticatedUser.getId() != userId) {
+      throw new UserException("Vous n'avez pas accès !");
+    }
+
+    // Check userId exists
+    User ownerUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+    // Get the first day of the current month
+    LocalDate dateStart = LocalDate.now().withDayOfMonth(1);
+
+    // Get the first day of the next month
+    LocalDate dateEnd = dateStart.plusMonths(1);
 
     BigDecimal totalEarned = rentalRepository.totalEarned(ownerUser.getId(), dateStart, dateEnd);
 

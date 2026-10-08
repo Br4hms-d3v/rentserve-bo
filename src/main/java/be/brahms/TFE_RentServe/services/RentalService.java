@@ -15,4 +15,12 @@ public interface RentalService {
    * @return the amount earned
    */
   RentalEarnDTO totalEarned(long userId, LocalDate dateStart, LocalDate dateEnd);
+
+  /**
+   * This method get amount only this month
+   *
+   * @param userId the identifier user
+   * @return the amount earn this month
+   */
+  RentalEarnDTO totalEarnedThisMonth(long userId);
 }
