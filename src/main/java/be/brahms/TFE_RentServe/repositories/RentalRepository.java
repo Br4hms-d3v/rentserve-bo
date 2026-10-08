@@ -26,7 +26,7 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
    * @return a total amount earn the month
    */
   @Query(
-      "SELECT COALESCE(SUM (r.amount),0) FROM Rental r LEFT JOIN r.userFavor uf LEFT JOIN r.userMaterial um JOIN r.bill b WHERE (uf.user.id = :userId OR um.user.id = :userId) AND b.isPaid = false AND r.createdAt >= :dateStart AND r.createdAt <= :dateEnd")
+      "SELECT COALESCE(SUM (r.amount),0) FROM Rental r LEFT JOIN r.userFavor uf LEFT JOIN r.userMaterial um JOIN r.bill b WHERE (uf.user.id = :userId OR um.user.id = :userId) AND b.isPaid = true AND r.createdAt >= :dateStart AND r.createdAt <= :dateEnd")
   BigDecimal totalEarned(
       @Param("userId") Long userId,
       @Param("dateStart") LocalDate dateStart,
