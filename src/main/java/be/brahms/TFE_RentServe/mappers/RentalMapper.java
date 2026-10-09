@@ -1,11 +1,14 @@
 package be.brahms.TFE_RentServe.mappers;
 
+import be.brahms.TFE_RentServe.models.dtos.rental.RentalByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalDetailEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.userFavor.UserFavorNameDTO;
 import be.brahms.TFE_RentServe.models.dtos.userMaterial.UserMaterialNameDTO;
 import be.brahms.TFE_RentServe.models.entities.Rental;
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -68,5 +71,56 @@ public interface RentalMapper {
    */
   default List<RentalDetailEarnDTO> toDetailEarnDTO(List<Rental> rentals) {
     return rentals.stream().map(this::toDetailEarnDTO).toList();
+  }
+
+  /**
+   * This map all data about the rental
+   *
+   * <ul>
+   *   <li>Get a name of user material
+   *   <li>Get a name of user favor
+   *   <li>Get a total days
+   *   <li>Get a total hours
+   * </ul>
+   *
+   * @param rental the entity
+   * @return a detail rental in DTO
+   */
+  default RentalByIdDTO toRentalDetailIdDTO(Rental rental) {
+    // Get the name of favor if it's empty let null
+    UserFavorNameDTO nameFavor =
+        rental.getUserFavor() != null
+            ? new UserFavorNameDTO(rental.getUserFavor().getFavor().getNameFavor())
+            : null;
+
+    // Get the name of material if it's empty let null
+    UserMaterialNameDTO nameMaterial =
+        rental.getUserMaterial() != null
+            ? new UserMaterialNameDTO(rental.getUserMaterial().getMaterial().getNameMaterial())
+            : null;
+
+    // Get a local date time with date start and time start
+    LocalDateTime start = LocalDateTime.of(rental.getStarDateAt(), rental.getStartTime());
+
+    // Get a local date time with date end and time end
+    LocalDateTime end = LocalDateTime.of(rental.getEndDateAt(), rental.getEndTime());
+
+    // Get a total time between start util end
+    Duration duration = Duration.between(start, end);
+
+    long durationDays = duration.toDays();
+    long durationHours = duration.toHours();
+
+    return new RentalByIdDTO(
+        rental.getId(),
+        rental.getAmount(),
+        rental.getStarDateAt(),
+        rental.getEndDateAt(),
+        rental.getStartTime(),
+        rental.getEndTime(),
+        nameFavor,
+        nameMaterial,
+        durationDays,
+        durationHours);
   }
 }

@@ -1,8 +1,10 @@
 package be.brahms.TFE_RentServe.services.impl;
 
+import be.brahms.TFE_RentServe.exceptions.rental.RentalNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.user.UserException;
 import be.brahms.TFE_RentServe.exceptions.user.UserNotFoundException;
 import be.brahms.TFE_RentServe.mappers.RentalMapper;
+import be.brahms.TFE_RentServe.models.dtos.rental.RentalByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalDetailEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalEarnDTO;
 import be.brahms.TFE_RentServe.models.entities.Rental;
@@ -130,6 +132,14 @@ public class RentalServiceImpl implements RentalService {
     return rentalMapper.toEarnDTO(totalEarned);
   }
 
+  /**
+   * Get a detail about the earned owner
+   *
+   * @param userId the identifier about user
+   * @param dateStart the date start
+   * @param dateEnd the date end
+   * @return the detail about what the user earn
+   */
   @Override
   public List<RentalDetailEarnDTO> totalDetailEarned(
       long userId, LocalDate dateStart, LocalDate dateEnd) {
@@ -139,5 +149,18 @@ public class RentalServiceImpl implements RentalService {
     userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
     return rentalMapper.toDetailEarnDTO(listRentalDetail);
+  }
+
+  /**
+   * Get more detail about the rental with ID
+   *
+   * @param id the identifier of rental
+   * @return a detail more specific about the rental
+   */
+  @Override
+  public RentalByIdDTO findRentalById(long id) {
+    Rental rentalDetail = rentalRepository.findById(id).orElseThrow(RentalNotFoundException::new);
+
+    return rentalMapper.toRentalDetailIdDTO(rentalDetail);
   }
 }

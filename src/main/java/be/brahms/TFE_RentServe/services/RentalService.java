@@ -1,5 +1,6 @@
 package be.brahms.TFE_RentServe.services;
 
+import be.brahms.TFE_RentServe.models.dtos.rental.RentalByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalDetailEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalEarnDTO;
 import java.time.LocalDate;
@@ -35,4 +36,12 @@ public interface RentalService {
    * @return the list of details about amount earned
    */
   List<RentalDetailEarnDTO> totalDetailEarned(long userId, LocalDate dateStart, LocalDate dateEnd);
+
+  /**
+   * Get a detail about the rental
+   *
+   * @param id the identifier of rental
+   * @return the detail about the rental
+   */
+  RentalByIdDTO findRentalById(long id);
 }
