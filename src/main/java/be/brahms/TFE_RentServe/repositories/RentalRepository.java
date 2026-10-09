@@ -47,4 +47,14 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
       @Param("userId") Long userId,
       @Param("dateStart") LocalDate dateStart,
       @Param("dateEnd") LocalDate dateEnd);
+
+  /**
+   * Get list rental not paid yet like a basket
+   *
+   * @param userId the owner identifier
+   * @return a detail for each amount earn
+   */
+  @Query(
+      "SELECT DISTINCT r FROM Rental r LEFT JOIN r.userFavor uf LEFT JOIN r.userMaterial um JOIN r.bill b WHERE r.user.id = :userId AND b.isPaid = false AND b.status='PENDING' ORDER BY r.createdAt ASC")
+  List<Rental> findRentalNotPaidYet(@Param("userId") Long userId);
 }

@@ -44,4 +44,12 @@ public interface RentalService {
    * @return the detail about the rental
    */
   RentalByIdDTO findRentalById(long id);
+
+  /**
+   * Get list detail rental not paid
+   *
+   * @param userId the identifier user
+   * @return a list of rental not paid
+   */
+  List<RentalByIdDTO> findRentalUser(long userId);
 }

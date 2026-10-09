@@ -123,4 +123,14 @@ public interface RentalMapper {
         durationDays,
         durationHours);
   }
+
+  /**
+   * This method call each method toRentalDetailIdDTO (above)
+   *
+   * @param rentals the list of rentals
+   * @return a list of each detail rental
+   */
+  default List<RentalByIdDTO> toRentalListDetailIdDTO(List<Rental> rentals) {
+    return rentals.stream().map(this::toRentalDetailIdDTO).toList();
+  }
 }

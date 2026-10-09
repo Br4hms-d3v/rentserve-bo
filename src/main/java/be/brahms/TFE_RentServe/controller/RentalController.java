@@ -3,6 +3,8 @@ package be.brahms.TFE_RentServe.controller;
 import be.brahms.TFE_RentServe.hateoas.rental.RentalAssembler;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalByIdDTO;
 import be.brahms.TFE_RentServe.services.RentalService;
+import java.util.List;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,5 +47,21 @@ public class RentalController {
   public ResponseEntity<EntityModel<RentalByIdDTO>> detailRentalById(@PathVariable long id) {
     RentalByIdDTO myDetailRental = rentalService.findRentalById(id);
     return ResponseEntity.ok(this.rentalAssembler.toModel(myDetailRental));
+  }
+
+  /**
+   * Get a list of rental not paid yet
+   *
+   * @param id the identifier of user
+   * @return a list of rental not paid yet
+   */
+  @GetMapping("user/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<CollectionModel<RentalByIdDTO>> findRentalNotPaidUser(
+      @PathVariable long id) {
+    List<RentalByIdDTO> rentalNotPaid = rentalService.findRentalUser(id);
+    CollectionModel<RentalByIdDTO> rentalNotPaidModel =
+        rentalAssembler.toCollectionModel(rentalNotPaid);
+    return ResponseEntity.ok().body(rentalNotPaidModel);
   }
 }

@@ -163,4 +163,19 @@ public class RentalServiceImpl implements RentalService {
 
     return rentalMapper.toRentalDetailIdDTO(rentalDetail);
   }
+
+  /**
+   * Get a list of rentals not paid yet Check if the user exist
+   *
+   * @param userId the identifier user id
+   * @return a list of rental not paid yet
+   */
+  @Override
+  public List<RentalByIdDTO> findRentalUser(long userId) {
+    userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+    List<Rental> rentalsNotPaid = rentalRepository.findRentalNotPaidYet(userId);
+
+    return rentalMapper.toRentalListDetailIdDTO(rentalsNotPaid);
+  }
 }
