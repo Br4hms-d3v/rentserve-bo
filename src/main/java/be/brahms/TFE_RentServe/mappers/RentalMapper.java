@@ -1,6 +1,7 @@
 package be.brahms.TFE_RentServe.mappers;
 
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalByIdDTO;
+import be.brahms.TFE_RentServe.models.dtos.rental.RentalDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalDetailEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.userFavor.UserFavorNameDTO;
@@ -10,7 +11,10 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import be.brahms.TFE_RentServe.models.forms.rental.RentalForm;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 /**
@@ -133,4 +137,40 @@ public interface RentalMapper {
   default List<RentalByIdDTO> toRentalListDetailIdDTO(List<Rental> rentals) {
     return rentals.stream().map(this::toRentalDetailIdDTO).toList();
   }
+
+  @Mapping(target = "dateStart", source = "starDateAt")
+  @Mapping(target = "dateEnd", source = "endDateAt")
+  default RentalDTO toRentalDTO (Rental rental){
+
+    // Get the name of favor if it's empty let null
+    UserFavorNameDTO nameFavor =
+            rental.getUserFavor() != null
+                    ? new UserFavorNameDTO(rental.getUserFavor().getFavor().getNameFavor())
+                    : null;
+
+    // Get the name of material if it's empty let null
+    UserMaterialNameDTO nameMaterial =
+            rental.getUserMaterial() != null
+                    ? new UserMaterialNameDTO(rental.getUserMaterial().getMaterial().getNameMaterial())
+                    : null;
+
+
+    return new RentalDTO(
+            rental.getId(),
+            rental.getAmount(),
+            rental.getStarDateAt(),
+            rental.getEndDateAt(),
+            rental.getStartTime(),
+            rental.getEndTime(),
+            nameFavor,
+            nameMaterial
+
+    );
+  }
+
+  // Form to Entity
+
+  @Mapping(target = "starDateAt", source = "dateStart")
+  @Mapping(target = "endDateAt", source = "dateEnd")
+  Rental fromRentalForm(RentalForm rentalForm);
 }

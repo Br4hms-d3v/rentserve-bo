@@ -1,8 +1,11 @@
 package be.brahms.TFE_RentServe.services;
 
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalByIdDTO;
+import be.brahms.TFE_RentServe.models.dtos.rental.RentalDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalDetailEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalEarnDTO;
+import be.brahms.TFE_RentServe.models.forms.rental.RentalForm;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -52,4 +55,6 @@ public interface RentalService {
    * @return a list of rental not paid
    */
   List<RentalByIdDTO> findRentalUser(long userId);
+
+  RentalDTO createRental(long userId, RentalForm rentalForm);
 }

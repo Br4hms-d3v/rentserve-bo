@@ -2,16 +2,15 @@ package be.brahms.TFE_RentServe.controller;
 
 import be.brahms.TFE_RentServe.hateoas.rental.RentalAssembler;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalByIdDTO;
+import be.brahms.TFE_RentServe.models.dtos.rental.RentalDTO;
+import be.brahms.TFE_RentServe.models.forms.rental.RentalForm;
 import be.brahms.TFE_RentServe.services.RentalService;
 import java.util.List;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * This controller manages Rental. It has a method to display detail about the rental It has a
@@ -63,5 +62,13 @@ public class RentalController {
     CollectionModel<RentalByIdDTO> rentalNotPaidModel =
         rentalAssembler.toCollectionModel(rentalNotPaid);
     return ResponseEntity.ok().body(rentalNotPaidModel);
+  }
+
+  @PostMapping("new-rental/{userId}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<EntityModel<RentalDTO>> newRental(@PathVariable long userId, @RequestBody RentalForm form) {
+    RentalDTO newRental = rentalService.createRental(userId, form);
+
+    return ResponseEntity.ok().body(rentalAssembler.toModel(newRental));
   }
 }

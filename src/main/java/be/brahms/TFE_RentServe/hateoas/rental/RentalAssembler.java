@@ -5,6 +5,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import be.brahms.TFE_RentServe.controller.RentalController;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalByIdDTO;
+import be.brahms.TFE_RentServe.models.dtos.rental.RentalDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
 import java.util.List;
 import org.springframework.hateoas.CollectionModel;
@@ -42,6 +43,13 @@ public class RentalAssembler
             .withRel("Detail rental"),
         linkTo(methodOn(RentalController.class).findRentalNotPaidUser(rental.id()))
             .withRel("Rental not-paid-user"));
+  }
+
+  public EntityModel<RentalDTO> toModel(RentalDTO rental) {
+    return EntityModel.of(
+            rental,
+            linkTo(methodOn(RentalController.class).newRental(rental.id(), null ))
+                    .withRel("Detail rental"));
   }
 
   /**
