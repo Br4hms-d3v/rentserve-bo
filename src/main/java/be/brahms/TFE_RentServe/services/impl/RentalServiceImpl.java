@@ -21,7 +21,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -51,11 +50,16 @@ public class RentalServiceImpl implements RentalService {
    * @param rentalMapper map between from Rental to entity or dto to entity
    * @param userRepository the userRepo to access user data
    * @param billRepository the billRepo to access bill data
-   * @param userMaterialRepository  the userMaterialRepo to access user material data
+   * @param userMaterialRepository the userMaterialRepo to access user material data
    * @param userFavorRepository the userFavorRep to access user favor data
    */
   public RentalServiceImpl(
-      RentalRepository rentalRepository, RentalMapper rentalMapper, UserRepository userRepository, BillRepository billRepository, UserMaterialRepository userMaterialRepository, UserFavorRepository userFavorRepository) {
+      RentalRepository rentalRepository,
+      RentalMapper rentalMapper,
+      UserRepository userRepository,
+      BillRepository billRepository,
+      UserMaterialRepository userMaterialRepository,
+      UserFavorRepository userFavorRepository) {
     this.rentalRepository = rentalRepository;
     this.rentalMapper = rentalMapper;
     this.userRepository = userRepository;
@@ -204,43 +208,46 @@ public class RentalServiceImpl implements RentalService {
 
     // Check you can choose only user material or user favor but not both
     boolean hasMaterial = rentalForm.userMaterial().id() != null;
-    boolean hasFavor =  rentalForm.userFavor().id() != null;
+    boolean hasFavor = rentalForm.userFavor().id() != null;
 
-    if(hasMaterial == hasFavor) {
-      throw new RentalException("La location doit concerner un matériel ou un service mais pas les deux");
+    if (hasMaterial == hasFavor) {
+      throw new RentalException(
+          "La location doit concerner un matériel ou un service mais pas les deux");
     }
 
-    if((rentalForm.dateEnd().isBefore(rentalForm.dateStart()) || rentalForm.dateEnd().equals(rentalForm.dateStart()))){
+    if ((rentalForm.dateEnd().isBefore(rentalForm.dateStart())
+        || rentalForm.dateEnd().equals(rentalForm.dateStart()))) {
       throw new RentalException("La date doit être postérieure!");
     }
 
     // Calculate the duration between start date and time until date end and time
-    LocalDateTime dateStart = LocalDateTime.of(
-            rentalForm.dateStart(), rentalForm.startTime()
-    );
-    LocalDateTime dateEnd = LocalDateTime.of(
-            rentalForm.dateEnd(), rentalForm.endTime()
-    );
+    LocalDateTime dateStart = LocalDateTime.of(rentalForm.dateStart(), rentalForm.startTime());
+    LocalDateTime dateEnd = LocalDateTime.of(rentalForm.dateEnd(), rentalForm.endTime());
 
-    if(!dateEnd.isAfter(dateStart)){
+    if (!dateEnd.isAfter(dateStart)) {
       throw new RentalException("La date et l'heure de fin doivent être postérieure au début");
     }
 
     long hours = Duration.between(dateStart, dateEnd).toHours();
 
     // All time spend by user (during by owner)
-    long hourPriceTotal = Math.max(1L, (long) Math.ceil(Duration.between(dateStart, dateEnd).toMinutes()/60.0));
+    long hourPriceTotal =
+        Math.max(1L, (long) Math.ceil(Duration.between(dateStart, dateEnd).toMinutes() / 60.0));
 
     // Retrieves the bill if the bill is not paid yet or create a new bill
-    Bill bill = billRepository.findBillByUser_idAndStatus(userId, Status.PENDING).orElseGet(() -> {
-      Bill newBill = new Bill();
-      newBill.setUser(user);
-      newBill.setStatus(Status.PENDING);
-      newBill.setIsPaid(false);
-      newBill.setAmount(BigDecimal.ZERO);
+    Bill bill =
+        billRepository
+            .findBillByUser_idAndStatus(userId, Status.PENDING)
+            .orElseGet(
+                () -> {
+                  Bill newBill = new Bill();
+                  newBill.setUser(user);
+                  newBill.setStatus(Status.PENDING);
+                  newBill.setIsPaid(false);
+                  newBill.setAmount(BigDecimal.ZERO);
 
-      return billRepository.save(newBill);
-    });
+                  return billRepository.save(newBill);
+                });
 
     // Create the rental an associate the user and the bill
     Rental rental = rentalMapper.fromRentalForm(rentalForm);
@@ -250,26 +257,30 @@ public class RentalServiceImpl implements RentalService {
     BigDecimal amount = null;
 
     // Retrieves the user material or user favor and calculate the price
-    if(hasMaterial) {
+    if (hasMaterial) {
       Long userMaterialId = rentalForm.userMaterial().id();
 
-      UserMaterial material = userMaterialRepository.findById(userMaterialId).orElseThrow(UserMaterialNotFoundException::new);
+      UserMaterial material =
+          userMaterialRepository
+              .findById(userMaterialId)
+              .orElseThrow(UserMaterialNotFoundException::new);
 
       rental.setUserMaterial(material);
       rental.setUserFavor(null);
 
       BigDecimal pricePerHour = material.getPriceHourMaterial();
-      amount = calculateAmount(pricePerHour,hourPriceTotal );
-    } else{
-      Long  userFavorId = rentalForm.userFavor().id();
+      amount = calculateAmount(pricePerHour, hourPriceTotal);
+    } else {
+      Long userFavorId = rentalForm.userFavor().id();
 
-      UserFavor favor = userFavorRepository.findById(userFavorId).orElseThrow(UserFavorNotFoundException::new);
+      UserFavor favor =
+          userFavorRepository.findById(userFavorId).orElseThrow(UserFavorNotFoundException::new);
 
       rental.setUserFavor(favor);
       rental.setUserMaterial(null);
 
       BigDecimal pricePerHour = favor.getPriceHourFavor();
-      amount = calculateAmount(pricePerHour,hourPriceTotal );
+      amount = calculateAmount(pricePerHour, hourPriceTotal);
     }
 
     rental.setAmount(amount);
@@ -281,11 +292,9 @@ public class RentalServiceImpl implements RentalService {
     return rentalMapper.toRentalDTO(rentalSaved);
   }
 
-  private BigDecimal calculateAmount( BigDecimal pricePerHour, Long hourPriceTotal ) {
+  private BigDecimal calculateAmount(BigDecimal pricePerHour, Long hourPriceTotal) {
     if (pricePerHour == null || pricePerHour.signum() < 0) {
-      throw new RentalException(
-              "Le tarif horaire est absent ou invalide."
-      );
+      throw new RentalException("Le tarif horaire est absent ou invalide.");
     }
     return pricePerHour.multiply(BigDecimal.valueOf(hourPriceTotal));
   }

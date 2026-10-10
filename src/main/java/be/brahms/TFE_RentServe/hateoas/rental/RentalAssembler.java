@@ -45,11 +45,25 @@ public class RentalAssembler
             .withRel("Rental not-paid-user"));
   }
 
+  /**
+   * Convert a RentalDto to an EntityModel with HATEOAS links
+   *
+   * <p>This method adds useful links to the RentalDto, like a link to the rental by ID
+   *
+   * <p>The generated model contains links to:
+   *
+   * <ul>
+   *   <li>Create a rental
+   * </ul>
+   *
+   * @param rental the rental
+   * @return an EntityModel with the rental data and HATEOAS links
+   */
   public EntityModel<RentalDTO> toModel(RentalDTO rental) {
     return EntityModel.of(
-            rental,
-            linkTo(methodOn(RentalController.class).newRental(rental.id(), null ))
-                    .withRel("Detail rental"));
+        rental,
+        linkTo(methodOn(RentalController.class).newRental(rental.id(), null))
+            .withRel("Detail rental"));
   }
 
   /**

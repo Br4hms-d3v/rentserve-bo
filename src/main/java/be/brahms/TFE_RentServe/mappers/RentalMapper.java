@@ -7,12 +7,11 @@ import be.brahms.TFE_RentServe.models.dtos.rental.RentalEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.userFavor.UserFavorNameDTO;
 import be.brahms.TFE_RentServe.models.dtos.userMaterial.UserMaterialNameDTO;
 import be.brahms.TFE_RentServe.models.entities.Rental;
+import be.brahms.TFE_RentServe.models.forms.rental.RentalForm;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import be.brahms.TFE_RentServe.models.forms.rental.RentalForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -138,38 +137,55 @@ public interface RentalMapper {
     return rentals.stream().map(this::toRentalDetailIdDTO).toList();
   }
 
+  /**
+   * This map all data about the rental
+   *
+   * <ul>
+   *   <li>Get an amount of rental
+   *   <li>Get a name of user material
+   *   <li>Get a name of user favor
+   *   <li>Get a date started and ended
+   *   <li>Get a started time and ended
+   * </ul>
+   *
+   * @param rental the entity
+   * @return a detail rental in DTO
+   */
   @Mapping(target = "dateStart", source = "starDateAt")
   @Mapping(target = "dateEnd", source = "endDateAt")
-  default RentalDTO toRentalDTO (Rental rental){
+  default RentalDTO toRentalDTO(Rental rental) {
 
     // Get the name of favor if it's empty let null
     UserFavorNameDTO nameFavor =
-            rental.getUserFavor() != null
-                    ? new UserFavorNameDTO(rental.getUserFavor().getFavor().getNameFavor())
-                    : null;
+        rental.getUserFavor() != null
+            ? new UserFavorNameDTO(rental.getUserFavor().getFavor().getNameFavor())
+            : null;
 
     // Get the name of material if it's empty let null
     UserMaterialNameDTO nameMaterial =
-            rental.getUserMaterial() != null
-                    ? new UserMaterialNameDTO(rental.getUserMaterial().getMaterial().getNameMaterial())
-                    : null;
-
+        rental.getUserMaterial() != null
+            ? new UserMaterialNameDTO(rental.getUserMaterial().getMaterial().getNameMaterial())
+            : null;
 
     return new RentalDTO(
-            rental.getId(),
-            rental.getAmount(),
-            rental.getStarDateAt(),
-            rental.getEndDateAt(),
-            rental.getStartTime(),
-            rental.getEndTime(),
-            nameFavor,
-            nameMaterial
-
-    );
+        rental.getId(),
+        rental.getAmount(),
+        rental.getStarDateAt(),
+        rental.getEndDateAt(),
+        rental.getStartTime(),
+        rental.getEndTime(),
+        nameFavor,
+        nameMaterial);
   }
 
   // Form to Entity
 
+  /**
+   * Convert a RentalForm to a rental entity. used to create a new rental
+   *
+   * @param rentalForm the form rental
+   * @return a new rental
+   */
   @Mapping(target = "starDateAt", source = "dateStart")
   @Mapping(target = "endDateAt", source = "dateEnd")
   Rental fromRentalForm(RentalForm rentalForm);

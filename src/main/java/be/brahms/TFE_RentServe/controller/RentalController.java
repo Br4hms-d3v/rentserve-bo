@@ -64,9 +64,17 @@ public class RentalController {
     return ResponseEntity.ok().body(rentalNotPaidModel);
   }
 
+  /**
+   * Get a new rental
+   *
+   * @param userId the user identifier
+   * @param form the form to create a new rental
+   * @return a rental
+   */
   @PostMapping("new-rental/{userId}")
   @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
-  public ResponseEntity<EntityModel<RentalDTO>> newRental(@PathVariable long userId, @RequestBody RentalForm form) {
+  public ResponseEntity<EntityModel<RentalDTO>> newRental(
+      @PathVariable long userId, @RequestBody RentalForm form) {
     RentalDTO newRental = rentalService.createRental(userId, form);
 
     return ResponseEntity.ok().body(rentalAssembler.toModel(newRental));
