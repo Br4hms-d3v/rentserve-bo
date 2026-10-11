@@ -381,29 +381,23 @@ public class RentalServiceImpl implements RentalService {
     return rentalMapper.toRentalDTO(rentalUpdate);
   }
 
-
   @Override
   @Transactional
   public void deleteRental(long id) {
     // Retrieve the rental
-    Rental rental = rentalRepository.findById(id)
-            .orElseThrow(RentalNotFoundException::new);
+    Rental rental = rentalRepository.findById(id).orElseThrow(RentalNotFoundException::new);
 
     // Retrieve the associated bill
     Bill bill = rental.getBill();
 
     // Check whether the rental is paid
     if (bill != null && Boolean.TRUE.equals(bill.getIsPaid())) {
-      throw new RentalException(
-              "Impossible de supprimer une location déjà payée"
-      );
+      throw new RentalException("Impossible de supprimer une location déjà payée");
     }
 
     // Update the bill amount
     if (bill != null) {
-      bill.setAmount(
-              bill.getAmount().subtract(rental.getAmount())
-      );
+      bill.setAmount(bill.getAmount().subtract(rental.getAmount()));
     }
     // Delete the rental
     rentalRepository.delete(rental);

@@ -74,5 +74,10 @@ public interface RentalService {
    */
   RentalDTO updateRental(long id, RentalUpdateForm form);
 
+  /**
+   * Delete a rental
+   *
+   * @param id the identifier rental
+   */
   void deleteRental(long id);
 }
