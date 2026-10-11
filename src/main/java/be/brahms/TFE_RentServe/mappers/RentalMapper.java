@@ -8,12 +8,14 @@ import be.brahms.TFE_RentServe.models.dtos.userFavor.UserFavorNameDTO;
 import be.brahms.TFE_RentServe.models.dtos.userMaterial.UserMaterialNameDTO;
 import be.brahms.TFE_RentServe.models.entities.Rental;
 import be.brahms.TFE_RentServe.models.forms.rental.RentalForm;
+import be.brahms.TFE_RentServe.models.forms.rental.RentalUpdateForm;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
 /**
@@ -189,4 +191,15 @@ public interface RentalMapper {
   @Mapping(target = "starDateAt", source = "dateStart")
   @Mapping(target = "endDateAt", source = "dateEnd")
   Rental fromRentalForm(RentalForm rentalForm);
+
+  /**
+   * Convert a RentalUPdateForm to a rental entity. used to update a rental
+   *
+   * @param rentalUpdateForm the form rental
+   * @param rental the rental enttiy
+   * @return an edited rental
+   */
+  @Mapping(target = "starDateAt", source = "dateStart")
+  @Mapping(target = "endDateAt", source = "dateEnd")
+  Rental fromRentalUpdateForm(RentalUpdateForm rentalUpdateForm, @MappingTarget Rental rental);
 }

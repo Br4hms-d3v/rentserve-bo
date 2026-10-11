@@ -4,6 +4,7 @@ import be.brahms.TFE_RentServe.hateoas.rental.RentalAssembler;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalDTO;
 import be.brahms.TFE_RentServe.models.forms.rental.RentalForm;
+import be.brahms.TFE_RentServe.models.forms.rental.RentalUpdateForm;
 import be.brahms.TFE_RentServe.services.RentalService;
 import java.util.List;
 import org.springframework.hateoas.CollectionModel;
@@ -78,5 +79,20 @@ public class RentalController {
     RentalDTO newRental = rentalService.createRental(userId, form);
 
     return ResponseEntity.ok().body(rentalAssembler.toModel(newRental));
+  }
+
+  /**
+   * Edit the rental
+   *
+   * @param id the identifier of rental
+   * @param form the edit rental
+   * @return the rental edited
+   */
+  @PutMapping("edit/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<EntityModel<RentalDTO>> editRental(
+      @PathVariable long id, @RequestBody RentalUpdateForm form) {
+    RentalDTO updateRental = rentalService.updateRental(id, form);
+    return ResponseEntity.ok().body(rentalAssembler.toModel(updateRental));
   }
 }

@@ -153,6 +153,20 @@
           }
         ]
       }
+    },
+    {
+      "changeSet": {
+        "id": "update-sequence-after-inserts-bills",
+        "author": "Brahms",
+        "changes": [
+          {
+            "sql": {
+              "dbms": "postgresql",
+              "sql": "SELECT setval('bills_id_seq', (SELECT MAX(id) FROM bills));"
+            }
+          }
+        ]
+      }
     }
   ]
 }

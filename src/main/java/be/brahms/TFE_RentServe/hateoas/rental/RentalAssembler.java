@@ -54,6 +54,7 @@ public class RentalAssembler
    *
    * <ul>
    *   <li>Create a rental
+   *   <li>Edit a rental
    * </ul>
    *
    * @param rental the rental
@@ -63,7 +64,9 @@ public class RentalAssembler
     return EntityModel.of(
         rental,
         linkTo(methodOn(RentalController.class).newRental(rental.id(), null))
-            .withRel("Detail rental"));
+            .withRel("Detail rental"),
+        linkTo(methodOn(RentalController.class).editRental(rental.id(), null))
+            .withRel("Rental edit"));
   }
 
   /**

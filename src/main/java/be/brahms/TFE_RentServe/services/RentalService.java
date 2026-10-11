@@ -5,6 +5,7 @@ import be.brahms.TFE_RentServe.models.dtos.rental.RentalDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalDetailEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalEarnDTO;
 import be.brahms.TFE_RentServe.models.forms.rental.RentalForm;
+import be.brahms.TFE_RentServe.models.forms.rental.RentalUpdateForm;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -63,4 +64,13 @@ public interface RentalService {
    * @return the new rental with data information
    */
   RentalDTO createRental(long userId, RentalForm rentalForm);
+
+  /**
+   * Update de rental
+   *
+   * @param id the identifier rental
+   * @param form the form to update rental
+   * @return return an updated renatl
+   */
+  RentalDTO updateRental(long id, RentalUpdateForm form);
 }

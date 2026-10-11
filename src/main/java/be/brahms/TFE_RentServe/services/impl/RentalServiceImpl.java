@@ -14,6 +14,7 @@ import be.brahms.TFE_RentServe.models.dtos.rental.RentalDetailEarnDTO;
 import be.brahms.TFE_RentServe.models.dtos.rental.RentalEarnDTO;
 import be.brahms.TFE_RentServe.models.entities.*;
 import be.brahms.TFE_RentServe.models.forms.rental.RentalForm;
+import be.brahms.TFE_RentServe.models.forms.rental.RentalUpdateForm;
 import be.brahms.TFE_RentServe.repositories.*;
 import be.brahms.TFE_RentServe.services.RentalService;
 import java.math.BigDecimal;
@@ -292,10 +293,91 @@ public class RentalServiceImpl implements RentalService {
     return rentalMapper.toRentalDTO(rentalSaved);
   }
 
+  /**
+   * Calculates the total amount using the hourly price and the number of hours.
+   *
+   * @param pricePerHour the price for one hour
+   * @param hourPriceTotal the total number of hours
+   * @return the total amount
+   * @throws RentalException if the hourly price is null or negative
+   */
   private BigDecimal calculateAmount(BigDecimal pricePerHour, Long hourPriceTotal) {
     if (pricePerHour == null || pricePerHour.signum() < 0) {
       throw new RentalException("Le tarif horaire est absent ou invalide.");
     }
     return pricePerHour.multiply(BigDecimal.valueOf(hourPriceTotal));
+  }
+
+  /**
+   * Update the rental
+   *
+   * <ul>
+   *   <li>Update the date start and end
+   *   <li>Update the time start and end
+   *   <li>Recalculate the price amount
+   *   <li>Recalculate the price bill (total)
+   * </ul>
+   *
+   * @param id the identifier rental
+   * @param form the form to update the rental
+   * @return a rental updated
+   */
+  @Override
+  @Transactional
+  public RentalDTO updateRental(long id, RentalUpdateForm form) {
+    // Retrieves the existing rental
+    Rental rental = rentalRepository.findById(id).orElseThrow(RentalNotFoundException::new);
+
+    // Check validates dates
+    if (form.dateEnd().isBefore(form.dateStart())) {
+      throw new RentalException("La date de fin doit être posterieure à la date du début ");
+    }
+
+    // Build start and end date times
+    LocalDateTime dateStart = LocalDateTime.of(form.dateStart(), form.startTime());
+    LocalDateTime dateEnd = LocalDateTime.of(form.dateEnd(), form.endTime());
+
+    if (dateEnd.isBefore(dateStart)) {
+      throw new RentalException("La date et l'heure de fin doivent être postérieures au début");
+    }
+
+    // Calculate new price
+    long minutes = Duration.between(dateStart, dateEnd).toMinutes();
+    long hours = Math.max(1L, (minutes + 59) / 60);
+
+    // Keep the old amount to update the bill
+    BigDecimal oldAmount = rental.getAmount();
+
+    BigDecimal pricePerHour;
+
+    // Recalculate the price the associated material or favor
+    if (rental.getUserMaterial() != null) {
+      pricePerHour = rental.getUserMaterial().getPriceHourMaterial();
+    } else if (rental.getUserFavor() != null) {
+      pricePerHour = rental.getUserFavor().getPriceHourFavor();
+    } else {
+      throw new RentalException("La location doit être associée à un matériel ou à un service");
+    }
+    BigDecimal newAmount = calculateAmount(pricePerHour, hours);
+
+    rentalMapper.fromRentalUpdateForm(form, rental);
+    rental.setStarDateAt(form.dateStart());
+    rental.setEndDateAt(form.dateEnd());
+    rental.setStartTime(form.startTime());
+    rental.setEndTime(form.endTime());
+
+    rental.setAmount(newAmount);
+
+    // Update the amount in the bill
+    Bill bill = rental.getBill();
+    if (bill != null) {
+      BigDecimal billAmount = bill.getAmount();
+
+      bill.setAmount(billAmount.subtract(oldAmount).add(newAmount));
+    }
+
+    Rental rentalUpdate = rentalRepository.save(rental);
+
+    return rentalMapper.toRentalDTO(rentalUpdate);
   }
 }
