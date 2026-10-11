@@ -98,6 +98,12 @@ public class SecurityConf {
                     .hasAnyRole("MEMBER", "MODERATOR")
                     .requestMatchers("/api/user-material/**")
                     .hasAnyRole("MEMBER", "MODERATOR", "ADMIN")
+                    // Rental
+                    .requestMatchers("/api/rental/**")
+                    .hasAnyRole("MEMBER", "MODERATOR", "ADMIN")
+                    // Earn
+                    .requestMatchers("/api/earn/**")
+                    .hasAnyRole("MEMBER", "MODERATOR", "ADMIN")
                     .anyRequest()
                     .permitAll())
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
