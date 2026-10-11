@@ -95,4 +95,12 @@ public class RentalController {
     RentalDTO updateRental = rentalService.updateRental(id, form);
     return ResponseEntity.ok().body(rentalAssembler.toModel(updateRental));
   }
+
+  @DeleteMapping("{id}/delete")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<String> deleteRental(@PathVariable long id) {
+    rentalService.deleteRental(id);
+    return ResponseEntity.ok().body("Rental has been deleted");
+  }
+
 }

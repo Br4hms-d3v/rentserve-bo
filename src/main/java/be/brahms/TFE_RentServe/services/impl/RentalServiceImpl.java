@@ -216,7 +216,7 @@ public class RentalServiceImpl implements RentalService {
           "La location doit concerner un matériel ou un service mais pas les deux");
     }
 
-    if ((rentalForm.dateEnd().isBefore(rentalForm.dateStart())
+    if (!(rentalForm.dateEnd().isAfter(rentalForm.dateStart())
         || rentalForm.dateEnd().equals(rentalForm.dateStart()))) {
       throw new RentalException("La date doit être postérieure!");
     }
@@ -379,5 +379,33 @@ public class RentalServiceImpl implements RentalService {
     Rental rentalUpdate = rentalRepository.save(rental);
 
     return rentalMapper.toRentalDTO(rentalUpdate);
+  }
+
+
+  @Override
+  @Transactional
+  public void deleteRental(long id) {
+    // Retrieve the rental
+    Rental rental = rentalRepository.findById(id)
+            .orElseThrow(RentalNotFoundException::new);
+
+    // Retrieve the associated bill
+    Bill bill = rental.getBill();
+
+    // Check whether the rental is paid
+    if (bill != null && Boolean.TRUE.equals(bill.getIsPaid())) {
+      throw new RentalException(
+              "Impossible de supprimer une location déjà payée"
+      );
+    }
+
+    // Update the bill amount
+    if (bill != null) {
+      bill.setAmount(
+              bill.getAmount().subtract(rental.getAmount())
+      );
+    }
+    // Delete the rental
+    rentalRepository.delete(rental);
   }
 }

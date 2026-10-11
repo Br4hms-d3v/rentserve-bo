@@ -73,4 +73,6 @@ public interface RentalService {
    * @return return an updated renatl
    */
   RentalDTO updateRental(long id, RentalUpdateForm form);
+
+  void deleteRental(long id);
 }
