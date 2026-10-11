@@ -48,6 +48,8 @@ public class BillAssembler implements RepresentationModelAssembler<BillDTO, Enti
     return CollectionModel.of(
         bills,
         linkTo(methodOn(BillController.class).getBillList(user.getId()))
-            .withRel("Get a list of bills"));
+            .withRel("Get a list of bills"),
+        linkTo(methodOn(BillController.class).getCurrentMonth(user.getId()))
+            .withRel("Get a list of bills current month"));
   }
 }

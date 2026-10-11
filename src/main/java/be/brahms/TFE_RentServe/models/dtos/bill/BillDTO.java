@@ -9,6 +9,6 @@ import java.time.LocalDate;
  * @param id the identifier of bill
  * @param status the status of payment
  * @param createdAt date created the bill
- * @param updateAt date updated the bill
+ * @param updatedAt date updated the bill
  */
-public record BillDTO(long id, Status status, LocalDate createdAt, LocalDate updateAt) {}
+public record BillDTO(long id, Status status, LocalDate createdAt, LocalDate updatedAt) {}

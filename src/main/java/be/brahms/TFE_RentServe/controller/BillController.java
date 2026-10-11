@@ -69,4 +69,19 @@ public class BillController {
     CollectionModel<BillDTO> billListCollection = billAssembler.toCollectionModel(billList);
     return ResponseEntity.ok().body(billListCollection);
   }
+
+  /**
+   * Get a list of bills based on current month
+   *
+   * @param id the identifier of user
+   * @return a list of bills
+   */
+  @GetMapping("current-month/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<CollectionModel<BillDTO>> getCurrentMonth(@PathVariable long id) {
+    List<BillDTO> billListCurrentMonth = billService.findAllBillsCurrentMonth(id);
+    CollectionModel<BillDTO> billListCollection =
+        billAssembler.toCollectionModel(billListCurrentMonth);
+    return ResponseEntity.ok().body(billListCollection);
+  }
 }

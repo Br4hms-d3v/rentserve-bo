@@ -10,6 +10,7 @@ import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.repositories.BillRepository;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.BillService;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -65,6 +66,12 @@ public class BillServiceImpl implements BillService {
     return billMapper.toBillDetailDTO(bill);
   }
 
+  /**
+   * Get a list of bills from user
+   *
+   * @param userId the identifier
+   * @return a list of all bills from user
+   */
   @Override
   public List<BillDTO> findAllByUserId(long userId) {
     List<Bill> listBills = billRepository.findBillsByUserId(userId);
@@ -76,5 +83,29 @@ public class BillServiceImpl implements BillService {
       throw new AccessNotAuthorizedException();
     }
     return listBills.stream().map(billMapper::toBillDetailDTO).toList();
+  }
+
+  /**
+   * Get a list of bills from current month
+   *
+   * @param userId the user identifier
+   * @return a list of bill on current month
+   */
+  @Override
+  public List<BillDTO> findAllBillsCurrentMonth(long userId) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+    if (!user.getPseudo().equals(authentication.getName())) {
+      throw new AccessNotAuthorizedException();
+    }
+
+    LocalDate startDateMonth = LocalDate.now().withDayOfMonth(1);
+    LocalDate endDateMonth = startDateMonth.plusMonths(1);
+
+    List<Bill> listBillsCurrentMonth =
+        billRepository.findBillsCurrentMonthByUserId(userId, startDateMonth, endDateMonth);
+
+    return listBillsCurrentMonth.stream().map(billMapper::toBillDetailDTO).toList();
   }
 }

@@ -21,4 +21,12 @@ public interface BillService {
    * @return a list of bill
    */
   List<BillDTO> findAllByUserId(long userId);
+
+  /**
+   * This method get a list of bills
+   *
+   * @param userId the identifier user
+   * @return a list of bill based on the current month
+   */
+  List<BillDTO> findAllBillsCurrentMonth(long userId);
 }
