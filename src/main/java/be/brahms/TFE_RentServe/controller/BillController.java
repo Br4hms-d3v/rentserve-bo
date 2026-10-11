@@ -3,6 +3,8 @@ package be.brahms.TFE_RentServe.controller;
 import be.brahms.TFE_RentServe.hateoas.bill.BillAssembler;
 import be.brahms.TFE_RentServe.models.dtos.bill.BillDTO;
 import be.brahms.TFE_RentServe.services.BillService;
+import java.util.List;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,5 +54,19 @@ public class BillController {
   public ResponseEntity<EntityModel<BillDTO>> getBillById(@PathVariable long id) {
     BillDTO billId = billService.findById(id);
     return ResponseEntity.ok().body(billAssembler.toModel(billId));
+  }
+
+  /**
+   * Get a list of all bill from user
+   *
+   * @param id the identifier user
+   * @return a list of all bill from user
+   */
+  @GetMapping("list/{id}")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<CollectionModel<BillDTO>> getBillList(@PathVariable long id) {
+    List<BillDTO> billList = billService.findAllByUserId(id);
+    CollectionModel<BillDTO> billListCollection = billAssembler.toCollectionModel(billList);
+    return ResponseEntity.ok().body(billListCollection);
   }
 }

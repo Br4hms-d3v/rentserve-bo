@@ -6,6 +6,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import be.brahms.TFE_RentServe.controller.BillController;
 import be.brahms.TFE_RentServe.models.dtos.bill.BillDTO;
 import be.brahms.TFE_RentServe.models.entities.User;
+import java.util.List;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -33,5 +35,19 @@ public class BillAssembler implements RepresentationModelAssembler<BillDTO, Enti
         bill,
         linkTo(methodOn(BillController.class).getBillById(user.getId()))
             .withRel("Get detail about bill"));
+  }
+
+  /**
+   * Convert a billDto to EntityModel with HATEOAS links. This method adds useful links to the bill
+   *
+   * @param bills the list of bill
+   * @return a list of collection whit HATEOAS links
+   */
+  public CollectionModel<BillDTO> toCollectionModel(List<BillDTO> bills) {
+    User user = new User();
+    return CollectionModel.of(
+        bills,
+        linkTo(methodOn(BillController.class).getBillList(user.getId()))
+            .withRel("Get a list of bills"));
   }
 }

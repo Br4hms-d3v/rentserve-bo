@@ -2,11 +2,15 @@ package be.brahms.TFE_RentServe.services.impl;
 
 import be.brahms.TFE_RentServe.exceptions.bill.BillNotFoundException;
 import be.brahms.TFE_RentServe.exceptions.user.AccessNotAuthorizedException;
+import be.brahms.TFE_RentServe.exceptions.user.UserNotFoundException;
 import be.brahms.TFE_RentServe.mappers.BillMapper;
 import be.brahms.TFE_RentServe.models.dtos.bill.BillDTO;
 import be.brahms.TFE_RentServe.models.entities.Bill;
+import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.repositories.BillRepository;
+import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.BillService;
+import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,16 +30,20 @@ public class BillServiceImpl implements BillService {
 
   private final BillRepository billRepository;
   private final BillMapper billMapper;
+  private final UserRepository userRepository;
 
   /**
    * Constructor with params
    *
    * @param billRepository the billRepo to access bill data
    * @param billMapper the bill mapper change entity to dto or form to entity
+   * @param userRepository the userRepo to access user data
    */
-  public BillServiceImpl(BillRepository billRepository, BillMapper billMapper) {
+  public BillServiceImpl(
+      BillRepository billRepository, BillMapper billMapper, UserRepository userRepository) {
     this.billRepository = billRepository;
     this.billMapper = billMapper;
+    this.userRepository = userRepository;
   }
 
   /**
@@ -55,5 +63,18 @@ public class BillServiceImpl implements BillService {
     }
 
     return billMapper.toBillDetailDTO(bill);
+  }
+
+  @Override
+  public List<BillDTO> findAllByUserId(long userId) {
+    List<Bill> listBills = billRepository.findBillsByUserId(userId);
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+    if (!user.getPseudo().equals(authentication.getName())) {
+      throw new AccessNotAuthorizedException();
+    }
+    return listBills.stream().map(billMapper::toBillDetailDTO).toList();
   }
 }
