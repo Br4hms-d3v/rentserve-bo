@@ -3,6 +3,7 @@ package be.brahms.TFE_RentServe.services;
 import be.brahms.TFE_RentServe.models.dtos.userMaterial.UserMaterialByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.userMaterial.UserMaterialDTO;
 import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialCreateForm;
+import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialReturnForm;
 import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialUpdateForm;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -94,4 +95,14 @@ public interface UserMaterialService {
    * @return a list of users materials grouped by material id
    */
   List<UserMaterialDTO> findAllUserMaterialsByNameMaterial(String nameMaterial);
+
+  /**
+   * Returns a material to its owner by updating its availability and state.
+   *
+   * @param id the unique identifier of the user material to return
+   * @param form the validated form containing the material's availability and state after the
+   *     return
+   * @return the DTO representing the returned user material
+   */
+  UserMaterialDTO userMaterialReturn(long id, @Valid UserMaterialReturnForm form);
 }

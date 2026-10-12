@@ -84,4 +84,13 @@ public interface UserService {
    * @param user the user updated
    */
   void deleteAccount(long id, UserDeleteForm user);
+
+  /**
+   * Updates the role of an existing user.
+   *
+   * @param id the unique identifier of the user
+   * @param form the form containing the new role
+   * @return the DTO representing the updated user
+   */
+  UserDTO updateUserRole(long id, UserRoleForm form);
 }
