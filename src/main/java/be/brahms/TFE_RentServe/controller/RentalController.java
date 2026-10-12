@@ -96,11 +96,16 @@ public class RentalController {
     return ResponseEntity.ok().body(rentalAssembler.toModel(updateRental));
   }
 
+  /**
+   * Delete a rental
+   *
+   * @param id the identifier rental
+   * @return a message to confirm delete
+   */
   @DeleteMapping("{id}/delete")
   @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
   public ResponseEntity<String> deleteRental(@PathVariable long id) {
     rentalService.deleteRental(id);
     return ResponseEntity.ok().body("Rental has been deleted");
   }
-
 }
