@@ -269,6 +269,17 @@ public class RentalServiceImpl implements RentalService {
       rental.setUserMaterial(material);
       rental.setUserFavor(null);
 
+      // Check if it available
+      UserMaterial userMaterial =
+          userMaterialRepository
+              .findById(userMaterialId)
+              .orElseThrow(UserMaterialNotFoundException::new);
+      if (!userMaterial.isAvailable()) {
+        throw new RentalException("Ce matériel n'est pas disponible");
+      }
+      userMaterial.setAvailable(false);
+      userMaterialRepository.save(userMaterial);
+
       BigDecimal pricePerHour = material.getPriceHourMaterial();
       amount = calculateAmount(pricePerHour, hourPriceTotal);
     } else {
@@ -279,6 +290,15 @@ public class RentalServiceImpl implements RentalService {
 
       rental.setUserFavor(favor);
       rental.setUserMaterial(null);
+
+      // Check if it's available
+      UserFavor userFavor =
+          userFavorRepository.findById(userFavorId).orElseThrow(UserFavorNotFoundException::new);
+      if (!userFavor.isAvailable()) {
+        throw new RentalException("Ce matériel n'est pas disponible");
+      }
+      userFavor.setAvailable(false);
+      userFavorRepository.save(userFavor);
 
       BigDecimal pricePerHour = favor.getPriceHourFavor();
       amount = calculateAmount(pricePerHour, hourPriceTotal);
