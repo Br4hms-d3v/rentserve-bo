@@ -4,6 +4,7 @@ import be.brahms.TFE_RentServe.hateoas.userMaterial.UserMaterialAssembler;
 import be.brahms.TFE_RentServe.models.dtos.userMaterial.UserMaterialByIdDTO;
 import be.brahms.TFE_RentServe.models.dtos.userMaterial.UserMaterialDTO;
 import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialCreateForm;
+import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialReturnForm;
 import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialUpdateForm;
 import be.brahms.TFE_RentServe.services.UserMaterialService;
 import jakarta.validation.Valid;
@@ -207,5 +208,24 @@ public class UserMaterialController {
     CollectionModel<UserMaterialDTO> userMaterialDTOCollectionModel =
         userMaterialAssembler.toCollectionModel(userMaterialDTOs);
     return ResponseEntity.ok().body(userMaterialDTOCollectionModel);
+  }
+
+  /**
+   * Returns a material to its owner.
+   *
+   * <p>Allows authenticated users with the MEMBER, MODERATOR, or ADMIN role to return a material by
+   * updating its availability and state.
+   *
+   * @param id the unique identifier of the user material to return
+   * @param form the form containing the material's availability and state after the return
+   * @return a {@link ResponseEntity} containing the returned user material represented as an {@link
+   *     EntityModel}
+   */
+  @PutMapping("/{id}/return")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
+  public ResponseEntity<EntityModel<UserMaterialDTO>> returnUserMaterial(
+      @PathVariable long id, @RequestBody UserMaterialReturnForm form) {
+    UserMaterialDTO userMaterialBack = userMaterialService.userMaterialReturn(id, form);
+    return ResponseEntity.ok().body(userMaterialAssembler.toModel(userMaterialBack));
   }
 }

@@ -16,6 +16,7 @@ import be.brahms.TFE_RentServe.models.entities.Picture;
 import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.models.entities.UserMaterial;
 import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialCreateForm;
+import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialReturnForm;
 import be.brahms.TFE_RentServe.models.forms.userMaterial.UserMaterialUpdateForm;
 import be.brahms.TFE_RentServe.repositories.MaterialRepository;
 import be.brahms.TFE_RentServe.repositories.PictureRepository;
@@ -338,5 +339,30 @@ public class UserMaterialServiceImpl implements UserMaterialService {
     }
 
     return listUserMaterials.stream().map(userMaterialMapper::toListDto).toList();
+  }
+
+  /**
+   * Returns a material to its owner by updating its availability and state.
+   *
+   * <p>Retrieves the user material by its identifier, marks it as available, updates its state
+   * according to the provided form, and persists the changes.
+   *
+   * @param id the unique identifier of the user material to return
+   * @param form the form containing the state to apply to the returned material
+   * @return the DTO representing the updated user material
+   * @throws UserMaterialNotFoundException if no user material is found with the specified
+   *     identifier
+   */
+  @Override
+  public UserMaterialDTO userMaterialReturn(long id, UserMaterialReturnForm form) {
+
+    UserMaterial usermaterial =
+        userMaterialRepository.findById(id).orElseThrow(UserMaterialNotFoundException::new);
+
+    usermaterial.setAvailable(true);
+    usermaterial.setStateMaterial(form.state());
+
+    userMaterialRepository.save(usermaterial);
+    return userMaterialMapper.toDto(usermaterial);
   }
 }
