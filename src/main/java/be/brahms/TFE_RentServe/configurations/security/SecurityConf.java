@@ -49,6 +49,8 @@ public class SecurityConf {
                     .requestMatchers("/api/auth/**")
                     .permitAll()
                     // Users
+                    .requestMatchers("/api/user/{id}/role")
+                    .hasRole("ADMIN")
                     .requestMatchers("/api/user/list")
                     .hasRole("ADMIN")
                     .requestMatchers("/api/user/list/{role}")

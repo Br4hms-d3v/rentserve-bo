@@ -353,4 +353,22 @@ public class UserServiceImpl implements UserService {
 
     userRepository.save(userId);
   }
+
+  /**
+   * Updates the role of an existing user.
+   *
+   * @param id the unique identifier of the user whose role must be updated
+   * @param form the form containing the new role to assign to the user
+   * @return the DTO representing the user with the updated role
+   * @throws UserNotFoundException if no user is found with the specified ID
+   */
+  @Override
+  public UserDTO updateUserRole(long id, UserRoleForm form) {
+    User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+
+    user.setRole(form.role());
+    userRepository.save(user);
+
+    return userMapper.toDto(user);
+  }
 }

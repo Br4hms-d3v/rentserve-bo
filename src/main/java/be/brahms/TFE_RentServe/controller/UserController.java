@@ -9,6 +9,7 @@ import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserTokenDTO;
 import be.brahms.TFE_RentServe.models.forms.user.UserChangePasswordForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserDeleteForm;
+import be.brahms.TFE_RentServe.models.forms.user.UserRoleForm;
 import be.brahms.TFE_RentServe.models.forms.user.UserUpdateForm;
 import be.brahms.TFE_RentServe.services.UserService;
 import jakarta.validation.Valid;
@@ -139,5 +140,19 @@ public class UserController {
     userService.deleteAccount(id, form);
     userAssembler.toModelDelete(id);
     return ResponseEntity.ok("Le compte a bien été supprimé");
+  }
+
+  /**
+   * Updates the role of a user.
+   *
+   * @param id the unique identifier of the user
+   * @param form the form containing the new role
+   * @return a response containing the updated user
+   */
+  @PatchMapping("{id}/role")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> changeRole(@PathVariable long id, @RequestBody UserRoleForm form) {
+    UserDTO user = userService.updateUserRole(id, form);
+    return ResponseEntity.ok(userAssembler.toModel(user));
   }
 }
