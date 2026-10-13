@@ -6,6 +6,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import be.brahms.TFE_RentServe.controller.UserController;
 import be.brahms.TFE_RentServe.models.dtos.user.UserDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserPasswordDTO;
+import be.brahms.TFE_RentServe.models.dtos.user.UserRoleDTO;
 import be.brahms.TFE_RentServe.models.dtos.user.UserTokenDTO;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -88,5 +89,18 @@ public class UserAssembler implements RepresentationModelAssembler<UserDTO, Enti
   public EntityModel<?> toModelDelete(long id) {
     return EntityModel.of(
         linkTo(methodOn(UserController.class).deleteAccount(id, null)).withRel("Delete account"));
+  }
+
+  /**
+   * Create a HATEOAS to change role on user only the admin can do it
+   *
+   * @param user the user
+   * @return a new role for user with link
+   */
+  public EntityModel<UserRoleDTO> toModelUserRole(UserRoleDTO user) {
+    return EntityModel.of(
+        user,
+        linkTo(methodOn(UserController.class).changeRole(user.id(), null))
+            .withRel("Delete account"));
   }
 }
