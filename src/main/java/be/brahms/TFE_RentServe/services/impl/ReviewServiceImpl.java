@@ -24,7 +24,10 @@ import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.ReviewService;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -250,7 +253,15 @@ public class ReviewServiceImpl implements ReviewService {
         String pseudo = userDetails.getUsername();
 
         User user = userRepository.findByPseudo(pseudo).orElseThrow(UserNotFoundException::new);
-        reviewId.setUser(user);
+
+        // Check if is the wright user
+        if (!Objects.equals(
+                reviewId.getUser().getId(),
+                user.getId())) {
+          throw new AccessDeniedException(
+                  "Ce n'est pas ton commentaire"
+          );
+        }
       }
     }
 
