@@ -49,7 +49,7 @@ public interface ReviewMapper {
 
     // This is the same methode from userMaterialName but the code is short
     UserPseudoDTO userPseudo =
-        review.getUser() != null ? new UserPseudoDTO(review.getUser().getPseudo()) : null;
+        review.getUser() != null ? new UserPseudoDTO(review.getUser().getId(), review.getUser().getPseudo()) : null;
 
     return new ReviewUserMaterialDTO(
         review.getId(),
@@ -81,7 +81,7 @@ public interface ReviewMapper {
 
     // This is the same methode from userMaterialName but the code is short
     UserPseudoDTO userPseudo =
-        review.getUser() != null ? new UserPseudoDTO(review.getUser().getPseudo()) : null;
+        review.getUser() != null ? new UserPseudoDTO(review.getUser().getId(), review.getUser().getPseudo()) : null;
 
     return new ReviewUserFavorDTO(
         review.getId(),
@@ -116,7 +116,7 @@ public interface ReviewMapper {
 
     // UserPseudo
     UserPseudoDTO userPseudo =
-        review.getUser() != null ? new UserPseudoDTO(review.getUser().getPseudo()) : null;
+        review.getUser() != null ? new UserPseudoDTO(review.getUser().getId(), review.getUser().getPseudo()) : null;
 
     return new ReviewByIdDTO(
         review.getId(),

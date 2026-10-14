@@ -74,7 +74,7 @@ public interface UserFavorMapper {
     List<String> pictures = userFavor.getPictures().stream().map(Picture::getNamePicture).toList();
 
     // Get the pseudo from user
-    UserPseudoDTO userPseudo = new UserPseudoDTO(userFavor.getUser().getPseudo());
+    UserPseudoDTO userPseudo = new UserPseudoDTO(userFavor.getUser().getId(), userFavor.getUser().getPseudo());
 
     // Get the name from favor
     FavorNameDTO favorName =
