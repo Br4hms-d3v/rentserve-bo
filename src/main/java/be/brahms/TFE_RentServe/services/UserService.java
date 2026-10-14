@@ -92,5 +92,5 @@ public interface UserService {
    * @param form the form containing the new role
    * @return the DTO representing the updated user
    */
-  UserDTO updateUserRole(long id, UserRoleForm form);
+  UserRoleDTO updateUserRole(long id, UserRoleForm form);
 }

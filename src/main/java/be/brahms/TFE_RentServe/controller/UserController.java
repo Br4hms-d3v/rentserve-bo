@@ -151,8 +151,9 @@ public class UserController {
    */
   @PatchMapping("{id}/role")
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> changeRole(@PathVariable long id, @RequestBody UserRoleForm form) {
-    UserDTO user = userService.updateUserRole(id, form);
-    return ResponseEntity.ok(userAssembler.toModel(user));
+  public ResponseEntity<EntityModel<UserRoleDTO>> changeRole(
+      @PathVariable long id, @RequestBody UserRoleForm form) {
+    UserRoleDTO user = userService.updateUserRole(id, form);
+    return ResponseEntity.ok(userAssembler.toModelUserRole(user));
   }
 }
