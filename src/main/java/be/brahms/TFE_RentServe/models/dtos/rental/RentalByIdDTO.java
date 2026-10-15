@@ -21,6 +21,7 @@ import java.time.LocalTime;
  * @param userMaterial the name of material
  * @param durationDays the time spend on day
  * @param durationHours the time spend on hour
+ * @param billId the identifier of bill
  */
 public record RentalByIdDTO(
     Long id,
@@ -32,4 +33,5 @@ public record RentalByIdDTO(
     UserFavorNameDTO userFavor,
     UserMaterialNameDTO userMaterial,
     Long durationDays,
-    Long durationHours) {}
+    Long durationHours,
+    Long billId) {}

@@ -29,4 +29,12 @@ public interface BillService {
    * @return a list of bill based on the current month
    */
   List<BillDTO> findAllBillsCurrentMonth(long userId);
+
+  /**
+   * Generates a PDF file for a bill.
+   *
+   * @param billId the ID of the bill
+   * @return the PDF file as a byte array
+   */
+  byte[] generateBillPdf(long billId);
 }

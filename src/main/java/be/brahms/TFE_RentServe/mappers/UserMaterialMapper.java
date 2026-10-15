@@ -76,7 +76,8 @@ public interface UserMaterialMapper {
             ? List.of()
             : userMaterial.getPictures().stream().map(Picture::getNamePicture).toList();
 
-    UserPseudoDTO userPseudo = new UserPseudoDTO(userMaterial.getUser().getPseudo());
+    UserPseudoDTO userPseudo =
+        new UserPseudoDTO(userMaterial.getUser().getId(), userMaterial.getUser().getPseudo());
 
     MaterialNameDTO nameMaterial =
         new MaterialNameDTO(

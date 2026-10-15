@@ -6,6 +6,8 @@ import be.brahms.TFE_RentServe.services.BillService;
 import java.util.List;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -83,5 +85,23 @@ public class BillController {
     CollectionModel<BillDTO> billListCollection =
         billAssembler.toCollectionModel(billListCurrentMonth);
     return ResponseEntity.ok().body(billListCollection);
+  }
+
+  /**
+   * Downloads a bill as a PDF file.
+   *
+   * @param billId the ID of the bill
+   * @return the PDF file
+   */
+  @GetMapping("{billId}/pdf")
+  public ResponseEntity<byte[]> downloadBillPdf(@PathVariable long billId) {
+
+    byte[] pdf = billService.generateBillPdf(billId);
+
+    return ResponseEntity.ok()
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"facture-" + billId + ".pdf\"")
+        .contentType(MediaType.APPLICATION_PDF)
+        .body(pdf);
   }
 }
