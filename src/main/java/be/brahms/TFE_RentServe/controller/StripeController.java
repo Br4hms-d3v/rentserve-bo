@@ -44,7 +44,7 @@ public class StripeController {
    * @return a message to confirm the payment
    * @throws StripeException if an error occurs with Stripe
    */
-  @GetMapping("payment/success")
+  @GetMapping("payment/confirmed")
   public ResponseEntity<String> success(@RequestParam("sessionId") String sessionId)
       throws StripeException {
     stripeService.confirmPayment(sessionId);
