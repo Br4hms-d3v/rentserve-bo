@@ -110,7 +110,7 @@ public class StripeServiceImpl implements StripeService {
                           .setUnitAmount(feesInCents)
                           .setProductData(
                               SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                  .setName("Frais d’assurance du matériel et de gestion (2 %)")
+                                  .setName("Frais d’assurance du matériel et de gestion (10 %)")
                                   .build())
                           .build())
                   .build())

@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -261,78 +262,90 @@ public class BillServiceImpl implements BillService {
                 float priceColumn = tableX + tableWidth * 0.72f;
 
                 float currentY = tableTop;
-                float descriptionWidth = priceColumn - tableX;
 
-                // 6. Lignes de location et de prestation
-                if (bill.getRentals() != null) {
+                // 6. Lignes de location et de prestation (UN SEUL cadre)
+                float itemPitch = 85;      // espace vertical entre deux locations
+                float blockPadding = 30;   // marge basse du cadre
 
-                    for (Rental rental : bill.getRentals()) {
+                List<Rental> rentals = bill.getRentals() != null
+                        ? new ArrayList<>(bill.getRentals())
+                        : List.of();
 
-                        String name;
+                float blockHeight = rentals.isEmpty()
+                        ? 60
+                        : rentals.size() * itemPitch + blockPadding;
+                float blockBottom = currentY - blockHeight;
 
-                        if (rental.getUserMaterial() != null) {
-                            name = "Materiel : "
-                                    + safeText(rental.getUserMaterial()
-                                    .getDescriptionMaterial());
+                // Cadre unique + séparation de la colonne des prix,
+                // dessinés une seule fois pour toutes les locations
+                drawRect(content, tableX, blockBottom,
+                        tableWidth, blockHeight, 2f);
 
-                        } else if (rental.getUserFavor() != null) {
-                            name = "Service : "
-                                    + safeText(rental.getUserFavor()
-                                    .getDescriptionFavor());
+                drawLine(content, priceColumn, blockBottom,
+                        priceColumn, currentY, 2f);
 
-                        } else {
-                            name = "Location";
-                        }
+                float itemTop = currentY;
 
-                        float rowHeight = 100;
-                        float rowBottom = currentY - rowHeight;
+                for (Rental rental : rentals) {
 
-                        // Bordure extérieure et séparation des prix
-                        drawRect(content, tableX, rowBottom,
-                                tableWidth, rowHeight, 2f);
+                    String name;
 
-                        drawLine(content, priceColumn, rowBottom,
-                                priceColumn, currentY, 2f);
+                    if (rental.getUserMaterial() != null) {
+                        name = "Materiel : "
+                                + safeText(rental.getUserMaterial()
+                                .getDescriptionMaterial());
 
-                        drawText(content, "- " + name,
-                                tableX + 25, currentY - 25, 11, font);
+                    } else if (rental.getUserFavor() != null) {
+                        name = "Service : "
+                                + safeText(rental.getUserFavor()
+                                .getDescriptionFavor());
 
-                        String startDate = formatDate(rental.getStarDateAt());
-                        String endDate = formatDate(rental.getEndDateAt());
-
-                        String startTime = rental.getStartTime() != null
-                                ? rental.getStartTime().format(
-                                DateTimeFormatter.ofPattern("HH:mm"))
-                                : "";
-
-                        String endTime = rental.getEndTime() != null
-                                ? rental.getEndTime().format(
-                                DateTimeFormatter.ofPattern("HH:mm"))
-                                : "";
-
-                        drawText(content, "Debut : " + startDate
-                                        + " " + startTime,
-                                tableX + 45, currentY - 48, 10, font);
-
-                        drawText(content, "Fin : " + endDate
-                                        + " " + endTime,
-                                tableX + 45, currentY - 68, 10, font);
-
-                        BigDecimal rentalAmount =
-                                rental.getAmount() != null
-                                        ? rental.getAmount()
-                                        : BigDecimal.ZERO;
-
-                        drawText(content,
-                                formatEuro(rentalAmount),
-                                priceColumn + 8, currentY - 30, 11, font);
-
-                        currentY = rowBottom;
+                    } else {
+                        name = "Location";
                     }
+
+                    String startDate = formatDate(rental.getStarDateAt());
+                    String endDate = formatDate(rental.getEndDateAt());
+
+                    String startTime = rental.getStartTime() != null
+                            ? rental.getStartTime().format(
+                            DateTimeFormatter.ofPattern("HH:mm"))
+                            : "";
+
+                    String endTime = rental.getEndTime() != null
+                            ? rental.getEndTime().format(
+                            DateTimeFormatter.ofPattern("HH:mm"))
+                            : "";
+
+                    BigDecimal rentalAmount =
+                            rental.getAmount() != null
+                                    ? rental.getAmount()
+                                    : BigDecimal.ZERO;
+
+                    drawText(content, "- " + name,
+                            tableX + 25, itemTop - 25, 11, font);
+
+                    drawText(content, "Debut : " + startDate
+                                    + " " + startTime,
+                            tableX + 45, itemTop - 48, 10, font);
+
+                    drawText(content, "Fin : " + endDate
+                                    + " " + endTime,
+                            tableX + 45, itemTop - 68, 10, font);
+
+                    drawText(content,
+                            formatEuro(rentalAmount),
+                            priceColumn + 8, itemTop - 30, 11, font);
+
+                    // Pas de rectangle ni de trait entre deux locations
+                    itemTop -= itemPitch;
                 }
 
+                currentY = blockBottom;
+
                 // 7. Frais d'assurance et de gestion
-                float feeHeight = 38;
+                BigDecimal totalHT = amount.setScale(2, RoundingMode.HALF_UP);
+                float feeHeight = 60;
                 float feeBottom = currentY - feeHeight;
 
                 drawRect(content, tableX, feeBottom,
@@ -341,12 +354,21 @@ public class BillServiceImpl implements BillService {
                 drawLine(content, priceColumn, feeBottom,
                         priceColumn, currentY, 2f);
 
+// Ligne 1 : total hors taxe
                 drawText(content,
-                        "Frais d'assurance et de gestion (10 %)",
+                        "Prix total H.T (hors taxe)",
                         tableX + 18, currentY - 23, 10, font);
 
-                drawText(content, formatEuro(fees),
+                drawText(content, formatEuro(totalHT),
                         priceColumn + 8, currentY - 23, 10, font);
+
+// Ligne 2 : frais (plus bas)
+                drawText(content,
+                        "Frais d'assurance et de gestion (10 %)",
+                        tableX + 18, currentY - 45, 10, font);
+
+                drawText(content, formatEuro(fees),
+                        priceColumn + 8, currentY - 45, 10, font);
 
                 // 8. Total à payer
                 currentY = feeBottom;
