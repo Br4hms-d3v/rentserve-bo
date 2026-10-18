@@ -11,6 +11,10 @@ import be.brahms.TFE_RentServe.models.entities.User;
 import be.brahms.TFE_RentServe.repositories.BillRepository;
 import be.brahms.TFE_RentServe.repositories.UserRepository;
 import be.brahms.TFE_RentServe.services.BillService;
+
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -18,9 +22,12 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.springframework.security.core.Authentication;
@@ -41,225 +48,401 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class BillServiceImpl implements BillService {
 
-  private final BillRepository billRepository;
-  private final BillMapper billMapper;
-  private final UserRepository userRepository;
+    private final BillRepository billRepository;
+    private final BillMapper billMapper;
+    private final UserRepository userRepository;
 
-  /**
-   * Constructor with params
-   *
-   * @param billRepository the billRepo to access bill data
-   * @param billMapper the bill mapper change entity to dto or form to entity
-   * @param userRepository the userRepo to access user data
-   */
-  public BillServiceImpl(
-      BillRepository billRepository, BillMapper billMapper, UserRepository userRepository) {
-    this.billRepository = billRepository;
-    this.billMapper = billMapper;
-    this.userRepository = userRepository;
-  }
-
-  /**
-   * Get a detail about the bill
-   *
-   * @param id the identifier of user favor
-   * @return a detail about the bill
-   */
-  @Override
-  public BillDTO findById(long id) {
-    Bill bill = billRepository.findById(id).orElseThrow(BillNotFoundException::new);
-    String billOwner = bill.getUser().getPseudo();
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    if (!billOwner.equals(authentication.getName())) {
-      throw new AccessNotAuthorizedException();
+    /**
+     * Constructor with params
+     *
+     * @param billRepository the billRepo to access bill data
+     * @param billMapper     the bill mapper change entity to dto or form to entity
+     * @param userRepository the userRepo to access user data
+     */
+    public BillServiceImpl(
+            BillRepository billRepository, BillMapper billMapper, UserRepository userRepository) {
+        this.billRepository = billRepository;
+        this.billMapper = billMapper;
+        this.userRepository = userRepository;
     }
 
-    return billMapper.toBillDetailDTO(bill);
-  }
+    /**
+     * Get a detail about the bill
+     *
+     * @param id the identifier of user favor
+     * @return a detail about the bill
+     */
+    @Override
+    public BillDTO findById(long id) {
+        Bill bill = billRepository.findById(id).orElseThrow(BillNotFoundException::new);
+        String billOwner = bill.getUser().getPseudo();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-  /**
-   * Get a list of bills from user
-   *
-   * @param userId the identifier
-   * @return a list of all bills from user
-   */
-  @Override
-  public List<BillDTO> findAllByUserId(long userId) {
-    List<Bill> listBills = billRepository.findBillsByUserId(userId);
-
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
-    if (!user.getPseudo().equals(authentication.getName())) {
-      throw new AccessNotAuthorizedException();
-    }
-    return listBills.stream().map(billMapper::toBillDetailDTO).toList();
-  }
-
-  /**
-   * Get a list of bills from current month
-   *
-   * @param userId the user identifier
-   * @return a list of bill on current month
-   */
-  @Override
-  public List<BillDTO> findAllBillsCurrentMonth(long userId) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
-    if (!user.getPseudo().equals(authentication.getName())) {
-      throw new AccessNotAuthorizedException();
-    }
-
-    LocalDate startDateMonth = LocalDate.now().withDayOfMonth(1);
-    LocalDate endDateMonth = startDateMonth.plusMonths(1);
-
-    List<Bill> listBillsCurrentMonth =
-        billRepository.findBillsCurrentMonthByUserId(userId, startDateMonth, endDateMonth);
-
-    return listBillsCurrentMonth.stream().map(billMapper::toBillDetailDTO).toList();
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public byte[] generateBillPdf(long billId) {
-
-    Bill bill = billRepository.findById(billId).orElseThrow(BillNotFoundException::new);
-
-    BigDecimal amount = bill.getAmount();
-
-    BigDecimal fees = amount.multiply(new BigDecimal("0.02")).setScale(2, RoundingMode.HALF_UP);
-
-    BigDecimal total = amount.add(fees);
-
-    try (PDDocument document = new PDDocument();
-        ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-
-      PDPage page = new PDPage();
-      document.addPage(page);
-
-      try (PDPageContentStream content = new PDPageContentStream(document, page)) {
-
-        float y = 750;
-
-        // Titre
-        y = writeLine(content, "RENT SERVE - FACTURE", 50, y, 18);
-        y -= 15;
-
-        y = writeLine(content, "Facture n° : " + bill.getId(), 50, y, 12);
-
-        y = writeLine(content, "Statut : " + bill.getStatus(), 50, y - 5, 12);
-
-        y -= 25;
-
-        y = writeLine(content, "DETAIL DES LOCATIONS", 50, y, 14);
-
-        y -= 10;
-
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-
-        if (bill.getRentals() != null) {
-          for (Rental rental : bill.getRentals()) {
-
-            String name;
-
-            if (rental.getUserMaterial() != null) {
-              name = "Materiel : " + safeText(rental.getUserMaterial().getDescriptionMaterial());
-
-            } else if (rental.getUserFavor() != null) {
-              name = "Service : " + safeText(rental.getUserFavor().getDescriptionFavor());
-
-            } else {
-              name = "Location";
-            }
-
-            y = writeLine(content, name, 50, y - 5, 11);
-
-            String start =
-                rental.getStarDateAt() != null
-                    ? rental.getStarDateAt().format(dateFormatter)
-                    : "Non renseignee";
-
-            String startTime =
-                rental.getStartTime() != null ? rental.getStartTime().format(timeFormatter) : "";
-
-            y = writeLine(content, "Debut : " + start + " " + startTime, 65, y - 3, 10);
-
-            String end =
-                rental.getEndDateAt() != null
-                    ? rental.getEndDateAt().format(dateFormatter)
-                    : "Non renseignee";
-
-            String endTime =
-                rental.getEndTime() != null ? rental.getEndTime().format(timeFormatter) : "";
-
-            y = writeLine(content, "Fin : " + end + " " + endTime, 65, y - 3, 10);
-
-            y -= 10;
-          }
+        if (!billOwner.equals(authentication.getName())) {
+            throw new AccessNotAuthorizedException();
         }
 
-        y -= 10;
-
-        y =
-            writeLine(
-                content, "Montant des prestations : " + amount.toPlainString() + " EUR", 50, y, 12);
-
-        y =
-            writeLine(
-                content,
-                "Frais d'assurance et de gestion (2 %) : " + fees.toPlainString() + " EUR",
-                50,
-                y - 8,
-                12);
-
-        y -= 15;
-
-        writeLine(content, "TOTAL A PAYER : " + total.toPlainString() + " EUR", 50, y - 5, 14);
-      }
-
-      document.save(output);
-      return output.toByteArray();
-
-    } catch (IOException e) {
-      throw new IllegalStateException("Erreur lors de la generation du PDF", e);
-    }
-  }
-
-  private float writeLine(PDPageContentStream content, String text, float x, float y, int fontSize)
-      throws IOException {
-
-    content.beginText();
-    content.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), fontSize);
-    content.newLineAtOffset(x, y);
-
-    // Les polices PDF standard ne prennent pas en charge
-    // tous les caractères Unicode.
-    content.showText(safeText(text));
-
-    content.endText();
-
-    return y - fontSize - 5;
-  }
-
-  private String safeText(String text) {
-    if (text == null) {
-      return "";
+        return billMapper.toBillDetailDTO(bill);
     }
 
-    // Évite les caractères non pris en charge par Helvetica standard.
-    return text.replace("€", "EUR")
-        .replace("’", "'")
-        .replace("–", "-")
-        .replace("é", "e")
-        .replace("è", "e")
-        .replace("ê", "e")
-        .replace("à", "a")
-        .replace("ù", "u")
-        .replace("ç", "c")
-        .replace("É", "E");
-  }
+    /**
+     * Get a list of bills from user
+     *
+     * @param userId the identifier
+     * @return a list of all bills from user
+     */
+    @Override
+    public List<BillDTO> findAllByUserId(long userId) {
+        List<Bill> listBills = billRepository.findBillsByUserId(userId);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        if (!user.getPseudo().equals(authentication.getName())) {
+            throw new AccessNotAuthorizedException();
+        }
+        return listBills.stream().map(billMapper::toBillDetailDTO).toList();
+    }
+
+    /**
+     * Get a list of bills from current month
+     *
+     * @param userId the user identifier
+     * @return a list of bill on current month
+     */
+    @Override
+    public List<BillDTO> findAllBillsCurrentMonth(long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        if (!user.getPseudo().equals(authentication.getName())) {
+            throw new AccessNotAuthorizedException();
+        }
+
+        LocalDate startDateMonth = LocalDate.now().withDayOfMonth(1);
+        LocalDate endDateMonth = startDateMonth.plusMonths(1);
+
+        List<Bill> listBillsCurrentMonth =
+                billRepository.findBillsCurrentMonthByUserId(userId, startDateMonth, endDateMonth);
+
+        return listBillsCurrentMonth.stream().map(billMapper::toBillDetailDTO).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] generateBillPdf(long billId) {
+
+        Bill bill = billRepository.findById(billId)
+                .orElseThrow(BillNotFoundException::new);
+
+        BigDecimal amount = bill.getAmount() != null
+                ? bill.getAmount()
+                : BigDecimal.ZERO;
+
+        // Taux de gestion : 10 %, comme sur ton modèle.
+        BigDecimal feeRate = new BigDecimal("0.10");
+
+        BigDecimal fees = amount.multiply(feeRate)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal total = amount.add(fees)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        try (PDDocument document = new PDDocument();
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+
+            PDPage page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
+
+            try (PDPageContentStream content =
+                         new PDPageContentStream(document, page)) {
+
+                float pageWidth = page.getMediaBox().getWidth();
+                float left = 55;
+                float right = pageWidth - 55;
+                float width = right - left;
+                float y = 785;
+
+                PDFont font = new PDType1Font(
+                        Standard14Fonts.FontName.HELVETICA);
+                PDFont bold = new PDType1Font(
+                        Standard14Fonts.FontName.HELVETICA_BOLD);
+
+                // 1. Logo
+                float logoX = left;
+                float logoY = y - 48;
+                float logoWidth = 100;
+                float logoHeight = 48;
+
+                PDImageXObject logo = PDImageXObject.createFromFile(
+                        "C:/Users/khadr/ProjectAngular/TFE_RentServe_Frontend/public/logo/logoSmall.jpg",
+                        document
+                );
+
+                float imageWidth = logo.getWidth();
+                float imageHeight = logo.getHeight();
+
+                // Redimensionnement proportionnel pour conserver le ratio
+                float scale = Math.min(
+                        logoWidth / imageWidth,
+                        logoHeight / imageHeight
+                );
+
+                float renderedWidth = imageWidth * scale;
+                float renderedHeight = imageHeight * scale;
+
+                // Centrage dans la zone réservée au logo
+                float imageX = logoX + (logoWidth - renderedWidth) / 2;
+                float imageY = logoY + (logoHeight - renderedHeight) / 2;
+
+                content.drawImage(
+                        logo,
+                        imageX,
+                        imageY,
+                        renderedWidth,
+                        renderedHeight
+                );
+
+                // 2. Nom de la plateforme
+                drawText(content, "RENT SERVER", left + 5, y - 78, 13, bold);
+
+                // 3. Numéro et statut
+                drawText(content,
+                        "Facture n° : " + bill.getId(),
+                        left + 5, y - 118, 12, font);
+
+                drawText(content,
+                        "Statut : " + bill.getStatus(),
+                        left + 5, y - 138, 11, font);
+
+                // 4. Informations du client
+                // Adapte les getters à ceux de ton entité User.
+                User client = bill.getUser();
+
+                float clientX = 365;
+                float clientY = y - 85;
+
+                if (client != null) {
+                    drawText(content,
+                            safeText(client.getName() + " "
+                                    + client.getFirstName()),
+                            clientX, clientY, 11, font);
+
+                    drawText(content,
+                            safeText(client.getStreet()),
+                            clientX, clientY - 20, 10, font);
+
+                    drawText(content,
+                            safeText(client.getZipCode() + " " + client.getCity()),
+                            clientX, clientY - 40, 10, font);
+                }
+
+                drawLine(content, clientX - 5, clientY - 52,
+                        right, clientY - 52, 0.8f);
+
+                LocalDate today = LocalDate.now();
+
+                drawText(content,
+                        "Fait le " + today.format(
+                                DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        clientX + 5, clientY - 76, 10, font);
+
+                drawText(content, "100 Bruxelles",
+                        clientX + 5, clientY - 96, 10, font);
+
+                // 5. Titre du tableau
+                float tableTop = 520;
+
+                drawText(content, "DETAIL DES LOCATIONS",
+                        left + 20, tableTop + 15, 13, bold);
+
+                float tableX = left;
+                float tableWidth = width;
+                float priceColumn = tableX + tableWidth * 0.72f;
+
+                float currentY = tableTop;
+                float descriptionWidth = priceColumn - tableX;
+
+                // 6. Lignes de location et de prestation
+                if (bill.getRentals() != null) {
+
+                    for (Rental rental : bill.getRentals()) {
+
+                        String name;
+
+                        if (rental.getUserMaterial() != null) {
+                            name = "Materiel : "
+                                    + safeText(rental.getUserMaterial()
+                                    .getDescriptionMaterial());
+
+                        } else if (rental.getUserFavor() != null) {
+                            name = "Service : "
+                                    + safeText(rental.getUserFavor()
+                                    .getDescriptionFavor());
+
+                        } else {
+                            name = "Location";
+                        }
+
+                        float rowHeight = 100;
+                        float rowBottom = currentY - rowHeight;
+
+                        // Bordure extérieure et séparation des prix
+                        drawRect(content, tableX, rowBottom,
+                                tableWidth, rowHeight, 2f);
+
+                        drawLine(content, priceColumn, rowBottom,
+                                priceColumn, currentY, 2f);
+
+                        drawText(content, "- " + name,
+                                tableX + 25, currentY - 25, 11, font);
+
+                        String startDate = formatDate(rental.getStarDateAt());
+                        String endDate = formatDate(rental.getEndDateAt());
+
+                        String startTime = rental.getStartTime() != null
+                                ? rental.getStartTime().format(
+                                DateTimeFormatter.ofPattern("HH:mm"))
+                                : "";
+
+                        String endTime = rental.getEndTime() != null
+                                ? rental.getEndTime().format(
+                                DateTimeFormatter.ofPattern("HH:mm"))
+                                : "";
+
+                        drawText(content, "Debut : " + startDate
+                                        + " " + startTime,
+                                tableX + 45, currentY - 48, 10, font);
+
+                        drawText(content, "Fin : " + endDate
+                                        + " " + endTime,
+                                tableX + 45, currentY - 68, 10, font);
+
+                        BigDecimal rentalAmount =
+                                rental.getAmount() != null
+                                        ? rental.getAmount()
+                                        : BigDecimal.ZERO;
+
+                        drawText(content,
+                                formatEuro(rentalAmount),
+                                priceColumn + 8, currentY - 30, 11, font);
+
+                        currentY = rowBottom;
+                    }
+                }
+
+                // 7. Frais d'assurance et de gestion
+                float feeHeight = 38;
+                float feeBottom = currentY - feeHeight;
+
+                drawRect(content, tableX, feeBottom,
+                        tableWidth, feeHeight, 2f);
+
+                drawLine(content, priceColumn, feeBottom,
+                        priceColumn, currentY, 2f);
+
+                drawText(content,
+                        "Frais d'assurance et de gestion (10 %)",
+                        tableX + 18, currentY - 23, 10, font);
+
+                drawText(content, formatEuro(fees),
+                        priceColumn + 8, currentY - 23, 10, font);
+
+                // 8. Total à payer
+                currentY = feeBottom;
+                float totalHeight = 32;
+                float totalBottom = currentY - totalHeight;
+
+                drawRect(content, tableX, totalBottom,
+                        tableWidth, totalHeight, 2.5f);
+
+                drawLine(content, priceColumn, totalBottom,
+                        priceColumn, currentY, 2.5f);
+
+                drawText(content, "TOTAL A PAYER",
+                        tableX + 18, currentY - 21, 11, bold);
+
+                drawText(content, formatEuro(total),
+                        priceColumn + 8, currentY - 21, 11, bold);
+            }
+
+            document.save(output);
+            return output.toByteArray();
+
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Erreur lors de la generation du PDF", e);
+        }
+    }
+
+    private void drawText(
+            PDPageContentStream content,
+            String text,
+            float x,
+            float y,
+            int fontSize,
+            PDFont font) throws IOException {
+
+        content.beginText();
+        content.setFont(font, fontSize);
+        content.newLineAtOffset(x, y);
+        content.showText(safeText(text));
+        content.endText();
+    }
+
+    private void drawRect(
+            PDPageContentStream content,
+            float x,
+            float y,
+            float width,
+            float height,
+            float lineWidth) throws IOException {
+
+        content.setLineWidth(lineWidth);
+        content.addRect(x, y, width, height);
+        content.stroke();
+    }
+
+    private void drawLine(
+            PDPageContentStream content,
+            float x1,
+            float y1,
+            float x2,
+            float y2,
+            float lineWidth) throws IOException {
+
+        content.setLineWidth(lineWidth);
+        content.moveTo(x1, y1);
+        content.lineTo(x2, y2);
+        content.stroke();
+    }
+
+    private String formatDate(LocalDate date) {
+        return date != null
+                ? date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                : "Non renseignee";
+    }
+
+    private String formatEuro(BigDecimal amount) {
+        return amount.setScale(2, RoundingMode.HALF_UP)
+                .toPlainString().replace('.', ',') + " EUR";
+    }
+
+    private String safeText(String text) {
+        if (text == null) {
+            return "";
+        }
+
+        return text
+                .replace("€", "EUR")
+                .replace("’", "'")
+                .replace("–", "-")
+                .replace("é", "e")
+                .replace("è", "e")
+                .replace("ê", "e")
+                .replace("à", "a")
+                .replace("ù", "u")
+                .replace("ç", "c")
+                .replace("É", "E");
+    }
 }

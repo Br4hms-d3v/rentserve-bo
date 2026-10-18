@@ -66,7 +66,7 @@ public class StripeServiceImpl implements StripeService {
     }
 
     // Calculate 2% fees, rounded to 2 decimal places
-    BigDecimal fees = amount.multiply(new BigDecimal("0.02")).setScale(2, RoundingMode.HALF_UP);
+    BigDecimal fees = amount.multiply(new BigDecimal("0.10")).setScale(2, RoundingMode.HALF_UP);
 
     // Stripe retrieves the amount in cents
     long amountInCents = amount.movePointRight(2).longValueExact();
