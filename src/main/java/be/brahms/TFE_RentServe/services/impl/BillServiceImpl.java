@@ -381,7 +381,7 @@ public class BillServiceImpl implements BillService {
                 drawLine(content, priceColumn, totalBottom,
                         priceColumn, currentY, 2.5f);
 
-                drawText(content, "TOTAL A PAYER",
+                drawText(content, "TOTAL A PAYER TTC",
                         tableX + 18, currentY - 21, 11, bold);
 
                 drawText(content, formatEuro(total),
