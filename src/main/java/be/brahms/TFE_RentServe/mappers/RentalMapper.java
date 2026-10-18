@@ -116,7 +116,7 @@ public interface RentalMapper {
         Duration duration = Duration.between(start, end);
 
         long durationDays = duration.toDays();
-        long durationHours = duration.toHours();
+        long durationHours = duration.toHoursPart();
 
         return new RentalByIdDTO(
                 rental.getId(),
