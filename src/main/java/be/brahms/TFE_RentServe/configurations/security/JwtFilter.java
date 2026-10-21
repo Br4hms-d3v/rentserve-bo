@@ -79,7 +79,7 @@ public class JwtFilter extends OncePerRequestFilter {
       }
     } else {
       // No Authorization header or does not start with "Bearer"
-      System.out.println("Missing or incorrect Authorization header");
+//      System.out.println("Missing or incorrect Authorization header");
     }
     // Continue with the rest of the request
     filterChain.doFilter(request, response); // continue the filter chain
