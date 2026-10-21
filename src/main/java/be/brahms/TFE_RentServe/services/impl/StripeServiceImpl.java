@@ -77,8 +77,8 @@ public class StripeServiceImpl implements StripeService {
     SessionCreateParams.Builder params =
         SessionCreateParams.builder()
             .setMode(SessionCreateParams.Mode.PAYMENT)
-            .setSuccessUrl(frontendUrl + "/payment/success?session_id={CHECKOUT_SESSION_ID} &billId="
-                    + billId)
+            .setSuccessUrl(
+                frontendUrl + "/payment/success?session_id={CHECKOUT_SESSION_ID} &billId=" + billId)
             .setCancelUrl(frontendUrl + "/payment/cancel")
             .setClientReferenceId(String.valueOf(bill.getId()))
             .putMetadata("bill_id", String.valueOf(bill.getId()))
@@ -125,8 +125,6 @@ public class StripeServiceImpl implements StripeService {
   public void confirmPayment(String sessionId) throws StripeException {
     // Check the status of session from Stripe
     Session session = Session.retrieve(sessionId);
-
-
 
     String billId = session.getMetadata() != null ? session.getMetadata().get("bill_id") : null;
 
