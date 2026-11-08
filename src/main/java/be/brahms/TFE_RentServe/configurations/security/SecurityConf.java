@@ -109,8 +109,14 @@ public class SecurityConf {
                     // Earn
                     .requestMatchers("/api/earn/**")
                     .hasAnyRole("MEMBER", "MODERATOR", "ADMIN")
+                    // Stripe
+                    .requestMatchers("/api/stripe/**")
+                    .hasAnyRole("MEMBER", "MODERATOR", "ADMIN")
+                    // Bill
+                    .requestMatchers("/api/bill/**")
+                    .hasAnyRole("MEMBER", "MODERATOR", "ADMIN")
                     .anyRequest()
-                    .denyAll())
+                    .permitAll())
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
   }
