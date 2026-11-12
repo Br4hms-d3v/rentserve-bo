@@ -94,6 +94,7 @@ public class BillController {
    * @return the PDF file
    */
   @GetMapping("{billId}/pdf")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
   public ResponseEntity<byte[]> downloadBillPdf(@PathVariable long billId) {
 
     byte[] pdf = billService.generateBillPdf(billId);

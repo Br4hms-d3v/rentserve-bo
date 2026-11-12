@@ -17,12 +17,16 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -127,98 +131,224 @@ public class BillServiceImpl implements BillService {
 
     Bill bill = billRepository.findById(billId).orElseThrow(BillNotFoundException::new);
 
-    BigDecimal amount = bill.getAmount();
+    BigDecimal amount = bill.getAmount() != null ? bill.getAmount() : BigDecimal.ZERO;
 
-    BigDecimal fees = amount.multiply(new BigDecimal("0.02")).setScale(2, RoundingMode.HALF_UP);
+    // Taux de gestion : 10 %, comme sur ton modèle.
+    BigDecimal feeRate = new BigDecimal("0.10");
 
-    BigDecimal total = amount.add(fees);
+    BigDecimal fees = amount.multiply(feeRate).setScale(2, RoundingMode.HALF_UP);
+
+    BigDecimal total = amount.add(fees).setScale(2, RoundingMode.HALF_UP);
 
     try (PDDocument document = new PDDocument();
         ByteArrayOutputStream output = new ByteArrayOutputStream()) {
 
-      PDPage page = new PDPage();
+      PDPage page = new PDPage(PDRectangle.A4);
       document.addPage(page);
 
       try (PDPageContentStream content = new PDPageContentStream(document, page)) {
 
-        float y = 750;
+        float pageWidth = page.getMediaBox().getWidth();
+        float left = 55;
+        float right = pageWidth - 55;
+        float width = right - left;
+        float y = 785;
 
-        // Titre
-        y = writeLine(content, "RENT SERVE - FACTURE", 50, y, 18);
-        y -= 15;
+        PDFont font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+        PDFont bold = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
 
-        y = writeLine(content, "Facture n° : " + bill.getId(), 50, y, 12);
+        // 1. Logo
+        float logoX = left;
+        float logoY = y - 48;
+        float logoWidth = 100;
+        float logoHeight = 48;
 
-        y = writeLine(content, "Statut : " + bill.getStatus(), 50, y - 5, 12);
+        PDImageXObject logo =
+            PDImageXObject.createFromFile(
+                "C:/Users/khadr/ProjectAngular/TFE_RentServe_Frontend/public/logo/logoSmall.jpg",
+                document);
 
-        y -= 25;
+        float imageWidth = logo.getWidth();
+        float imageHeight = logo.getHeight();
 
-        y = writeLine(content, "DETAIL DES LOCATIONS", 50, y, 14);
+        // Redimensionnement proportionnel pour conserver le ratio
+        float scale = Math.min(logoWidth / imageWidth, logoHeight / imageHeight);
 
-        y -= 10;
+        float renderedWidth = imageWidth * scale;
+        float renderedHeight = imageHeight * scale;
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        // Centrage dans la zone réservée au logo
+        float imageX = logoX + (logoWidth - renderedWidth) / 2;
+        float imageY = logoY + (logoHeight - renderedHeight) / 2;
 
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        content.drawImage(logo, imageX, imageY, renderedWidth, renderedHeight);
 
-        if (bill.getRentals() != null) {
-          for (Rental rental : bill.getRentals()) {
+        // 2. Nom de la plateforme
+        drawText(content, "RENT SERVER", left + 5, y - 78, 13, bold);
 
-            String name;
+        // 3. Numéro et statut
+        drawText(content, "Facture n° : " + bill.getId(), left + 5, y - 118, 12, font);
 
-            if (rental.getUserMaterial() != null) {
-              name = "Materiel : " + safeText(rental.getUserMaterial().getDescriptionMaterial());
+        drawText(content, "Statut : " + bill.getStatus(), left + 5, y - 138, 11, font);
 
-            } else if (rental.getUserFavor() != null) {
-              name = "Service : " + safeText(rental.getUserFavor().getDescriptionFavor());
+        // 4. Informations du client
+        // Adapte les getters à ceux de ton entité User.
+        User client = bill.getUser();
 
-            } else {
-              name = "Location";
-            }
+        float clientX = 365;
+        float clientY = y - 85;
 
-            y = writeLine(content, name, 50, y - 5, 11);
+        if (client != null) {
+          drawText(
+              content,
+              safeText(client.getName() + " " + client.getFirstName()),
+              clientX,
+              clientY,
+              11,
+              font);
 
-            String start =
-                rental.getStarDateAt() != null
-                    ? rental.getStarDateAt().format(dateFormatter)
-                    : "Non renseignee";
+          drawText(content, safeText(client.getStreet()), clientX, clientY - 20, 10, font);
 
-            String startTime =
-                rental.getStartTime() != null ? rental.getStartTime().format(timeFormatter) : "";
-
-            y = writeLine(content, "Debut : " + start + " " + startTime, 65, y - 3, 10);
-
-            String end =
-                rental.getEndDateAt() != null
-                    ? rental.getEndDateAt().format(dateFormatter)
-                    : "Non renseignee";
-
-            String endTime =
-                rental.getEndTime() != null ? rental.getEndTime().format(timeFormatter) : "";
-
-            y = writeLine(content, "Fin : " + end + " " + endTime, 65, y - 3, 10);
-
-            y -= 10;
-          }
+          drawText(
+              content,
+              safeText(client.getZipCode() + " " + client.getCity()),
+              clientX,
+              clientY - 40,
+              10,
+              font);
         }
 
-        y -= 10;
+        drawLine(content, clientX - 5, clientY - 52, right, clientY - 52, 0.8f);
 
-        y =
-            writeLine(
-                content, "Montant des prestations : " + amount.toPlainString() + " EUR", 50, y, 12);
+        LocalDate today = LocalDate.now();
 
-        y =
-            writeLine(
-                content,
-                "Frais d'assurance et de gestion (2 %) : " + fees.toPlainString() + " EUR",
-                50,
-                y - 8,
-                12);
+        drawText(
+            content,
+            "Fait le " + today.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+            clientX + 5,
+            clientY - 76,
+            10,
+            font);
 
-        y -= 15;
+        drawText(content, "100 Bruxelles", clientX + 5, clientY - 96, 10, font);
 
-        writeLine(content, "TOTAL A PAYER : " + total.toPlainString() + " EUR", 50, y - 5, 14);
+        // 5. Titre du tableau
+        float tableTop = 520;
+
+        drawText(content, "DETAIL DES LOCATIONS", left + 20, tableTop + 15, 13, bold);
+
+        float tableX = left;
+        float tableWidth = width;
+        float priceColumn = tableX + tableWidth * 0.72f;
+
+        float currentY = tableTop;
+
+        // 6. Lignes de location et de prestation (UN SEUL cadre)
+        float itemPitch = 85; // espace vertical entre deux locations
+        float blockPadding = 30; // marge basse du cadre
+
+        List<Rental> rentals =
+            bill.getRentals() != null ? new ArrayList<>(bill.getRentals()) : List.of();
+
+        float blockHeight = rentals.isEmpty() ? 60 : rentals.size() * itemPitch + blockPadding;
+        float blockBottom = currentY - blockHeight;
+
+        // Cadre unique + séparation de la colonne des prix,
+        // dessinés une seule fois pour toutes les locations
+        drawRect(content, tableX, blockBottom, tableWidth, blockHeight, 2f);
+
+        drawLine(content, priceColumn, blockBottom, priceColumn, currentY, 2f);
+
+        float itemTop = currentY;
+
+        for (Rental rental : rentals) {
+
+          String name;
+
+          if (rental.getUserMaterial() != null) {
+            name = "Materiel : " + safeText(rental.getUserMaterial().getDescriptionMaterial());
+
+          } else if (rental.getUserFavor() != null) {
+            name = "Service : " + safeText(rental.getUserFavor().getDescriptionFavor());
+
+          } else {
+            name = "Location";
+          }
+
+          String startDate = formatDate(rental.getStarDateAt());
+          String endDate = formatDate(rental.getEndDateAt());
+
+          String startTime =
+              rental.getStartTime() != null
+                  ? rental.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+                  : "";
+
+          String endTime =
+              rental.getEndTime() != null
+                  ? rental.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+                  : "";
+
+          BigDecimal rentalAmount =
+              rental.getAmount() != null ? rental.getAmount() : BigDecimal.ZERO;
+
+          drawText(content, "- " + name, tableX + 25, itemTop - 25, 11, font);
+
+          drawText(
+              content,
+              "Debut : " + startDate + " " + startTime,
+              tableX + 45,
+              itemTop - 48,
+              10,
+              font);
+
+          drawText(
+              content, "Fin : " + endDate + " " + endTime, tableX + 45, itemTop - 68, 10, font);
+
+          drawText(content, formatEuro(rentalAmount), priceColumn + 8, itemTop - 30, 11, font);
+
+          // Pas de rectangle ni de trait entre deux locations
+          itemTop -= itemPitch;
+        }
+
+        currentY = blockBottom;
+
+        // 7. Frais d'assurance et de gestion
+        BigDecimal totalHT = amount.setScale(2, RoundingMode.HALF_UP);
+        float feeHeight = 60;
+        float feeBottom = currentY - feeHeight;
+
+        drawRect(content, tableX, feeBottom, tableWidth, feeHeight, 2f);
+
+        drawLine(content, priceColumn, feeBottom, priceColumn, currentY, 2f);
+
+        // Ligne 1 : total hors taxe
+        drawText(content, "Prix total H.T (hors taxe)", tableX + 18, currentY - 23, 10, font);
+
+        drawText(content, formatEuro(totalHT), priceColumn + 8, currentY - 23, 10, font);
+
+        // Ligne 2 : frais (plus bas)
+        drawText(
+            content,
+            "Frais d'assurance et de gestion (10 %)",
+            tableX + 18,
+            currentY - 45,
+            10,
+            font);
+
+        drawText(content, formatEuro(fees), priceColumn + 8, currentY - 45, 10, font);
+
+        // 8. Total à payer
+        currentY = feeBottom;
+        float totalHeight = 32;
+        float totalBottom = currentY - totalHeight;
+
+        drawRect(content, tableX, totalBottom, tableWidth, totalHeight, 2.5f);
+
+        drawLine(content, priceColumn, totalBottom, priceColumn, currentY, 2.5f);
+
+        drawText(content, "TOTAL A PAYER TTC", tableX + 18, currentY - 21, 11, bold);
+
+        drawText(content, formatEuro(total), priceColumn + 8, currentY - 21, 11, bold);
       }
 
       document.save(output);
@@ -229,20 +359,42 @@ public class BillServiceImpl implements BillService {
     }
   }
 
-  private float writeLine(PDPageContentStream content, String text, float x, float y, int fontSize)
+  private void drawText(
+      PDPageContentStream content, String text, float x, float y, int fontSize, PDFont font)
       throws IOException {
 
     content.beginText();
-    content.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), fontSize);
+    content.setFont(font, fontSize);
     content.newLineAtOffset(x, y);
-
-    // Les polices PDF standard ne prennent pas en charge
-    // tous les caractères Unicode.
     content.showText(safeText(text));
-
     content.endText();
+  }
 
-    return y - fontSize - 5;
+  private void drawRect(
+      PDPageContentStream content, float x, float y, float width, float height, float lineWidth)
+      throws IOException {
+
+    content.setLineWidth(lineWidth);
+    content.addRect(x, y, width, height);
+    content.stroke();
+  }
+
+  private void drawLine(
+      PDPageContentStream content, float x1, float y1, float x2, float y2, float lineWidth)
+      throws IOException {
+
+    content.setLineWidth(lineWidth);
+    content.moveTo(x1, y1);
+    content.lineTo(x2, y2);
+    content.stroke();
+  }
+
+  private String formatDate(LocalDate date) {
+    return date != null ? date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "Non renseignee";
+  }
+
+  private String formatEuro(BigDecimal amount) {
+    return amount.setScale(2, RoundingMode.HALF_UP).toPlainString().replace('.', ',') + " EUR";
   }
 
   private String safeText(String text) {
@@ -250,7 +402,6 @@ public class BillServiceImpl implements BillService {
       return "";
     }
 
-    // Évite les caractères non pris en charge par Helvetica standard.
     return text.replace("€", "EUR")
         .replace("’", "'")
         .replace("–", "-")

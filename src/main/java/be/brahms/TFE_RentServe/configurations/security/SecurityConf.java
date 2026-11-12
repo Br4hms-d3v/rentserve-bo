@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -39,6 +40,8 @@ public class SecurityConf {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http.cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
             auth ->
                 auth
@@ -105,6 +108,12 @@ public class SecurityConf {
                     .hasAnyRole("MEMBER", "MODERATOR", "ADMIN")
                     // Earn
                     .requestMatchers("/api/earn/**")
+                    .hasAnyRole("MEMBER", "MODERATOR", "ADMIN")
+                    // Stripe
+                    .requestMatchers("/api/stripe/**")
+                    .hasAnyRole("MEMBER", "MODERATOR", "ADMIN")
+                    // Bill
+                    .requestMatchers("/api/bill/**")
                     .hasAnyRole("MEMBER", "MODERATOR", "ADMIN")
                     .anyRequest()
                     .permitAll())

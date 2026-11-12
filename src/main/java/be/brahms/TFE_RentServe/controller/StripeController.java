@@ -4,6 +4,7 @@ import be.brahms.TFE_RentServe.models.dtos.stripe.CheckoutSessionDTO;
 import be.brahms.TFE_RentServe.services.StripeService;
 import com.stripe.exception.StripeException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,7 @@ public class StripeController {
    * @throws StripeException if an error occurs with Stripe
    */
   @PostMapping("{id}/pay")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
   public ResponseEntity<CheckoutSessionDTO> pay(@PathVariable long id) throws StripeException {
     CheckoutSessionDTO session = stripeService.createCheckoutSession(id);
     return ResponseEntity.ok(session);
@@ -45,6 +47,7 @@ public class StripeController {
    * @throws StripeException if an error occurs with Stripe
    */
   @GetMapping("payment/confirmed")
+  @PreAuthorize("hasAnyRole('MEMBER', 'MODERATOR', 'ADMIN')")
   public ResponseEntity<String> success(@RequestParam("sessionId") String sessionId)
       throws StripeException {
     stripeService.confirmPayment(sessionId);
